@@ -1,0 +1,14 @@
+{
+  "name": "serious-eats-node-scripts",
+  "version": "0.0.1",
+  "dependencies": {
+    "async": "latest",
+    "node.io": "latest",
+    "plist": "git://github.com/catesandrew/node-plist.git",
+    "underscore": "latest",
+    "commander": "latest",
+    "progress": "latest",
+    "request": "latest",
+    "backbone": "latest"
+  }
+}
