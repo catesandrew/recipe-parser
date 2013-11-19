@@ -42,6 +42,37 @@ var verbose = function() {
   }
 };
 
+var re = /((?:\d+)\/(?:\d+))/g;
+var fractions = {
+  '1/4': '¼',
+  '1/2': '½',
+  '3/4': '¾',
+  '1/3': '⅓',
+  '2/3': '⅔',
+  '1/5': '⅕',
+  '2/5': '⅖',
+  '3/5': '⅗',
+  '4/5': '⅘',
+  '1/6': '⅙',
+  '5/6': '⅚',
+  '1/8': '⅛',
+  '3/8': '⅜',
+  '5/8': '⅝',
+  '7/8': '⅞',
+}
+var substituteFraction = function(str) {
+  if (str == null) return '';
+  return str.replace(re, function(str, p1, offset, s) {
+    var p2 = trim(p1);
+
+    if (fractions[p2]) {
+      return fractions[p2];
+    } else {
+      return p1;
+    }
+  });
+}
+
 var size_re = new RegExp(".*\\(([0-9]+?[.][0-9]+? [MG]B)\\)$");
 var scrape = function(callback, url) {
   var methods = {
@@ -56,7 +87,6 @@ var scrape = function(callback, url) {
 
         $('.hrecipe .tags li').each(function(tag) {
           obj.tags || (obj.tags = []);
-
           obj.tags.push(tag.fulltext);
         });
 
@@ -73,7 +103,7 @@ var scrape = function(callback, url) {
             // do nothing
           } else {
             if (p.rawtext) {
-              obj.summaries.push(p.rawtext);
+              obj.summaries.push(substituteFraction(trim(p.rawtext)));
             }
           }
         });
@@ -88,7 +118,7 @@ var scrape = function(callback, url) {
           obj.ingredients || (obj.ingredients = []);
           breakdown = {};
           text = ingredient.fulltext;
-          matches = text.match(/^([\d \/]+)\s+(\w+)\s+(.*)/i);
+          matches = text.match(/^([\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
 
           breakdown.quantity = matches[1];
           breakdown.measurement = matches[2];
@@ -173,6 +203,7 @@ if (program.url) {
     }
     addCategory(10, 'Holiday', false);
     addCategory(14, 'Thanksgiving', false);
+    addCategory(21, 'Side Dishes', false);
 
     var directions = obj['DIRECTIONS_LIST'] = [];
     _.each(item.procedures, function(procedure) {
@@ -203,7 +234,7 @@ if (program.url) {
     }
 
     if (item.prepTime) {
-      addTime(15, item.prepTime) // prep
+      addTime(9, item.prepTime) // prep
 
       if (item.totalTime) {
         var cookTime = parseInt(item.totalTime, 10) - parseInt(item.prepTime, 10);
@@ -233,6 +264,11 @@ if (program.url) {
 
   scrape(function(err, items) {
     if (err) { console.log(err); }
+
+    _.each(items, function(item) {
+      //console.log(item);
+      //console.log(item.ingredients);
+    });
 
     async.forEach(items, function(item, done) {
       if (item.image.src) {
@@ -267,7 +303,6 @@ if (program.url) {
       }
     }, function(err) {
       _.each(items, function(item) {
-        //console.log(item);
         exportRecipe(item);
       });
     });
