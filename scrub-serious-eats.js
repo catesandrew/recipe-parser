@@ -144,22 +144,22 @@ var scrape = function(callback, url) {
         if (err) { this.exit(err); }
         var obj = {};
 
-        obj.title = $('.hrecipe h1.fn').fulltext;
-
-        addTags($, obj);
-        addImage($, obj);
-        addSummary($, obj);
-        addIngredients($, obj);
-        addProcedure($, obj);
-
-        verbose('## Adding Servings')
-        var servings = $('.hrecipe .recipe-about td span.yield');
-        if (servings) {
-          obj.servings = servings.fulltext;
-        }
-
-        verbose('## Adding Times')
         try {
+          obj.title = $('.hrecipe h1.fn').fulltext;
+
+          addTags($, obj);
+          addImage($, obj);
+          addSummary($, obj);
+          addIngredients($, obj);
+          addProcedure($, obj);
+
+          verbose('## Adding Servings')
+          var servings = $('.hrecipe .recipe-about td span.yield');
+          if (servings) {
+            obj.servings = servings.fulltext;
+          }
+
+          verbose('## Adding Times')
           var prepTime = $('.hrecipe .recipe-about td span.prepTime');
           if (prepTime) {
             obj.prepTime = prepTime.fulltext;
