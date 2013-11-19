@@ -1,172 +1,197 @@
-var async = require('async'),
+(function() {
+
+  // Baseline setup
+  // --------------
+
+  // Establish the root object, `window` in the browser, or `exports` on the server.
+  var root = this;
+
+  // Establish the object that gets returned to break out of a loop iteration.
+  var breaker = {};
+
+  var async = require('async'),
     fs = require('fs'),
     _ = require('underscore'),
     plist = require('plist'),
     util = require('util'),
     http = require('http'),
-    url = require('url'),
+    URL = require('url'),
     path = require('path'),
     events = require('events'),
     exec = require('child_process').exec;
 
-var trimCommaSpaceTheOrA=function(name){
-  var exact_name = name.split(', The');
-  if (exact_name.length > 1) {
-    exact_name = 'The ' + exact_name[0];
+  // Create a safe reference to the Underscore object for use below.
+  var Utils = function(obj) {
+    if (obj instanceof Utils) return obj;
+    if (!(this instanceof Utils)) return new Utils(obj);
+    this._wrapped = obj;
+  };
+
+  // Export the Underscore object for **Node.js**, with
+  // backwards-compatibility for the old `require()` API. If we're in
+  // the browser, add `Utils` as a global object via a string identifier,
+  // for Closure Compiler "advanced" mode.
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+      exports = module.exports = Utils;
+    }
+    exports.utils = Utils;
   } else {
-    // it did not split b/c it was not found at end
-    exact_name = exact_name[0];
-    // retry with trying to find A at the end
-    // TODO: check for ', An' at end
-    exact_name = exact_name.split(', A');
+    root.Utils = Utils;
+  }
+
+  // Current version.
+  Utils.VERSION = '0.1';
+
+  var trimCommaSpaceTheOrA = function(name){
+    var exact_name = name.split(', The');
     if (exact_name.length > 1) {
-      exact_name = 'A ' + exact_name[0];
+      exact_name = 'The ' + exact_name[0];
     } else {
-      // again, it was not found so reset 
+      // it did not split b/c it was not found at end
       exact_name = exact_name[0];
-    }
-  }
-
-  // trim spaces
-  exact_name = exact_name.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-
-  lookForTheAtEnd = exact_name.match(/ The$/);
-  if (lookForTheAtEnd) {
-    exact_name = "The " + exact_name.substr(0, exact_name.length - 4);
-  }
-  return exact_name;
-};
-
-var readPlist = function(callback, path) {
-  async.series([
-    function(callback){
-      path = path || "";
-      var safe_path = path.replace(' ', '\\ ');
-
-      try {
-        // Query the entry
-        var stats = fs.lstatSync(path);
-
-        if (stats.isFile()) {
-          exec('plutil -convert xml1 ' + safe_path, 
-            function (err, stdout, stderr) {
-              if (err) { callback(err); }
-              callback(null);
-          });
-        }
-      } 
-      catch (e) {
-        callback(e);
+      // retry with trying to find A at the end
+      // TODO: check for ', An' at end
+      exact_name = exact_name.split(', A');
+      if (exact_name.length > 1) {
+        exact_name = 'A ' + exact_name[0];
+      } else {
+        // again, it was not found so reset
+        exact_name = exact_name[0];
       }
-    },
-    function(callback){
-      plist.parseFile(path, function(err, obj) {
-        if (err) { callback(err); }
-        callback(null, obj);
-      });
-    },
-  ],
-  function(err, results){
-    if (err) { callback(err); }
-    if (results.length > 1) {
-      callback(null, results[1]);
     }
-  });
-};
 
-var downloadTorrent = function(callback, downloadfile, dir) {
-  // http://stackoverflow.com/questions/4771614/download-large-file-with-node-js-avoiding-high-memory-consumption
-  var host = url.parse(downloadfile).hostname;
+    // trim spaces
+    exact_name = exact_name.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 
-  if (host === "www.bt-chat.com") {
-    return callback("bt-chat.com is banned");
-  }
-  var filename = url.parse(downloadfile).pathname;
-  if (!filename) {
-    return callback("filename is corrupt: " + downloadfile);
-  }
-  filename = filename.split("/").pop();
+    lookForTheAtEnd = exact_name.match(/ The$/);
+    if (lookForTheAtEnd) {
+      exact_name = "The " + exact_name.substr(0, exact_name.length - 4);
+    }
+    return exact_name;
+  };
 
-  var theurl = http.createClient(80, host);
-  //console.log("Downloading file: " + filename);
-  //console.log("Request URL: " + encodeURI(filename));
-  var request = theurl.request('GET', encodeURI(downloadfile), {"host": host});
-  request.end();
+  var readPlist = function(callback, path) {
+    async.series([
+      function(callback) {
+        path = path || '';
+        var safe_path = path.replace(' ', '\\ ');
 
-  // We actually want the file to be stored in memory and then
-  // written to disk for .torrent files. otherwise the watched
-  // folder for transmission might go bonkers trying to open
-  // incomplete torrent files.
-  request.addListener('response', function (response) {
-    response.setEncoding('binary');
-    //console.log("Status Code: " + response.statusCode);
-    //console.log("HEADERS: " + JSON.stringify(response.headers));
-    //console.log("File size: " + response.headers['content-length'] + " bytes.");
-    var statusCode = response.statusCode;
-    if (!_.isNull(statusCode) && !_.isUndefined(statusCode)) {
-      if (_.isNumber(statusCode)) {
-        if (statusCode === 404) {
-          return callback('404: ' + JSON.stringify(response.headers));
+        try {
+          // Query the entry
+          var stats = fs.lstatSync(path);
+
+          if (stats.isFile()) {
+            exec('plutil -convert xml1 ' + safe_path,
+              function (err, stdout, stderr) {
+                if (err) { callback(err); }
+                callback(null);
+            });
+          }
         }
-      } 
+        catch (e) {
+          callback(e);
+        }
+      },
+      function(callback){
+        plist.parseFile(path, function(err, obj) {
+          if (err) { callback(err); }
+          callback(null, obj);
+        });
+      },
+    ],
+    function(err, results){
+      if (err) { callback(err); }
+      if (results.length > 1) {
+        callback(null, results[1]);
+      }
+    });
+  };
+
+  var strcmp = function( str1, str2 ) {
+    // http://kevin.vanzonneveld.net
+    // +   original by: Waldo Malqui Silva
+    // +      input by: Steve Hilder
+    // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+    // +    revised by: gorthaur
+    // *     example 1: strcmp( 'waldo', 'owald' );
+    // *     returns 1: 1
+    // *     example 2: strcmp( 'owald', 'waldo' );
+    // *     returns 2: -1
+
+    return ( ( str1 === str2 ) ? 0 : ( ( str1 > str2 ) ? 1 : -1 ) );
+  };
+
+  var calcPadding = function(num) {
+    var min_len = 2,
+        padding = "",
+        len = num.toString().length;
+
+    if (len > min_len) {
+      min_len = len;
     }
-    var fileSize = response.headers['content-length']; // string like 785 bytes
-    if ( !fileSize ) {
-      return callback("No Content Length");
+    for(var i=0; i<min_len;i++) {
+      padding += "0";
     }
-    var body = '';
-    response.addListener('data', function (chunk) {
-      body += chunk;
+    return {
+      len:(-1 * min_len),
+      padding:padding
+    }
+  };
+
+  var escapeRegExp = function(str){
+    if (str == null) return '';
+    return String(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+  };
+
+  var defaultToWhiteSpace = function(characters) {
+    if (characters == null)
+      return '\\s';
+    else if (characters.source)
+      return characters.source;
+    else
+      return '[' + escapeRegExp(characters) + ']';
+  };
+
+  var re = /((?:\d+)\/(?:\d+))/g;
+  var fractions = {
+    '1/4': '¼',
+    '1/2': '½',
+    '3/4': '¾',
+    '1/3': '⅓',
+    '2/3': '⅔',
+    '1/5': '⅕',
+    '2/5': '⅖',
+    '3/5': '⅗',
+    '4/5': '⅘',
+    '1/6': '⅙',
+    '5/6': '⅚',
+    '1/8': '⅛',
+    '3/8': '⅜',
+    '5/8': '⅝',
+    '7/8': '⅞',
+  };
+
+  Utils.substituteFraction = function(str) {
+    if (str == null) return '';
+    return str.replace(re, function(str, p1, offset, s) {
+      var p2 = Utils.trim(p1);
+
+      if (fractions[p2]) {
+        return fractions[p2];
+      } else {
+        return p1;
+      }
     });
-    response.addListener("end", function() {
-      fs.writeFileSync(dir + "/" + filename, body, 'binary');
-      //console.log("Downloaded file: " + filename);
-      return callback(null, "Downloaded file: " + filename);
-    });
-    response.addListener('error', function (e) {
-      return callback(e);
-    });
-    response.addListener('close', function (e) {
-      return callback(e);
-    });
-  });
+  };
 
-};
+  Utils.trim = function(str, characters) {
+    if (str == null) return '';
+    characters = defaultToWhiteSpace(characters);
+    return String(str).replace(new RegExp('\^' + characters + '+|' + characters + '+$', 'g'), '');
+  };
 
-var strcmp = function( str1, str2 ) {
-  // http://kevin.vanzonneveld.net
-  // +   original by: Waldo Malqui Silva
-  // +      input by: Steve Hilder
-  // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-  // +    revised by: gorthaur
-  // *     example 1: strcmp( 'waldo', 'owald' );
-  // *     returns 1: 1
-  // *     example 2: strcmp( 'owald', 'waldo' );
-  // *     returns 2: -1
-
-  return ( ( str1 === str2 ) ? 0 : ( ( str1 > str2 ) ? 1 : -1 ) );
-};
-
-var calcPadding = function(num) {
-  var min_len = 2,
-      padding = "",
-      len = num.toString().length;
-
-  if (len > min_len) {
-    min_len = len;
-  }
-  for(var i=0; i<min_len;i++) {
-    padding += "0";
-  }
-  return {
-    len:(-1 * min_len),
-    padding:padding
-  }
-};
-
-var Utils = function(){};
-Utils.prototype = {
-  handleYear:function(year) {
+  Utils.handleYear = function(year) {
     // Handle two-digit years with heuristic-ish guessing
     // Assumes 50-99 becomes 1950-1999, and 0-49 becomes 2000-2049
     // ..might need to rewrite this function in 2050, but that seems like
@@ -181,8 +206,9 @@ Utils.prototype = {
       return 2000 + year;
     }
     return 1900 + year;
-  },
-  cleanRegexedSeriesName:function(seriesname) {
+  };
+
+  Utils.cleanRegexedSeriesName = function(seriesname) {
     // Cleans up series name by removing any . and _
     // characters, along with any trailing hyphens.
 
@@ -203,8 +229,9 @@ Utils.prototype = {
       .replace(/\s\s*$/, '');
 
     return seriesname;
-  },
-  readPlists:function(callback) {
+  };
+
+  Utils.readPlists = function(callback) {
     async.parallel({
       userPrefs: function(callback) {
         var user_prefs_file = utils.expandHomeDir("~/Library/Preferences/net.sourceforge.tvshows.plist");
@@ -259,15 +286,17 @@ Utils.prototype = {
       if (err) { callback(err); }
       callback(null, results);
     });
-  },
-  writePlist:function(callback, obj, output) {
-    var data = utils.exportToPlist(obj);
+  };
+
+  Utils.writePlist = function(callback, obj, output) {
+    var data = Utils.exportToPlist(obj);
     fs.writeFile(output, data, function (err) {
       if (err) { callback(err); }
       callback(null, 'successfully saved file to ' + output);
     });
-  },
-  exportToPlist:function(obj) {
+  };
+
+  Utils.exportToPlist = function(obj) {
     var headers = [
       '<?xml version="1.0" encoding="UTF-8"?>',
       '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
@@ -280,8 +309,9 @@ Utils.prototype = {
       '\n</plist>';
 
     return data;
-  },
-  expandHomeDir:function(dir){
+  };
+
+  Utils.expandHomeDir=function(dir){
     dir = dir || '';
     if (dir.indexOf('~') === 0) {
       var home = process.env.HOME;
@@ -294,8 +324,9 @@ Utils.prototype = {
       }
     }
     return dir;
-  },
-  levenshtein: function(left, right) {
+  };
+
+  Utils.levenshtein = function(left, right) {
     var cost = [],
         str1 = left || '',
         str2 = right || '',
@@ -342,8 +373,9 @@ Utils.prototype = {
     }
 
     return cost[n][m];
-  },
-  unescape: function(str) {
+  };
+
+  Utils.unescape = function(str) {
     str = str || '';
     var mapping = {
       '&lt;': '<',
@@ -351,7 +383,8 @@ Utils.prototype = {
       '&quot;': '"',
       '&#x27;': "'",
       '&#x60;': '`',
-      '&amp;' : '&'
+      '&amp;' : '&',
+      '&mdash;': '—'
     };
     _.each(mapping, function(value, key) {
       var re;
@@ -364,8 +397,9 @@ Utils.prototype = {
       str = str.replace(re,value);
     });
     return str;
-  },
-  descSortByStr:function(obj, val, context) {
+  };
+
+  Utils.descSortByStr = function(obj, val, context) {
     // http://stackoverflow.com/questions/5013819/reverse-sort-order-with-backbone-js
     //
     // The Underscore.js method _.sortBy ends up "wrapping" up javascript
@@ -385,7 +419,14 @@ Utils.prototype = {
       });
       return str;
     });
-  }
+  };
+
+
+}).call(this);
+
+
+var Utils = function(){};
+Utils.prototype = {
 };
 var utils = new Utils();
 exports.utils = utils;

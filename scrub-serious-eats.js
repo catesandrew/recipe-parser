@@ -7,27 +7,8 @@ var async = require('async'),
     http = require('http'),
     URL = require('url'),
     util = require('util');
-var utils = require('./utils.js').utils;
 
-var escapeRegExp = function(str){
-  if (str == null) return '';
-  return String(str).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
-};
-
-var defaultToWhiteSpace = function(characters) {
-  if (characters == null)
-    return '\\s';
-  else if (characters.source)
-    return characters.source;
-  else
-    return '[' + escapeRegExp(characters) + ']';
-};
-
-var trim = function(str, characters){
-  if (str == null) return '';
-  characters = defaultToWhiteSpace(characters);
-  return String(str).replace(new RegExp('\^' + characters + '+|' + characters + '+$', 'g'), '');
-}
+var Utils = require('./utils.js');
 
 program
   .version('0.1')
@@ -42,41 +23,29 @@ var verbose = function() {
   }
 };
 
-var re = /((?:\d+)\/(?:\d+))/g;
-var fractions = {
-  '1/4': '¼',
-  '1/2': '½',
-  '3/4': '¾',
-  '1/3': '⅓',
-  '2/3': '⅔',
-  '1/5': '⅕',
-  '2/5': '⅖',
-  '3/5': '⅗',
-  '4/5': '⅘',
-  '1/6': '⅙',
-  '5/6': '⅚',
-  '1/8': '⅛',
-  '3/8': '⅜',
-  '5/8': '⅝',
-  '7/8': '⅞',
-}
-var substituteFraction = function(str) {
-  if (str == null) return '';
-  return str.replace(re, function(str, p1, offset, s) {
-    var p2 = trim(p1);
-
-    if (fractions[p2]) {
-      return fractions[p2];
-    } else {
-      return p1;
-    }
-  });
+var listHelper = function($, selector, helper) {
+  var elements = $(selector);
+  if (elements.length) {
+    verbose('  count: ' + elements.length);
+    elements.each(function(ele) {
+      helper(ele);
+    });
+  } else if (elements.children && elements.children.length) {
+    verbose('  count: ' + elements.children.length);
+    //helper(elements.children.first());
+    elements.children.each(function(ele) {
+      helper(ele);
+    });
+  } else {
+    verbose('  count: 1');
+    helper(elements);
+  }
 }
 
 var addSummary = function($, obj) {
   verbose('## Adding Summary')
   obj.summaries || (obj.summaries = []);
-  var summaryHelper = function(summary) {
+  listHelper($, '.hrecipe .content-unit .summary p', function(summary) {
     if (!summary) { return; }
     var child;
     if (summary.children) {
@@ -87,83 +56,39 @@ var addSummary = function($, obj) {
     } else if (child && child.name === 'small') {
       // do nothing
     } else {
-      obj.summaries.push(substituteFraction(trim(summary.innerHTML)));
+      obj.summaries.push(Utils.substituteFraction(Utils.trim(summary.innerHTML)));
     }
-  }
-  var summaries = $('.hrecipe .content-unit .summary p');
-  if (summaries.length) {
-    verbose('  count: ' + summaries.length);
-    summaries.each(function(p) {
-      summaryHelper(p);
-    });
-  } else if (summaries.children && summaries.children.length) {
-    verbose('  count: ' + summaries.children.length);
-    //summaryHelper(summaries.children.first());
-    summaries.children.each(function(p) {
-      summaryHelper(p);
-    });
-  }
+  });
 }
 
 var addProcedure = function($, obj) {
   verbose('## Adding Procedures')
   obj.procedures || (obj.procedures = []);
-  var procedures = $('.hrecipe .procedure ol.instructions li .procedure-text');
-  var procedureHelper = function(p) {
-    if (!p) { return; }
-    obj.procedures.push(substituteFraction(trim(p.fulltext)));
-  }
-  if (procedures.length) {
-    verbose('  count: ' + procedures.length);
-    procedures.each(function(p) {
-      procedureHelper(p);
-    });
-  } else if (procedures.children && procedures.children.length) {
-    verbose('  count: ' + procedures.children.length);
-    procedureHelper(procedures.children.first());
-  }
+  listHelper($, '.hrecipe .procedure ol.instructions li .procedure-text', function(procedure) {
+    if (!procedure) { return; }
+    obj.procedures.push(Utils.substituteFraction(Utils.trim(procedure.fulltext)));
+  });
 }
 
 var addTags = function($, obj) {
   verbose('## Adding Tags')
   obj.tags || (obj.tags = []);
-  var tags = $('.hrecipe .tags li');
-  var tagHelper = function(tag) {
+  listHelper($, '.hrecipe .tags li', function(tag) {
     if (!tag) { return; }
-    obj.tags.push(trim(tag.fulltext));
-  }
-  if (tags.length) {
-    verbose('  count: ' + tags.length);
-    tags.each(function(tag) {
-      tagHelper(tag);
-    });
-  } else if (tags.children && tags.children.length) {
-    verbose('  count: ' + tags.children.length);
-    tagHelper(tags.children.first());
-  }
+    obj.tags.push(Utils.trim(tag.fulltext));
+  });
 }
 
 var addImage = function($, obj) {
   verbose('## Adding Image');
 
-  var images = $('.hrecipe .content-unit img');
-  var imageHelper = function(img) {
+  listHelper($, '.hrecipe .content-unit img', function(img) {
     if (!img) { return; }
     obj.image = {
       src: img.attribs.src,
       alt: img.attribs.alt
     };
-  }
-  if (images.length) {
-    verbose('  count: ' + images.length);
-    imageHelper(_.first(images));
-  } else if (images.children && images.children.length) {
-    verbose('  count: ' + images.children.length);
-    imageHelper(images.children.first());
-  } else {
-    verbose('  count: 1');
-    imageHelper(images);
-  }
+  });
 }
 
 var addIngredients = function($, obj) {
@@ -191,10 +116,10 @@ var addIngredients = function($, obj) {
           text = matches[3];
           matches = text.match(/(.*), ([^,]*$)/i);
 
-          breakdown.product = substituteFraction(trim(matches[1]));
-          breakdown.direction = substituteFraction(trim(matches[2]));
+          breakdown.product = Utils.substituteFraction(Utils.trim(matches[1]));
+          breakdown.direction = Utils.substituteFraction(Utils.trim(matches[2]));
         } else {
-          breakdown.product = substituteFraction(trim(matches[3]));
+          breakdown.product = Utils.substituteFraction(Utils.trim(matches[3]));
         }
 
         obj.ingredients.push(breakdown);
@@ -267,7 +192,7 @@ if (program.url) {
     obj['DIFFICULTY'] = 0;
     obj['KEYWORDS'] = item.tags.join(', ');
     obj['MEASUREMENT_SYSTEM'] = 0;
-    obj['NAME'] = trim(item.title);
+    obj['NAME'] = Utils.trim(item.title);
     obj['NOTE'] = '';
     obj['NOTES_LIST'] = [];
     obj['NUTRITION'] = '';
@@ -277,7 +202,7 @@ if (program.url) {
     obj['SUMMARY'] = item.summaries.join('\n');
     obj['TYPE'] = 102;
     obj['URL'] = url;
-    obj['YIELD'] = trim(item.servings);
+    obj['YIELD'] = Utils.trim(item.servings);
 
     if (item.image.data) {
       obj['EXPORT_TYPE'] = 'BINARY';
@@ -303,7 +228,7 @@ if (program.url) {
         VARIATION_ID: -1,
         LABEL_TEXT: '',
         IS_HIGHLIGHTED: false,
-        DIRECTION_TEXT: trim(procedure)
+        DIRECTION_TEXT: Utils.trim(procedure)
       });
     });
 
@@ -337,18 +262,18 @@ if (program.url) {
     var ingredients = obj['INGREDIENTS_TREE'] = [];
     _.each(item.ingredients, function(ingredient) {
       ingredients.push({
-        DESCRIPTION: trim(ingredient.product),
-        DIRECTION: trim(ingredient.direction) || '',
+        DESCRIPTION: Utils.trim(ingredient.product),
+        DIRECTION: Utils.trim(ingredient.direction) || '',
         INCLUDED_RECIPE_ID: -1,
         IS_DIVIDER: false,
         IS_MAIN: false,
-        MEASUREMENT: trim(ingredient.measurement),
-        QUANTITY: trim(ingredient.quantity)
+        MEASUREMENT: Utils.trim(ingredient.measurement),
+        QUANTITY: Utils.trim(ingredient.quantity)
       });
     });
 
-    var plist_file = utils.expandHomeDir('~/Desktop/recipe.mgourmet4');
-    utils.writePlist(function(err, obj) {
+    var plist_file = Utils.expandHomeDir('~/Desktop/recipe.mgourmet4');
+    Utils.writePlist(function(err, obj) {
       if (err) { console.error(err); }
       }, [obj], plist_file
     );
