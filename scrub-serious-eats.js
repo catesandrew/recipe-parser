@@ -203,7 +203,6 @@ var addIngredients = function($, obj) {
   });
 }
 
-var size_re = new RegExp(".*\\(([0-9]+?[.][0-9]+? [MG]B)\\)$");
 var scrape = function(callback, url) {
   var methods = {
     input: false,
