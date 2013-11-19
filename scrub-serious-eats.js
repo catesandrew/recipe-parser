@@ -73,6 +73,136 @@ var substituteFraction = function(str) {
   });
 }
 
+var addSummary = function($, obj) {
+  verbose('## Adding Summary')
+  obj.summaries || (obj.summaries = []);
+  var summaryHelper = function(summary) {
+    if (!summary) { return; }
+    var child;
+    if (summary.children) {
+      child = summary.children.first();
+    }
+    if (summary.attribs && summary.attribs.class) {
+      // do nothing
+    } else if (child && child.name === 'small') {
+      // do nothing
+    } else {
+      obj.summaries.push(substituteFraction(trim(summary.innerHTML)));
+    }
+  }
+  var summaries = $('.hrecipe .content-unit .summary p');
+  if (summaries.length) {
+    verbose('  count: ' + summaries.length);
+    summaries.each(function(p) {
+      summaryHelper(p);
+    });
+  } else if (summaries.children && summaries.children.length) {
+    verbose('  count: ' + summaries.children.length);
+    //summaryHelper(summaries.children.first());
+    summaries.children.each(function(p) {
+      summaryHelper(p);
+    });
+  }
+}
+
+var addProcedure = function($, obj) {
+  verbose('## Adding Procedures')
+  obj.procedures || (obj.procedures = []);
+  var procedures = $('.hrecipe .procedure ol.instructions li .procedure-text');
+  var procedureHelper = function(p) {
+    if (!p) { return; }
+    obj.procedures.push(substituteFraction(trim(p.fulltext)));
+  }
+  if (procedures.length) {
+    verbose('  count: ' + procedures.length);
+    procedures.each(function(p) {
+      procedureHelper(p);
+    });
+  } else if (procedures.children && procedures.children.length) {
+    verbose('  count: ' + procedures.children.length);
+    procedureHelper(procedures.children.first());
+  }
+}
+
+var addTags = function($, obj) {
+  verbose('## Adding Tags')
+  obj.tags || (obj.tags = []);
+  var tags = $('.hrecipe .tags li');
+  var tagHelper = function(tag) {
+    if (!tag) { return; }
+    obj.tags.push(trim(tag.fulltext));
+  }
+  if (tags.length) {
+    verbose('  count: ' + tags.length);
+    tags.each(function(tag) {
+      tagHelper(tag);
+    });
+  } else if (tags.children && tags.children.length) {
+    verbose('  count: ' + tags.children.length);
+    tagHelper(tags.children.first());
+  }
+}
+
+var addImage = function($, obj) {
+  verbose('## Adding Image');
+
+  var images = $('.hrecipe .content-unit img');
+  var imageHelper = function(img) {
+    if (!img) { return; }
+    obj.image = {
+      src: img.attribs.src,
+      alt: img.attribs.alt
+    };
+  }
+  if (images.length) {
+    verbose('  count: ' + images.length);
+    imageHelper(_.first(images));
+  } else if (images.children && images.children.length) {
+    verbose('  count: ' + images.children.length);
+    imageHelper(images.children.first());
+  } else {
+    verbose('  count: 1');
+    imageHelper(images);
+  }
+}
+
+var addIngredients = function($, obj) {
+  verbose('## Adding Ingredients');
+  obj.ingredients || (obj.ingredients = []);
+  var ingredients = $('.hrecipe .content-unit .ingredients ul li'),
+      text,
+      matches,
+      breakdown,
+      description;
+
+  ingredients.each(function(ingredient) {
+    breakdown = {};
+    text = ingredient.fulltext;
+    //console.log(text);
+    if (text) {
+      matches = text.match(/^([-\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
+      //console.log('match: ' + matches);
+
+      if (matches && matches.length) {
+        breakdown.quantity = matches[1];
+        breakdown.measurement = matches[2];
+
+        if (matches[3].indexOf(',') > 0) {
+          text = matches[3];
+          matches = text.match(/(.*), ([^,]*$)/i);
+
+          breakdown.product = substituteFraction(trim(matches[1]));
+          breakdown.direction = substituteFraction(trim(matches[2]));
+        } else {
+          breakdown.product = substituteFraction(trim(matches[3]));
+        }
+
+        obj.ingredients.push(breakdown);
+      }
+    }
+  });
+}
+
 var size_re = new RegExp(".*\\(([0-9]+?[.][0-9]+? [MG]B)\\)$");
 var scrape = function(callback, url) {
   var methods = {
@@ -85,65 +215,28 @@ var scrape = function(callback, url) {
 
         obj.title = $('.hrecipe h1.fn').fulltext;
 
-        $('.hrecipe .tags li').each(function(tag) {
-          obj.tags || (obj.tags = []);
-          obj.tags.push(tag.fulltext);
-        });
+        addTags($, obj);
+        addImage($, obj);
+        addSummary($, obj);
+        addIngredients($, obj);
+        addProcedure($, obj);
 
-        var img = _.first($('.hrecipe .content-unit img'));
-        obj.image = {
-          src: img.attribs.src,
-          alt: img.attribs.alt
-        };
+        verbose('## Adding Servings')
+        var servings = $('.hrecipe .recipe-about td span.yield');
+        if (servings) {
+          obj.servings = servings.fulltext;
+        }
 
-        var summary = $('.hrecipe .content-unit .summary');
-        $('p', summary).each(function(p) {
-          obj.summaries || (obj.summaries = []);
-          if (p.attribs && p.attribs.class) {
-            // do nothing
-          } else {
-            if (p.rawtext) {
-              obj.summaries.push(substituteFraction(trim(p.rawtext)));
-            }
-          }
-        });
+        verbose('## Adding Times')
+        var prepTime = $('.hrecipe .recipe-about td span.prepTime');
+        if (prepTime) {
+          obj.prepTime = prepTime.fulltext;
+        }
 
-        var ingredients = $('.hrecipe .content-unit .ingredients ul li'),
-            text,
-            matches,
-            breakdown,
-            description;
-
-        ingredients.each(function(ingredient) {
-          obj.ingredients || (obj.ingredients = []);
-          breakdown = {};
-          text = ingredient.fulltext;
-          matches = text.match(/^([\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
-
-          breakdown.quantity = matches[1];
-          breakdown.measurement = matches[2];
-
-          if (matches[3].indexOf(',') > 0) {
-            text = matches[3];
-            matches = text.match(/(.*), ([^,]*$)/i);
-
-            breakdown.product = matches[1];
-            breakdown.direction = matches[2];
-          } else {
-            breakdown.product = matches[3];
-          }
-
-          obj.ingredients.push(breakdown);
-        });
-
-        $('.hrecipe .procedure ol.instructions li .procedure-text').each(function(procedure) {
-          obj.procedures || (obj.procedures = []);
-          obj.procedures.push(procedure.fulltext);
-        });
-
-        obj.servings = $('.hrecipe .recipe-about td span.yield').fulltext;
-        obj.prepTime = $('.hrecipe .recipe-about td span.prepTime').fulltext;
-        obj.totalTime = $('.hrecipe .recipe-about td span.totalTime').fulltext;
+        var totalTime = $('.hrecipe .recipe-about td span.totalTime');
+        if (totalTime) {
+          obj.totalTime = totalTime.fulltext;
+        }
 
         this.emit(obj);
       });
@@ -182,7 +275,7 @@ if (program.url) {
     obj['PUBLICATION_PAGE'] = url;
     obj['SERVINGS'] = 1;
     obj['SOURCE'] = 'Serious Eats';
-    obj['SUMMARY'] = item.summaries.join('\n\n');
+    obj['SUMMARY'] = item.summaries.join('\n');
     obj['TYPE'] = 102;
     obj['URL'] = url;
     obj['YIELD'] = trim(item.servings);
@@ -265,11 +358,6 @@ if (program.url) {
   scrape(function(err, items) {
     if (err) { console.log(err); }
 
-    _.each(items, function(item) {
-      //console.log(item);
-      //console.log(item.ingredients);
-    });
-
     async.forEach(items, function(item, done) {
       if (item.image.src) {
         var oURL = URL.parse(item.image.src),
@@ -304,6 +392,7 @@ if (program.url) {
     }, function(err) {
       _.each(items, function(item) {
         exportRecipe(item);
+        console.log('Done: ' + item.title);
       });
     });
 
