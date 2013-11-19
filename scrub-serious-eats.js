@@ -159,14 +159,18 @@ var scrape = function(callback, url) {
         }
 
         verbose('## Adding Times')
-        var prepTime = $('.hrecipe .recipe-about td span.prepTime');
-        if (prepTime) {
-          obj.prepTime = prepTime.fulltext;
-        }
+        try {
+          var prepTime = $('.hrecipe .recipe-about td span.prepTime');
+          if (prepTime) {
+            obj.prepTime = prepTime.fulltext;
+          }
 
-        var totalTime = $('.hrecipe .recipe-about td span.totalTime');
-        if (totalTime) {
-          obj.totalTime = totalTime.fulltext;
+          var totalTime = $('.hrecipe .recipe-about td span.totalTime');
+          if (totalTime) {
+            obj.totalTime = totalTime.fulltext;
+          }
+        } catch(e) {
+          verbose(e);
         }
 
         this.emit(obj);
