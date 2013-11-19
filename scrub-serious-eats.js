@@ -23,19 +23,26 @@ var verbose = function() {
   }
 };
 
-var listHelper = function($, selector, helper) {
+var listHelper = function($, selector, chooseFirst, helper) {
   var elements = $(selector);
   if (elements.length) {
     verbose('  count: ' + elements.length);
-    elements.each(function(ele) {
-      helper(ele);
-    });
+    if (chooseFirst) {
+      helper(_.first(elements));
+    } else {
+      elements.each(function(ele) {
+        helper(ele);
+      });
+    }
   } else if (elements.children && elements.children.length) {
     verbose('  count: ' + elements.children.length);
-    //helper(elements.children.first());
-    elements.children.each(function(ele) {
-      helper(ele);
-    });
+    if (chooseFirst) {
+      helper(elements.children.first());
+    } else {
+      elements.children.each(function(ele) {
+        helper(ele);
+      });
+    }
   } else {
     verbose('  count: 1');
     helper(elements);
@@ -45,7 +52,7 @@ var listHelper = function($, selector, helper) {
 var addSummary = function($, obj) {
   verbose('## Adding Summary')
   obj.summaries || (obj.summaries = []);
-  listHelper($, '.hrecipe .content-unit .summary p', function(summary) {
+  listHelper($, '.hrecipe .content-unit .summary p', false, function(summary) {
     if (!summary) { return; }
     var child;
     if (summary.children) {
@@ -64,7 +71,7 @@ var addSummary = function($, obj) {
 var addProcedure = function($, obj) {
   verbose('## Adding Procedures')
   obj.procedures || (obj.procedures = []);
-  listHelper($, '.hrecipe .procedure ol.instructions li .procedure-text', function(procedure) {
+  listHelper($, '.hrecipe .procedure ol.instructions li .procedure-text', false, function(procedure) {
     if (!procedure) { return; }
     obj.procedures.push(Utils.substituteFraction(Utils.trim(procedure.fulltext)));
   });
@@ -73,7 +80,7 @@ var addProcedure = function($, obj) {
 var addTags = function($, obj) {
   verbose('## Adding Tags')
   obj.tags || (obj.tags = []);
-  listHelper($, '.hrecipe .tags li', function(tag) {
+  listHelper($, '.hrecipe .tags li', false, function(tag) {
     if (!tag) { return; }
     obj.tags.push(Utils.trim(tag.fulltext));
   });
@@ -82,7 +89,7 @@ var addTags = function($, obj) {
 var addImage = function($, obj) {
   verbose('## Adding Image');
 
-  listHelper($, '.hrecipe .content-unit img', function(img) {
+  listHelper($, '.hrecipe .content-unit img', true, function(img) {
     if (!img) { return; }
     obj.image = {
       src: img.attribs.src,
