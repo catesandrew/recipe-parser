@@ -122,19 +122,22 @@
     return ( ( str1 === str2 ) ? 0 : ( ( str1 > str2 ) ? 1 : -1 ) );
   };
 
-  var calcPadding = function(num) {
-    var min_len = 2,
-        padding = "",
-        len = num.toString().length;
+  Utils.calcPadding = function(num, minLen) {
+    if (_.isNumber(num)) {
+      num = num.toString();
+    }
+    var minLen = 2,
+        padding = '',
+        len = num.length;
 
-    if (len > min_len) {
+    if (len > minLen) {
       min_len = len;
     }
-    for(var i=0; i<min_len;i++) {
-      padding += "0";
+    for(var i=0; i<minLen;i++) {
+      padding += '0';
     }
     return {
-      len:(-1 * min_len),
+      len:(-1 * minLen),
       padding:padding
     }
   };
@@ -153,7 +156,19 @@
       return '[' + escapeRegExp(characters) + ']';
   };
 
-  var re = /((?:\d+)\/(?:\d+))/g;
+  var reDegree = /(\d+\s)degree(?:s)?\s(?:f)/gi;
+  // 160 degrees F -> 160°F
+  Utils.substituteDegree = function(str) {
+    if (str == null) return '';
+    return str.replace(reDegree, function(str, p1, offset, s) {
+      // '350 degree F for 30 minutes' -->
+      // ["350 degree F", "350 ", 0, "350 degree F for 30 minutes"]
+      //if (!p1) { console.log(arguments); exit(1);}
+      return p1.trim() + '°F';
+    });
+  };
+
+  var reFractions = /((?:\d+) )?((?:\d)\/(?:\d))/g;
   var fractions = {
     '1/4': '¼',
     '1/2': '½',
@@ -174,14 +189,24 @@
 
   Utils.substituteFraction = function(str) {
     if (str == null) return '';
-    return str.replace(re, function(str, p1, offset, s) {
-      var p2 = Utils.trim(p1);
-
-      if (fractions[p2]) {
-        return fractions[p2];
+    var findFraction = function(str) {
+      if (fractions[str]) {
+        return fractions[str];
       } else {
-        return p1;
+        return str;
       }
+    }
+    return str.replace(reFractions, function(str, p1, p2, offset, s) {
+      // '15 1/2, 6 3/4 1/2 andrew' -->
+      // ["15 1/2", "15 ", "1/2", 0, "15 1/2, 6 3/4 1/2 andrew"]
+      // ["6 3/4", "6 ", "3/4", 8, "15 1/2, 6 3/4 1/2 andrew"]
+      // ["1/2", undefined, "1/2", 14, "15 1/2, 6 3/4 1/2 andrew"]
+
+      var fraction = findFraction(p2);
+      if (p1) {
+        return p1.trim() + fraction;
+      }
+      return fraction;
     });
   };
 
