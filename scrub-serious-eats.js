@@ -73,7 +73,7 @@ var addProcedure = function($, obj) {
   obj.procedures || (obj.procedures = []);
   listHelper($, '.hrecipe .procedure ol.instructions li .procedure-text', false, function(procedure) {
     if (!procedure) { return; }
-    obj.procedures.push(Utils.substituteFraction(Utils.trim(procedure.fulltext)));
+    obj.procedures.push(Utils.substituteDegree(Utils.substituteFraction(Utils.trim(procedure.striptags))));
   });
 }
 
@@ -82,7 +82,7 @@ var addTags = function($, obj) {
   obj.tags || (obj.tags = []);
   listHelper($, '.hrecipe .tags li', false, function(tag) {
     if (!tag) { return; }
-    obj.tags.push(Utils.trim(tag.fulltext));
+    obj.tags.push(Utils.trim(tag.striptags));
   });
 }
 
@@ -109,7 +109,7 @@ var addIngredients = function($, obj) {
 
   ingredients.each(function(ingredient) {
     breakdown = {};
-    text = ingredient.fulltext;
+    text = ingredient.striptags;
     //console.log(text);
     if (text) {
       matches = text.match(/^([-\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
@@ -145,7 +145,7 @@ var scrape = function(callback, url) {
         var obj = {};
 
         try {
-          obj.title = $('.hrecipe h1.fn').fulltext;
+          obj.title = $('.hrecipe h1.fn').striptags;
 
           addTags($, obj);
           addImage($, obj);
@@ -156,18 +156,18 @@ var scrape = function(callback, url) {
           verbose('## Adding Servings')
           var servings = $('.hrecipe .recipe-about td span.yield');
           if (servings) {
-            obj.servings = servings.fulltext;
+            obj.servings = servings.striptags;
           }
 
           verbose('## Adding Times')
           var prepTime = $('.hrecipe .recipe-about td span.prepTime');
           if (prepTime) {
-            obj.prepTime = prepTime.fulltext;
+            obj.prepTime = prepTime.striptags;
           }
 
           var totalTime = $('.hrecipe .recipe-about td span.totalTime');
           if (totalTime) {
-            obj.totalTime = totalTime.fulltext;
+            obj.totalTime = totalTime.striptags;
           }
         } catch(e) {
           verbose(e);
@@ -229,18 +229,22 @@ if (program.url) {
         USER_ADDED: userAdded
       });
     }
-    addCategory(10, 'Holiday', false);
-    addCategory(14, 'Thanksgiving', false);
-    addCategory(21, 'Side Dishes', false);
+    //addCategory(10, 'Holiday', false);
+    //addCategory(14, 'Thanksgiving', false);
+    //addCategory(21, 'Side Dishes', false);
 
     var directions = obj['DIRECTIONS_LIST'] = [];
     _.each(item.procedures, function(procedure) {
-      directions.push({
-        VARIATION_ID: -1,
-        LABEL_TEXT: '',
-        IS_HIGHLIGHTED: false,
-        DIRECTION_TEXT: Utils.trim(procedure)
-      });
+      procedure = Utils.trim(procedure);
+      if (procedure) {
+        procedure = procedure.replace(/\s{2,}/g, ' '); // replace extra spaces with one
+        directions.push({
+          VARIATION_ID: -1,
+          LABEL_TEXT: '',
+          IS_HIGHLIGHTED: false,
+          DIRECTION_TEXT: procedure
+        });
+      }
     });
 
     var preps = obj['PREP_TIMES'] = [];
@@ -257,7 +261,7 @@ if (program.url) {
         AMOUNT: hours > 0 ? hours : minutes,
         AMOUNT_2: hours > 0 ? minutes : 0,
         TIME_UNIT_ID: hours > 0 ? 1 : 2,
-        TIME_UNIT_2_ID: hours > 0 ? 1 : 2
+        TIME_UNIT_2_ID: hours > 0 ? 2 : 1
       });
     }
 
