@@ -42,6 +42,7 @@
 
   // Current version.
   Utils.VERSION = '0.1';
+  var unescape_regex_cache = {};
 
   var trimCommaSpaceTheOrA = function(name){
     var exact_name = name.split(', The');
@@ -409,6 +410,7 @@
       '&#x27;': "'",
       '&#x60;': '`',
       '&amp;' : '&',
+      '&frasl;' : '/',
       '&mdash;': '—'
     };
     _.each(mapping, function(value, key) {
