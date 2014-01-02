@@ -24,28 +24,33 @@ var verbose = function() {
 };
 
 var listHelper = function($, selector, chooseFirst, helper) {
-  var elements = $(selector);
-  if (elements.length) {
-    verbose('  count: ' + elements.length);
-    if (chooseFirst) {
-      helper(_.first(elements));
+  try {
+    var elements = $(selector);
+    if (elements.length) {
+      verbose('  count: ' + elements.length);
+      if (chooseFirst) {
+        helper(_.first(elements));
+      } else {
+        elements.each(function(ele) {
+          helper(ele);
+        });
+      }
+    } else if (elements.children && elements.children.length) {
+      verbose('  count: ' + elements.children.length);
+      if (chooseFirst) {
+        helper(elements.children.first());
+      } else {
+        elements.children.each(function(ele) {
+          helper(ele);
+        });
+      }
     } else {
-      elements.each(function(ele) {
-        helper(ele);
-      });
+      verbose('  count: 1');
+      helper(elements);
     }
-  } else if (elements.children && elements.children.length) {
-    verbose('  count: ' + elements.children.length);
-    if (chooseFirst) {
-      helper(elements.children.first());
-    } else {
-      elements.children.each(function(ele) {
-        helper(ele);
-      });
-    }
-  } else {
-    verbose('  count: 1');
-    helper(elements);
+  } catch(e) {
+    verbose(e);
+    helper();
   }
 }
 
@@ -229,6 +234,8 @@ if (program.url) {
         USER_ADDED: userAdded
       });
     }
+    //addCategory(206, 'Smoothies', false);
+    //addCategory(88, 'Mixed Drinks', false);
     //addCategory(10, 'Holiday', false);
     //addCategory(14, 'Thanksgiving', false);
     //addCategory(21, 'Side Dishes', false);
