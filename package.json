@@ -2,13 +2,22 @@
   "name": "serious-eats-node-scripts",
   "version": "0.0.1",
   "dependencies": {
-    "async": "latest",
-    "node.io": "latest",
     "plist": "git://github.com/catesandrew/node-plist.git",
-    "underscore": "latest",
-    "commander": "latest",
-    "progress": "latest",
-    "request": "latest",
-    "backbone": "latest"
+    "mocha": "~1.17.0",
+    "commander": "~2.1.0",
+    "backbone": "~1.1.0",
+    "request": "~2.31.0",
+    "underscore": "~1.5.2",
+    "node.io": "~0.5.1",
+    "async": "~0.2.9",
+    "progress": "~1.1.3",
+    "chai": "~1.8.1",
+    "pluralize": "0.0.6"
+  },
+  "devDependencies": {
+    "yeoman": "~0.9.6",
+    "grunt-cli": "~0.1.11",
+    "bower": "~1.2.8",
+    "yo": "~1.1.2"
   }
 }

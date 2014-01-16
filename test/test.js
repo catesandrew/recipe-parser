@@ -1,0 +1,943 @@
+/*global require, describe, it */
+var assert = require('assert'),
+    pluralize = require('pluralize'),
+    _ = require('underscore'),
+    chai = require('chai');
+
+var assert = chai.assert,
+    expect = chai.expect,
+    should = chai.should();
+
+var ingredients = [
+  {
+    '2 pounds russet potatoes, unpeeled and scrubbed': {
+      description: 'russet potatoes',
+      direction: 'unpeeled and scrubbed',
+      measurement: 'pounds',
+      quantity: '2'
+    }
+  }, {
+    '8 tablespoons unsalted butter (1 stick), melted': {
+      description: 'unsalted butter',
+      direction: 'melted',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '8',
+      alt: '1 stick'
+    }
+  }, {
+    '1 1/2 teaspoons table salt': {
+      description: 'table salt',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '1 1/2'
+    }
+  }, {
+    '1/2 teaspoon ground black pepper': {
+      description: 'black pepper',
+      direction: 'ground',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/2'
+    }
+  }, {
+    '2 tablespoons prepared horseradish': {
+      description: 'prepared horseradish',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '2'
+    }
+  }, {
+    '1/4 cup grated fresh horseradish': {
+      description: 'horseradish',
+      direction: 'fresh, grated',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '1/4'
+    }
+  }, {
+    '3 medium scallions, green parts only, minced': {
+      description: 'scallions',
+      direction: 'green parts only, minced',
+      isMain: false,
+      measurement: 'medium',
+      quantity: '3'
+    }
+  }, {
+    '1 1/4 teaspoons table salt': {
+      description: 'table salt',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '1 1/4'
+    }
+  }, {
+    '1/2 teaspoon ground black pepper': {
+      description: 'black pepper',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/2'
+    }
+  }, {
+    '2 tablespoons grainy mustard': {
+      description: 'grainy mustard',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '2'
+    }
+  }, {
+    '3 ounces smoked cheddar cheese, grated (1 cup)': {
+      description: 'cheddar cheese',
+      direction: 'smoked, grated',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '3',
+      alt: '1 cup'
+    }
+  }, {
+    '1 teaspoon smoked paprika (sweet or bittersweet)': {
+      description: 'smoked paprika',
+      direction: 'sweet or bittersweet',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1'
+    }
+  }, {
+    '8 tablespoons unsalted butter (1 stick)': {
+      description: 'unsalted butter',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '8',
+      alt: '1 stick'
+    }
+  }, {
+    '3 medium cloves garlic, minced or pressed through garlic press (1 generous tablespoon)': {
+      description: 'garlic cloves',
+      direction: 'minced or pressed through garlic press',
+      isMain: false,
+      measurement: 'medium',
+      quantity: '3',
+      alt: '1 tablespoon'
+    }
+  }, {
+    '1/2 teaspoon ground black pepper': {
+      description: 'black pepper',
+      direction: 'ground',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/2'
+    }
+  }, {
+    '1 1/2 teaspoons unsalted butter': {
+      description: 'unsalted butter',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '1 1/2'
+    }
+  }, {
+    '1 1/2 teaspoons vegetable oil': {
+      description: 'vegetable oil',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '1 1/2'
+    }
+  }, {
+    '1/2 teaspoon light brown sugar': {
+      description: 'light brown sugar',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/2'
+    }
+  }, {
+    '1 pound yellow onions (4 small or 3 medium), sliced 1/4 inch thick': {
+      description: 'yellow onions',
+      direction: 'sliced 1/4 inch thick',
+      isMain: false,
+      measurement: 'pound',
+      //quantity: '1 (4 small or 3 medium)'
+      quantity: '1'
+    }
+  }, {
+    '1 cup port, preferably ruby port': {
+      description: 'port',
+      direction: 'preferably ruby port',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '1'
+    }
+  }, {
+    '1 teaspoon chopped fresh thyme leaves': {
+      description: 'thyme leaves',
+      direction: 'fresh, chopped',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1'
+    }
+  }, {
+    '6 tablespoons unsalted butter, melted': {
+      description: 'unsalted butter',
+      direction: 'melted',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '6'
+    }
+  }, {
+    '4 ounces blue cheese, crumbled': {
+      description: 'blue cheese',
+      direction: 'crumbled',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '4'
+    }
+  }, {
+    '1/2 teaspoon ground black pepper': {
+      description: 'black pepper',
+      direction: 'ground',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/2'
+    }
+  }, {
+    '11 ounces bread flour (2 cups)': {
+      description: 'bread flour',
+      direction: '(2 cups)',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '11'
+    }
+  }, {
+    '1/4 teaspoon instant yeast': {
+      description: 'instant yeast',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/4'
+    }
+  }, {
+    '8 ounces water (1 cup), room temperature': {
+      description: 'water',
+      direction: 'room temperature',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '8',
+      alt: '1 cup'
+    }
+  }, {
+    '16 1/2 ounces bread flour (3 cups), plus extra for dusting hands and work surface': {
+      description: 'bread flour',
+      direction: 'plus extra for dusting hands and work surface',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '16 1/2',
+      alt: '3 cups'
+    }
+  }, {
+    '1 teaspoon instant yeast': {
+      description: 'instant yeast',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1'
+    }
+  }, {
+    '10.7 ounces water (1 1/3 cups), room temperature': {
+      description: 'water',
+      direction: 'room temperature',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '10.7',
+      alt: '1 1/3 cups'
+    }
+  }, {
+    '3/4 cup sesame seeds': {
+      description: 'sesame seeds',
+      direction: '',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '3/4'
+    }
+  }, {
+    '4 tuna steaks, 8 ounces each and about 1 inch thick': {
+      description: 'tuna steaks',
+      direction: '8 ounces each and about 1 inch thick',
+      isMain: false,
+      measurement: '',
+      quantity: '4'
+    }
+  }, {
+    '2 tablespoons vegetable oil': {
+      description: 'vegetable oil',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '2'
+    }
+  }, {
+    'Salt and ground black pepper': [
+      {
+        description: 'salt'
+      }, {
+        description: 'black pepper',
+        direction: 'ground'
+      }
+    ]
+  }, {
+    '1/4 cup soy sauce': {
+      description: 'soy sauce',
+      direction: '',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '1/4'
+    }
+  }, {
+    '1/4 cup rice vinegar': {
+      description: 'rice vinegar',
+      direction: '',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '1/4'
+    }
+  }, {
+    '1/4 cup water': {
+      description: 'water',
+      direction: '',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '1/4'
+    }
+  }, {
+    '2 1/2 teaspoons sugar': {
+      description: 'sugar',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '2 1/2'
+    }
+  }, {
+    '1 medium scallion, sliced thin': {
+      description: 'scallion',
+      direction: 'sliced thin',
+      isMain: false,
+      measurement: 'medium',
+      quantity: '1'
+    }
+  }, {
+    '2 teaspoons minced fresh ginger': {
+      description: 'ginger',
+      direction: 'fresh, minced',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '2'
+    }
+  }, {
+    '1 1/2 teaspoons toasted sesame oil': {
+      description: 'sesame oil',
+      direction: 'toasted',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '1 1/2'
+    }
+  }, {
+    '1/2 teaspoon red pepper flakes': {
+      description: 'red pepper flakes',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1/2'
+    }
+  }, {
+    '4 teaspoons cracked black peppercorns (or cracked white peppercorns)': {
+      description: 'black peppercorns',
+      direction: 'cracked (or cracked white peppercorns)',
+      isMain: false,
+      measurement: 'teaspoons',
+      quantity: '4'
+    }
+  }, {
+    '4 ounces salt pork, trimmed of rind and cut into 1/2-inch cubes': {
+      description: 'salt pork',
+      direction: 'trimmed of rind and cut into 1/2-inch cubes',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '4'
+    }
+  }, {
+    '2 ounces bacon (2 slices), cut into 1/4-inch pieces': {
+      description: 'bacon',
+      direction: 'cut into 1/4-inch pieces',
+      isMain: false,
+      measurement: 'ounces',
+      quantity: '2',
+      alt: '2 slices'
+    }
+  }, {
+    '1 medium onion, chopped fine': {
+      description: 'onion',
+      direction: 'chopped fine',
+      isMain: false,
+      measurement: 'medium',
+      quantity: '1'
+    }
+  }, {
+    '1/2 cup mild molasses': {
+      description: 'molasses',
+      direction: 'mild',
+      isMain: false,
+      measurement: 'cup',
+      quantity: '1/2'
+    }
+  }, {
+    '1 1/2 tablespoons brown mustard': {
+      description: 'brown mustard',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '1 1/2'
+    }
+  }, {
+    '1 pound dried small white beans (about 2 cups), rinsed and picked over': {
+      description: 'dried small white beans',
+      direction: 'rinsed and picked over',
+      isMain: false,
+      measurement: 'pound',
+      quantity: '1',
+      alt: 'about 2 cups'
+    }
+  }, {
+    'Table salt': {
+      description: 'table salt'
+    }
+  }, {
+    '1 teaspoon cider vinegar': {
+      description: 'cider vinegar',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1'
+    }
+  }, {
+    'Ground black pepper': {
+      description: 'black pepper',
+      direction: 'ground'
+    }
+  }, {
+    '3 1/2 tablespoons soy sauce': {
+      description: 'soy sauce',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '3 1/2'
+    }
+  }, {
+    '3 tablespoons rice wine': {
+      description: 'rice wine',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '3'
+    }
+  }, {
+    '2 tablespoons minced scallions': {
+      description: 'scallions',
+      direction: 'minced',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '2'
+    }
+  }, {
+    '2 tablespoons minced fresh ginger': {
+      description: 'ginger',
+      direction: 'fresh, minced',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '2'
+    }
+  }, {
+    '1 1/2 tablespoons black Chinese vinegar or Worcestershire sauce': {
+      description: 'black Chinese vinegar or Worcestershire sauce',
+      direction: '',
+      isMain: false,
+      measurement: 'tablespoons',
+      quantity: '1 1/2'
+    }
+  }, {
+    '1 teaspoon sesame oil': {
+      description: 'sesame oil',
+      direction: '',
+      isMain: false,
+      measurement: 'teaspoon',
+      quantity: '1'
+    }
+  }, {
+    '1/2 pound medium shrimp, peeled and butterflied': {
+      description: 'shrimp',
+      direction: 'medium, peeled and butterflied',
+      isMain: false,
+      measurement: 'pound',
+      quantity: '1/2'
+    }
+  }, {
+    '1/2 pound scallops, sliced horizontally in half': {
+      description: 'scallops',
+      direction: 'sliced horizontally in half',
+      isMain: false,
+      measurement: 'pound',
+      quantity: '1/2'
+    }
+  }, {
+    '1 quart Quick Broth (see related recipe)': {
+      description: 'quick broth',
+      direction: 'see related recipe',
+      isMain: false,
+      measurement: 'quart',
+      quantity: '1'
+    }
+  }, {
+    // will want this to translate to qty:1, measure:2 inch piece
+    '2 inch piece fresh ginger, sliced thin': {
+      description: 'ginger',
+      direction: 'fresh, sliced thin',
+      isMain: false,
+      measurement: '2 inch piece',
+      quantity: '2'
+    }
+  }, {
+    '10 Chinese black mushrooms, softened in hot water, stems removed and caps cut into quarters': {
+      description: 'Chinese black mushrooms',
+      direction: 'softened in hot water, stems removed and caps cut into quarters',
+      quantity: '10'
+    }
+  }, {
+    '1/2 cup rice wine or sake': [
+      {
+        description: 'Or',
+        isDivider: true,
+        ingredients: [
+          {
+            description: 'rice wine',
+            measurement: 'cup',
+            quantity: '1/2'
+          }, {
+            description: 'sake',
+            measurement: 'cup',
+            quantity: '1/2'
+          }
+        ]
+      }
+    ]
+  }, {
+    'Table salt': {
+      description: 'table salt'
+    }
+  }, {
+    '1 tablespoon vegetable oil or peanut oil': [
+      {
+        description: 'Or',
+        isDivider: true,
+        ingredients: [
+          {
+            description: 'vegetable oil',
+            measurement: 'tablespoon',
+            quantity: '1'
+          }, {
+            description: 'peanut oil',
+            measurement: 'tablespoon',
+            quantity: '1'
+          }
+        ]
+      }
+    ]
+  }, {
+    '8 medium cloves garlic, smashed and skins removed': {
+      description: 'garlic cloves',
+      direction: 'smashed and skins removed',
+      measurement: 'medium',
+      quantity: '8'
+    }
+  }, {
+    // will want quantity to be '1 large'
+    '1 large head small Napa cabbage or celery cabbage, about 2 1/2 pounds, halved lengthwise and cored, leaves cut into 2-inch squares': [
+      {
+        description: 'Or',
+        isDivider: true,
+        ingredients: [
+          {
+            description: 'small Napa cabbage',
+            direction: 'halved lengthwise and cored, leaves cut into 2-inch squares',
+            measurement: 'head',
+            quantity: '1',
+            alt: 'about 2 1/2 pounds'
+          }, {
+            description: 'celery cabbage',
+            direction: 'halved lengthwise and cored, leaves cut into 2-inch squares',
+            measurement: 'head',
+            quantity: '1',
+            alt: 'about 2 1/2 pounds'
+          }
+        ]
+      }
+    ]
+  }, {
+    '1/2 pound snow peas, ends snapped and strings removed': {
+      description: 'snow peas',
+      direction: 'ends snapped and strings removed',
+      isMain: false,
+      measurement: 'pound',
+      quantity: '1/2'
+    }
+  }
+];
+
+function parseIngredient(text) {
+  var breakdown = {},
+      matches;
+
+  matches = text.match(/^([-\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
+
+  if (matches && matches.length) {
+    breakdown.quantity = matches[1].trim();
+    breakdown.measurement = matches[2];
+
+    if (matches[3].indexOf(',') > 0) {
+      text = matches[3];
+      matches = text.match(/(.*), ([^,]*$)/i);
+      breakdown.product = matches[1];
+      breakdown.direction = matches[2];
+    } else {
+      breakdown.product = matches[3];
+    }
+
+    return breakdown;
+  }
+}
+
+//(\d++(?! */))? *-? *(?:(\d+) */ *(\d+))?.*$  original
+//Match the regular expression below and capture its match into backreference number 1 «(\d++(?! */))?»
+   //Between zero and one times, as many times as possible, giving back as needed (greedy) «?»
+   //Match a single digit 0..9 «\d++»
+      //Between one and unlimited times, as many times as possible, without giving back (possessive) «++»
+
+   //Assert that it is impossible to match the regex below starting at this position (negative lookahead) «(?! */)»
+      //Match the space character " " literally « *»
+         //Between zero and unlimited times, as many times as possible, giving back as needed (greedy) «*»
+      //Match the character "/" literally «/»
+
+//Match the space character " " literally « *»
+   //Between zero and unlimited times, as many times as possible, giving back as needed (greedy) «*»
+
+//Match the character "-" literally «-?»
+   //Between zero and one times, as many times as possible, giving back as needed (greedy) «?»
+
+//Match the space character " " literally « *»
+   //Between zero and unlimited times, as many times as possible, giving back as needed (greedy) «*»
+
+//Match the regular expression below «(?:(\d+) */ *(\d+))?»
+   //Between zero and one times, as many times as possible, giving back as needed (greedy) «?»
+   //Match the regular expression below and capture its match into backreference number 2 «(\d+)»
+      //Match a single digit 0..9 «\d+»
+         //Between one and unlimited times, as many times as possible, giving back as needed (greedy) «+»
+   //Match the character “ ” literally « *»
+      //Between zero and unlimited times, as many times as possible, giving back as needed (greedy) «*»
+   //Match the character “/” literally «/»
+   //Match the character “ ” literally « *»
+      //Between zero and unlimited times, as many times as possible, giving back as needed (greedy) «*»
+   //Match the regular expression below and capture its match into backreference number 3 «(\d+)»
+      //Match a single digit 0..9 «\d+»
+         //Between one and unlimited times, as many times as possible, giving back as needed (greedy) «+»
+
+//Match any single character that is not a line break character «.*»
+   //Between zero and unlimited times, as many times as possible, giving back as needed (greedy) «*»
+//Assert position at the end of the string (or before the line break at the end of the string, if any) «$»
+//
+//*(-|to)?                                     divider
+//\d++(?:\.\d{1,2})?   match decimal
+//
+//(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?.*$/;
+//
+
+//var reNumber = /(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?.*$/;
+var reNumber = /(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?(.*)$/;
+
+function remove(array, from, to) {
+  var rest = array.slice((to || from) + 1 || array.length);
+  array.length = from < 0 ? array.length + from : from;
+  return array.push.apply(array, rest);
+}
+
+function parseQuantity(text) {
+  var breakdown = {},
+      retval = [],
+      matches;
+
+  matches = text.match(reNumber);
+
+  if (!matches) {
+    return retval;
+  }
+
+  // remove the first element
+  remove(matches, 0, 0);
+
+  for (var i = 0; i < matches.length; i+=2) {
+    if (matches.length >= i+2) {
+      retval.push({
+        whole: matches[i],
+        part: matches[i+1]
+      });
+    } else if (matches.length >= i+1) {
+      retval.push({
+        whole: matches[i]
+      });
+    }
+  }
+
+  return retval;
+}
+
+function pruneQuantity(text) {
+  var matches = text.match(reNumber);
+
+  if (!matches) {
+    return;
+  }
+
+  var idx = 5;
+  if (matches.length > idx) {
+    return matches[idx];
+  }
+}
+
+function getQuantityFromValue(value) {
+  var quantity;
+
+  if (_.isArray(value)) {
+    quantity = _.first(_.uniq(_.map(value, function(val) {
+      if (val.isDivider) {
+        return _.first(_.uniq(_.pluck(val.ingredients, 'quantity')));
+      } else {
+        return val.quantity;
+      }
+    })));
+    //console.log('Q: ' + quantity);
+  } else {
+    quantity = value.quantity;
+  }
+  return quantity;
+}
+
+var measurments = [
+  'bag',
+  'batch',
+  'block',
+  'bottle',
+  'box',
+  'bunch',
+  'can',
+  'container',
+  'crown',
+  'cube',
+  'cup',
+  'dash',
+  'dozen',
+  'drop',
+  'ear',
+  'envelope',
+  'feet',
+  'fillet',
+  'fluid ounce',
+  'gallon',
+  'gram',
+  'grind',
+  'half',
+  'handful',
+  'head',
+  'heart',
+  'large',
+  'leaf',
+  'liter',
+  'loaf',
+  'medium',
+  'mini',
+  'ounce',
+  'package',
+  'packet',
+  'part',
+  'pat',
+  'piece',
+  'pinch',
+  'pint',
+  'pouch',
+  'pound',
+  'quart',
+  'recipe',
+  'scoop',
+  'set',
+  'sheet',
+  'shot',
+  'side',
+  'slab',
+  'slice',
+  'small',
+  'splash',
+  'sprig',
+  'sprinkle',
+  'stalk',
+  'stem',
+  'stick',
+  'strip',
+  'tablespoon',
+  'teaspoon',
+  'tin',
+  'vial',
+  'whole'
+];
+
+[
+  'dozen', 'small', 'medium', 'large', 'mini', 'whole'
+].forEach(pluralize.addUncountableRule);
+
+measurments = _.union(measurments, _.map(measurments, function(measurment) {
+  return pluralize.plural(measurment);
+})).sort();
+
+var pluralizeTests = [
+  // Uncountables.
+  ['dozen', 'dozen'],
+  ['feet', 'feet'],
+  ['large', 'large'],
+  ['medium', 'medium'],
+  ['mini', 'mini'],
+  ['small', 'small'],
+  ['whole', 'whole'],
+  // Pluralization.
+  ['man', 'men'],
+  ['superman', 'supermen'],
+  ['ox', 'oxen'],
+  ['bag', 'bags'],
+  ['batch', 'batches'],
+  ['block', 'blocks'],
+  ['bottle', 'bottles'],
+  ['box', 'boxes'],
+  ['bunch', 'bunches'],
+  ['can', 'cans'],
+  ['clove', 'cloves'],
+  ['container', 'containers'],
+  ['crown', 'crowns'],
+  ['cube', 'cubes'],
+  ['cup', 'cups'],
+  ['dash', 'dashes'],
+  ['drop', 'drops'],
+  ['ear', 'ears'],
+  ['envelope', 'envelopes'],
+  ['fillet', 'fillets'],
+  ['fluid ounce', 'fluid ounces'],
+  ['gallon', 'gallons'],
+  ['grind', 'grinds'],
+  ['half', 'halves'],
+  ['handful', 'handfuls'],
+  ['head', 'heads'],
+  ['heart', 'hearts'],
+  ['leaf', 'leaves'],
+  ['liter', 'liters'],
+  ['loaf', 'loaves'],
+  ['ounce', 'ounces'],
+  ['package', 'packages'],
+  ['packet', 'packets'],
+  ['part', 'parts'],
+  ['pat', 'pats'],
+  ['piece', 'pieces'],
+  ['pinch', 'pinches'],
+  ['pint', 'pints'],
+  ['pouch', 'pouches'],
+  ['pound', 'pounds'],
+  ['quart', 'quarts'],
+  ['recipe', 'recipes'],
+  ['scoop', 'scoops'],
+  ['set', 'sets'],
+  ['sheet', 'sheets'],
+  ['side', 'sides'],
+  ['slab', 'slabs'],
+  ['slice', 'slices'],
+  ['splash', 'splashes'],
+  ['sprig', 'sprigs'],
+  ['sprinkle', 'sprinkles'],
+  ['stalk', 'stalks'],
+  ['stem', 'stems'],
+  ['stick', 'sticks'],
+  ['strip', 'strips'],
+  ['tablespoon', 'tablespoons'],
+  ['teaspoon', 'teaspoons'],
+  ['tin', 'tins'],
+  ['vial', 'vials']
+];
+
+describe('pluralize', function () {
+  it('should pluralize words', function () {
+    pluralizeTests.forEach(function (word) {
+      assert.equal(pluralize.plural(word[0]), word[1]);
+    });
+  });
+});
+
+describe('cooks illustrated instructions parser', function() {
+  it('should parse quantity', function() {
+    var key,
+        value,
+        retval,
+        quantity;
+
+    _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+      value = _.first(_.values(ingredient));
+      quantity = getQuantityFromValue(value);
+
+      retval = _.map(parseQuantity(key), function(duple) {
+        if (duple.whole && duple.part) {
+          return duple.whole + ' ' + duple.part;
+        } else if (duple.whole) {
+          return duple.whole;
+        } else if (duple.part) {
+          return duple.part;
+        }
+      });
+      expect(_.first(retval)).to.equal(quantity);
+      //console.log('Computed: ' + _.first(retval) + ', Expected: ' + quantity);
+    });
+  });
+
+  it('should parse description', function() {
+    var key,
+        value,
+        quantity;
+
+    _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+      value = _.first(_.values(ingredient));
+
+      console.log(pruneQuantity(key));
+
+      /*
+      quantity = _.first(_.map(parseQuantity(key), function(duple) {
+        if (duple.whole && duple.part) {
+          return duple.whole + ' ' + duple.part;
+        } else if (duple.whole) {
+          return duple.whole;
+        } else if (duple.part) {
+          return duple.part;
+        }
+      }));
+
+      */
+      //console.log('Quantity: ' + quantity);
+    });
+  });
+});
+
