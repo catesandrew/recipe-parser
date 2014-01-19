@@ -79,8 +79,8 @@ var ingredients = [
     }
   }, {
     '3 ounces smoked cheddar cheese, grated (1 cup)': {
-      description: 'cheddar cheese',
-      direction: 'smoked, grated',
+      description: 'smoked cheddar cheese',
+      direction: 'grated',
       measurement: 'ounces',
       quantity: '3',
       alt: '1 cup'
@@ -239,7 +239,7 @@ var ingredients = [
   }, {
     'Salt and ground black pepper': [
       {
-        description: 'salt'
+        description: 'kosher salt'
       }, {
         description: 'black pepper',
         direction: 'ground'
@@ -334,8 +334,8 @@ var ingredients = [
     }
   }, {
     '1/2 cup mild molasses': {
-      description: 'molasses',
-      direction: 'mild',
+      description: 'mild molasses',
+      direction: '',
       measurement: 'cup',
       quantity: '1/2'
     }
@@ -428,7 +428,7 @@ var ingredients = [
     }
   }, {
     '1 quart Quick Broth (see related recipe)': {
-      description: 'quick broth',
+      description: 'Quick Broth',
       direction: 'see related recipe',
       measurement: 'quart',
       quantity: '1'
@@ -635,7 +635,7 @@ var chopWordsFromFront = function(text, array, from) {
 
   var tokens = _.first(tokenizer.tokenize(text), from);
   for (var i = 0, l = tokens.length; i < l; i++) {
-    if (_.indexOf(array, tokens[i], true) >= 0) {
+    if (_.indexOf(array, tokens[i].toLowerCase(), true) >= 0) {
       found = i + 1;
     } else {
       break;
@@ -643,7 +643,7 @@ var chopWordsFromFront = function(text, array, from) {
   }
 
   for (i=0, l=found; i < l; i++) {
-    text = text.replace(new RegExp(tokens[i] + punctStr + '?'), '').trim();
+    text = text.replace(new RegExp(tokens[i] + punctStr + '?', 'i'), '').trim();
   }
   tokens.length = found;
   if (tokens.length) {
@@ -956,7 +956,7 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it.skip('should parse description', function() {
+  it('should parse description', function() {
     var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
     var parenthesesRe = /\(([^\)]*)\)/;
     var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
@@ -1035,12 +1035,21 @@ describe('cooks illustrated instructions parser', function() {
         return desc.trim().replace(/\s{2,}/g, ' ');
       });
 
-      var words = [
+      var _words = [
         'chopped', 'cracked', 'fresh',  'grated', 'ground', 'minced', 'toasted'
       ]
 
-      //descriptions = _.map(descriptions, function(desc) {
-      //});
+      descriptions = _.map(descriptions, function(desc) {
+        desc = (chopWordsFromFront(desc, _words, 2) || {}).pruned;
+        if (desc == 'cloves garlic') {
+          return 'garlic cloves';
+        } else if (desc.toLowerCase() == 'salt') {
+          return 'kosher salt';
+        } else if (desc.toLowerCase() == 'table salt') {
+          return 'table salt';
+        }
+        return desc;
+      });
 
 
       //console.log(descriptions);
