@@ -627,7 +627,7 @@ function pruneQuantity(text) {
   }
 }
 
-var chopWordsFromFront = function(text, array, from) {
+function chopWordsFromFront(text, array, from) {
   var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]',
       tokenizer = new natural.WordTokenizer(),
       matched,
@@ -654,6 +654,90 @@ var chopWordsFromFront = function(text, array, from) {
     pruned: text,
     matched: matched
   }
+}
+
+function getDescriptions(text) {
+  var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
+  var parenthesesRe = /\(([^\)]*)\)/;
+  var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
+
+  var description = (chopWordsFromFront(pruneQuantity(text), _measurements, 2) || {}).pruned,
+      parentheses = undefined,
+      descriptions,
+      matches;
+
+  //console.log('>' + description);
+  matches = description.match(commaRe);
+
+  // remove the first element
+  remove(matches, 0, 0);
+  description = _.first(matches);
+
+  // unsalted butter (1 stick)
+  // smoked paprika (sweet or bittersweet)
+  // unsalted butter (1 stick)
+  // yellow onions (4 small or 3 medium)
+  // bread flour (2 cups)
+  // water (1 cup)
+  // bread flour (3 cups)
+  // water (1 1/3 cups)
+  // bacon (2 slices)
+  // dried small white beans (about 2 cups)
+  // ground black pepper
+  // grated fresh horseradish
+  // minced fresh ginger
+  // fresh ginger
+  // minced scallions
+  // toasted sesame oil
+  // chopped fresh thyme
+  // cloves garlic
+  // Salt and ground black pepper
+  // black Chinese vinegar or Worcestershire sauce
+  // vegetable oil or peanut oil
+  // small Napa cabbage or celery cabbage
+  // cracked black peppercorns (or cracked white peppercorns)
+
+  // strip out parentheses.  match(/\([^\)]*\)/)
+  // split on `or` or `and`  .split(/(?:\s+)?(?:or|and)\s+/i)
+  // if first word contained in parentheses is `or` then split
+  //   ex, (or cracked white peppercorns) vs (sweet or bittersweet)
+
+  // strip out parentheses
+  matches = description.match(parenthesesRe);
+  if (matches) {
+    remove(matches, 0, 0); // remove the first element
+    parentheses = _.first(matches);
+    // remove the parentheses from the description
+    description = description.replace(parenthesesRe, '');
+  }
+
+  // split on `or` or `and`
+  descriptions = description.split(andOrSplitterRe);
+
+  // if first word contained in parentheses is `or` then split
+  if (parentheses && parentheses.indexOf('or') === 0) {
+    descriptions.push(parentheses.split(andOrSplitterRe)[1]);
+  }
+
+  // clean up
+  descriptions = _.map(descriptions, function(desc) {
+    // trim and replace extra spaces with one
+    return desc.trim().replace(/\s{2,}/g, ' ');
+  });
+
+  descriptions = _.map(descriptions, function(desc) {
+    desc = (chopWordsFromFront(desc, _words, 2) || {}).pruned;
+    if (desc == 'cloves garlic') {
+      return 'garlic cloves';
+    } else if (desc.toLowerCase() == 'salt') {
+      return 'kosher salt';
+    } else if (desc.toLowerCase() == 'table salt') {
+      return 'table salt';
+    }
+    return desc;
+  });
+
+  return descriptions;
 }
 
 // test helper functions
@@ -907,110 +991,28 @@ describe('cooks illustrated instructions parser', function() {
   });
 
   it('should parse description', function() {
-    var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
-    var parenthesesRe = /\(([^\)]*)\)/;
-    var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
-
-    var expectedDescription,
+    var expectedDescriptions,
         descriptions,
-        description,
-        parentheses,
-        matches,
         value,
         key;
 
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
-      expectedDescription = getKeyFromTestData(value, 'description');
-      description = (chopWordsFromFront(pruneQuantity(key), _measurements, 2) || {}).pruned;
-      parentheses = undefined;
+      expectedDescriptions = getKeyFromTestData(value, 'description');
+      descriptions = getDescriptions(key);
 
-      //console.log('>' + description);
-      matches = description.match(commaRe);
-
-      // remove the first element
-      remove(matches, 0, 0);
-      description = _.first(matches);
-
-      // unsalted butter (1 stick)
-      // smoked paprika (sweet or bittersweet)
-      // unsalted butter (1 stick)
-      // yellow onions (4 small or 3 medium)
-      // bread flour (2 cups)
-      // water (1 cup)
-      // bread flour (3 cups)
-      // water (1 1/3 cups)
-      // bacon (2 slices)
-      // dried small white beans (about 2 cups)
-      // ground black pepper
-      // grated fresh horseradish
-      // minced fresh ginger
-      // fresh ginger
-      // minced scallions
-      // toasted sesame oil
-      // chopped fresh thyme
-      // cloves garlic
-      // Salt and ground black pepper
-      // black Chinese vinegar or Worcestershire sauce
-      // vegetable oil or peanut oil
-      // small Napa cabbage or celery cabbage
-      // cracked black peppercorns (or cracked white peppercorns)
-
-      // strip out parentheses.  match(/\([^\)]*\)/)
-      // split on `or` or `and`  .split(/(?:\s+)?(?:or|and)\s+/i)
-      // if first word contained in parentheses is `or` then split
-      //   ex, (or cracked white peppercorns) vs (sweet or bittersweet)
-
-      // strip out parentheses
-      matches = description.match(parenthesesRe);
-      if (matches) {
-        remove(matches, 0, 0); // remove the first element
-        parentheses = _.first(matches);
-        // remove the parentheses from the description
-        description = description.replace(parenthesesRe, '');
-      }
-
-      // split on `or` or `and`
-      descriptions = description.split(andOrSplitterRe);
-
-      // if first word contained in parentheses is `or` then split
-      if (parentheses && parentheses.indexOf('or') === 0) {
-        descriptions.push(parentheses.split(andOrSplitterRe)[1]);
-      }
-
-      // clean up
-      descriptions = _.map(descriptions, function(desc) {
-        // trim and replace extra spaces with one
-        return desc.trim().replace(/\s{2,}/g, ' ');
-      });
-
-      descriptions = _.map(descriptions, function(desc) {
-        desc = (chopWordsFromFront(desc, _words, 2) || {}).pruned;
-        if (desc == 'cloves garlic') {
-          return 'garlic cloves';
-        } else if (desc.toLowerCase() == 'salt') {
-          return 'kosher salt';
-        } else if (desc.toLowerCase() == 'table salt') {
-          return 'table salt';
-        }
-        return desc;
-      });
-
-
-      //console.log(descriptions);
-      //console.log(expectedDescription);
-
-      for (var i = 0, l = expectedDescription.length; i < l; i++) {
-        if (_.isArray(expectedDescription[i])) {
-          for (var j = 0, ll = expectedDescription[i].length; j < ll; j++) {
-            expect(expectedDescription[i][j]).to.equal(descriptions[j]);
+      for (var i = 0, l = expectedDescriptions.length; i < l; i++) {
+        if (_.isArray(expectedDescriptions[i])) {
+          for (var j = 0, ll = expectedDescriptions[i].length; j < ll; j++) {
+            expect(expectedDescriptions[i][j]).to.equal(descriptions[j]);
           }
         } else {
-          expect(expectedDescription[i]).to.equal(descriptions[i]);
+          expect(expectedDescriptions[i]).to.equal(descriptions[i]);
         }
       }
 
     });
   });
+
 });
