@@ -677,6 +677,10 @@ function getKeyFromTestData(value, key) {
   return [retval];
 }
 
+var _words = [
+  'chopped', 'cracked', 'fresh',  'grated', 'ground', 'minced', 'toasted'
+];
+
 var _measurements = [
   'bag',
   'batch',
@@ -753,78 +757,78 @@ _measurements = _.union(_measurements, _.map(_measurements, function(measurement
   return pluralize.plural(measurement);
 })).sort();
 
-var pluralizeTests = [
-  // Uncountables.
-  ['dozen', 'dozen'],
-  ['feet', 'feet'],
-  ['large', 'large'],
-  ['medium', 'medium'],
-  ['mini', 'mini'],
-  ['small', 'small'],
-  ['whole', 'whole'],
-  // Pluralization.
-  ['man', 'men'],
-  ['superman', 'supermen'],
-  ['ox', 'oxen'],
-  ['bag', 'bags'],
-  ['batch', 'batches'],
-  ['block', 'blocks'],
-  ['bottle', 'bottles'],
-  ['box', 'boxes'],
-  ['bunch', 'bunches'],
-  ['can', 'cans'],
-  ['clove', 'cloves'],
-  ['container', 'containers'],
-  ['crown', 'crowns'],
-  ['cube', 'cubes'],
-  ['cup', 'cups'],
-  ['dash', 'dashes'],
-  ['drop', 'drops'],
-  ['ear', 'ears'],
-  ['envelope', 'envelopes'],
-  ['fillet', 'fillets'],
-  ['fluid ounce', 'fluid ounces'],
-  ['gallon', 'gallons'],
-  ['grind', 'grinds'],
-  ['half', 'halves'],
-  ['handful', 'handfuls'],
-  ['head', 'heads'],
-  ['heart', 'hearts'],
-  ['leaf', 'leaves'],
-  ['liter', 'liters'],
-  ['loaf', 'loaves'],
-  ['ounce', 'ounces'],
-  ['package', 'packages'],
-  ['packet', 'packets'],
-  ['part', 'parts'],
-  ['pat', 'pats'],
-  ['piece', 'pieces'],
-  ['pinch', 'pinches'],
-  ['pint', 'pints'],
-  ['pouch', 'pouches'],
-  ['pound', 'pounds'],
-  ['quart', 'quarts'],
-  ['recipe', 'recipes'],
-  ['scoop', 'scoops'],
-  ['set', 'sets'],
-  ['sheet', 'sheets'],
-  ['side', 'sides'],
-  ['slab', 'slabs'],
-  ['slice', 'slices'],
-  ['splash', 'splashes'],
-  ['sprig', 'sprigs'],
-  ['sprinkle', 'sprinkles'],
-  ['stalk', 'stalks'],
-  ['stem', 'stems'],
-  ['stick', 'sticks'],
-  ['strip', 'strips'],
-  ['tablespoon', 'tablespoons'],
-  ['teaspoon', 'teaspoons'],
-  ['tin', 'tins'],
-  ['vial', 'vials']
-];
-
 describe('pluralize', function () {
+  var pluralizeTests = [
+    // Uncountables.
+    ['dozen', 'dozen'],
+    ['feet', 'feet'],
+    ['large', 'large'],
+    ['medium', 'medium'],
+    ['mini', 'mini'],
+    ['small', 'small'],
+    ['whole', 'whole'],
+    // Pluralization.
+    ['man', 'men'],
+    ['superman', 'supermen'],
+    ['ox', 'oxen'],
+    ['bag', 'bags'],
+    ['batch', 'batches'],
+    ['block', 'blocks'],
+    ['bottle', 'bottles'],
+    ['box', 'boxes'],
+    ['bunch', 'bunches'],
+    ['can', 'cans'],
+    ['clove', 'cloves'],
+    ['container', 'containers'],
+    ['crown', 'crowns'],
+    ['cube', 'cubes'],
+    ['cup', 'cups'],
+    ['dash', 'dashes'],
+    ['drop', 'drops'],
+    ['ear', 'ears'],
+    ['envelope', 'envelopes'],
+    ['fillet', 'fillets'],
+    ['fluid ounce', 'fluid ounces'],
+    ['gallon', 'gallons'],
+    ['grind', 'grinds'],
+    ['half', 'halves'],
+    ['handful', 'handfuls'],
+    ['head', 'heads'],
+    ['heart', 'hearts'],
+    ['leaf', 'leaves'],
+    ['liter', 'liters'],
+    ['loaf', 'loaves'],
+    ['ounce', 'ounces'],
+    ['package', 'packages'],
+    ['packet', 'packets'],
+    ['part', 'parts'],
+    ['pat', 'pats'],
+    ['piece', 'pieces'],
+    ['pinch', 'pinches'],
+    ['pint', 'pints'],
+    ['pouch', 'pouches'],
+    ['pound', 'pounds'],
+    ['quart', 'quarts'],
+    ['recipe', 'recipes'],
+    ['scoop', 'scoops'],
+    ['set', 'sets'],
+    ['sheet', 'sheets'],
+    ['side', 'sides'],
+    ['slab', 'slabs'],
+    ['slice', 'slices'],
+    ['splash', 'splashes'],
+    ['sprig', 'sprigs'],
+    ['sprinkle', 'sprinkles'],
+    ['stalk', 'stalks'],
+    ['stem', 'stems'],
+    ['stick', 'sticks'],
+    ['strip', 'strips'],
+    ['tablespoon', 'tablespoons'],
+    ['teaspoon', 'teaspoons'],
+    ['tin', 'tins'],
+    ['vial', 'vials']
+  ];
+
   it('should pluralize words', function () {
     pluralizeTests.forEach(function (word) {
       assert.equal(pluralize.plural(word[0]), word[1]);
@@ -980,10 +984,6 @@ describe('cooks illustrated instructions parser', function() {
         // trim and replace extra spaces with one
         return desc.trim().replace(/\s{2,}/g, ' ');
       });
-
-      var _words = [
-        'chopped', 'cracked', 'fresh',  'grated', 'ground', 'minced', 'toasted'
-      ]
 
       descriptions = _.map(descriptions, function(desc) {
         desc = (chopWordsFromFront(desc, _words, 2) || {}).pruned;
