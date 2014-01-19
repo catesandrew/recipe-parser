@@ -627,16 +627,15 @@ function pruneQuantity(text) {
   }
 }
 
-var calcMeasurement = function(text) {
-  text = pruneQuantity(text);
+var chopWordsFromFront = function(text, array, from) {
   var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]',
       tokenizer = new natural.WordTokenizer(),
-      measurement,
+      matched,
       found = 0;
 
-  var tokens = _.first(tokenizer.tokenize(text), 2);
+  var tokens = _.first(tokenizer.tokenize(text), from);
   for (var i = 0, l = tokens.length; i < l; i++) {
-    if (_.indexOf(measurments, tokens[i], true) >= 0) {
+    if (_.indexOf(array, tokens[i], true) >= 0) {
       found = i + 1;
     } else {
       break;
@@ -648,12 +647,12 @@ var calcMeasurement = function(text) {
   }
   tokens.length = found;
   if (tokens.length) {
-    measurement = tokens.join(' ');
+    matched = tokens.join(' ');
   }
 
   return {
     pruned: text,
-    measurement: measurement
+    matched: matched
   }
 }
 
@@ -678,7 +677,7 @@ function getKeyFromTestData(value, key) {
   return [retval];
 }
 
-var measurments = [
+var _measurements = [
   'bag',
   'batch',
   'block',
@@ -750,7 +749,7 @@ var measurments = [
   'dozen', 'small', 'medium', 'large', 'mini', 'whole'
 ].forEach(pluralize.addUncountableRule);
 
-measurments = _.union(measurments, _.map(measurments, function(measurement) {
+_measurements = _.union(_measurements, _.map(_measurements, function(measurement) {
   return pluralize.plural(measurement);
 })).sort();
 
@@ -899,7 +898,7 @@ describe('cooks illustrated instructions parser', function() {
 
       tokens = _.first(tokenizer.tokenize(text), 2);
       for (var i = 0, l = tokens.length; i < l; i++) {
-        if (_.indexOf(measurments, tokens[i], true) >= 0) {
+        if (_.indexOf(_measurements, tokens[i], true) >= 0) {
           found = i + 1;
         } else {
           break;
@@ -941,7 +940,7 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedMeasurement = getKeyFromTestData(value, 'measurement');
-      measurement = (calcMeasurement(key)).measurement;
+      measurement = (chopWordsFromFront(pruneQuantity(key), _measurements, 2) || {}).matched;
 
       _.each(expectedMeasurement, function(expected) {
         if (_.isArray(expected)) {
@@ -957,7 +956,7 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it('should parse description', function() {
+  it.skip('should parse description', function() {
     var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
     var parenthesesRe = /\(([^\)]*)\)/;
     var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
@@ -974,7 +973,7 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedDescription = getKeyFromTestData(value, 'description');
-      description = (calcMeasurement(key) || {}).pruned;
+      description = (chopWordsFromFront(pruneQuantity(key), _measurements, 2) || {}).pruned;
       parentheses = undefined;
 
       //console.log('>' + description);
@@ -1036,6 +1035,9 @@ describe('cooks illustrated instructions parser', function() {
         return desc.trim().replace(/\s{2,}/g, ' ');
       });
 
+      var words = [
+        'chopped', 'cracked', 'fresh',  'grated', 'ground', 'minced', 'toasted'
+      ]
 
       //descriptions = _.map(descriptions, function(desc) {
       //});
