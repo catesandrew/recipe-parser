@@ -1,6 +1,8 @@
 /*global require, describe, it */
+// tokenizer: https://github.com/NaturalNode/natural
 var assert = require('assert'),
     pluralize = require('pluralize'),
+    natural = require('natural'),
     _ = require('underscore'),
     chai = require('chai');
 
@@ -20,7 +22,6 @@ var ingredients = [
     '8 tablespoons unsalted butter (1 stick), melted': {
       description: 'unsalted butter',
       direction: 'melted',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '8',
       alt: '1 stick'
@@ -28,8 +29,6 @@ var ingredients = [
   }, {
     '1 1/2 teaspoons table salt': {
       description: 'table salt',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '1 1/2'
     }
@@ -37,15 +36,12 @@ var ingredients = [
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
       direction: 'ground',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/2'
     }
   }, {
     '2 tablespoons prepared horseradish': {
       description: 'prepared horseradish',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '2'
     }
@@ -53,7 +49,6 @@ var ingredients = [
     '1/4 cup grated fresh horseradish': {
       description: 'horseradish',
       direction: 'fresh, grated',
-      isMain: false,
       measurement: 'cup',
       quantity: '1/4'
     }
@@ -61,31 +56,24 @@ var ingredients = [
     '3 medium scallions, green parts only, minced': {
       description: 'scallions',
       direction: 'green parts only, minced',
-      isMain: false,
       measurement: 'medium',
       quantity: '3'
     }
   }, {
     '1 1/4 teaspoons table salt': {
       description: 'table salt',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '1 1/4'
     }
   }, {
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/2'
     }
   }, {
     '2 tablespoons grainy mustard': {
       description: 'grainy mustard',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '2'
     }
@@ -93,7 +81,6 @@ var ingredients = [
     '3 ounces smoked cheddar cheese, grated (1 cup)': {
       description: 'cheddar cheese',
       direction: 'smoked, grated',
-      isMain: false,
       measurement: 'ounces',
       quantity: '3',
       alt: '1 cup'
@@ -102,15 +89,12 @@ var ingredients = [
     '1 teaspoon smoked paprika (sweet or bittersweet)': {
       description: 'smoked paprika',
       direction: 'sweet or bittersweet',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1'
     }
   }, {
     '8 tablespoons unsalted butter (1 stick)': {
       description: 'unsalted butter',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '8',
       alt: '1 stick'
@@ -119,7 +103,6 @@ var ingredients = [
     '3 medium cloves garlic, minced or pressed through garlic press (1 generous tablespoon)': {
       description: 'garlic cloves',
       direction: 'minced or pressed through garlic press',
-      isMain: false,
       measurement: 'medium',
       quantity: '3',
       alt: '1 tablespoon'
@@ -128,31 +111,24 @@ var ingredients = [
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
       direction: 'ground',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/2'
     }
   }, {
     '1 1/2 teaspoons unsalted butter': {
       description: 'unsalted butter',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '1 1/2'
     }
   }, {
     '1 1/2 teaspoons vegetable oil': {
       description: 'vegetable oil',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '1 1/2'
     }
   }, {
     '1/2 teaspoon light brown sugar': {
       description: 'light brown sugar',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/2'
     }
@@ -160,7 +136,6 @@ var ingredients = [
     '1 pound yellow onions (4 small or 3 medium), sliced 1/4 inch thick': {
       description: 'yellow onions',
       direction: 'sliced 1/4 inch thick',
-      isMain: false,
       measurement: 'pound',
       //quantity: '1 (4 small or 3 medium)'
       quantity: '1'
@@ -169,7 +144,6 @@ var ingredients = [
     '1 cup port, preferably ruby port': {
       description: 'port',
       direction: 'preferably ruby port',
-      isMain: false,
       measurement: 'cup',
       quantity: '1'
     }
@@ -177,7 +151,6 @@ var ingredients = [
     '1 teaspoon chopped fresh thyme leaves': {
       description: 'thyme leaves',
       direction: 'fresh, chopped',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1'
     }
@@ -185,7 +158,6 @@ var ingredients = [
     '6 tablespoons unsalted butter, melted': {
       description: 'unsalted butter',
       direction: 'melted',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '6'
     }
@@ -193,7 +165,6 @@ var ingredients = [
     '4 ounces blue cheese, crumbled': {
       description: 'blue cheese',
       direction: 'crumbled',
-      isMain: false,
       measurement: 'ounces',
       quantity: '4'
     }
@@ -201,7 +172,6 @@ var ingredients = [
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
       direction: 'ground',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/2'
     }
@@ -209,15 +179,12 @@ var ingredients = [
     '11 ounces bread flour (2 cups)': {
       description: 'bread flour',
       direction: '(2 cups)',
-      isMain: false,
       measurement: 'ounces',
       quantity: '11'
     }
   }, {
     '1/4 teaspoon instant yeast': {
       description: 'instant yeast',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/4'
     }
@@ -225,7 +192,6 @@ var ingredients = [
     '8 ounces water (1 cup), room temperature': {
       description: 'water',
       direction: 'room temperature',
-      isMain: false,
       measurement: 'ounces',
       quantity: '8',
       alt: '1 cup'
@@ -234,7 +200,6 @@ var ingredients = [
     '16 1/2 ounces bread flour (3 cups), plus extra for dusting hands and work surface': {
       description: 'bread flour',
       direction: 'plus extra for dusting hands and work surface',
-      isMain: false,
       measurement: 'ounces',
       quantity: '16 1/2',
       alt: '3 cups'
@@ -242,8 +207,6 @@ var ingredients = [
   }, {
     '1 teaspoon instant yeast': {
       description: 'instant yeast',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1'
     }
@@ -251,7 +214,6 @@ var ingredients = [
     '10.7 ounces water (1 1/3 cups), room temperature': {
       description: 'water',
       direction: 'room temperature',
-      isMain: false,
       measurement: 'ounces',
       quantity: '10.7',
       alt: '1 1/3 cups'
@@ -259,8 +221,6 @@ var ingredients = [
   }, {
     '3/4 cup sesame seeds': {
       description: 'sesame seeds',
-      direction: '',
-      isMain: false,
       measurement: 'cup',
       quantity: '3/4'
     }
@@ -268,15 +228,11 @@ var ingredients = [
     '4 tuna steaks, 8 ounces each and about 1 inch thick': {
       description: 'tuna steaks',
       direction: '8 ounces each and about 1 inch thick',
-      isMain: false,
-      measurement: '',
       quantity: '4'
     }
   }, {
     '2 tablespoons vegetable oil': {
       description: 'vegetable oil',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '2'
     }
@@ -292,32 +248,24 @@ var ingredients = [
   }, {
     '1/4 cup soy sauce': {
       description: 'soy sauce',
-      direction: '',
-      isMain: false,
       measurement: 'cup',
       quantity: '1/4'
     }
   }, {
     '1/4 cup rice vinegar': {
       description: 'rice vinegar',
-      direction: '',
-      isMain: false,
       measurement: 'cup',
       quantity: '1/4'
     }
   }, {
     '1/4 cup water': {
       description: 'water',
-      direction: '',
-      isMain: false,
       measurement: 'cup',
       quantity: '1/4'
     }
   }, {
     '2 1/2 teaspoons sugar': {
       description: 'sugar',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '2 1/2'
     }
@@ -325,7 +273,6 @@ var ingredients = [
     '1 medium scallion, sliced thin': {
       description: 'scallion',
       direction: 'sliced thin',
-      isMain: false,
       measurement: 'medium',
       quantity: '1'
     }
@@ -333,7 +280,6 @@ var ingredients = [
     '2 teaspoons minced fresh ginger': {
       description: 'ginger',
       direction: 'fresh, minced',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '2'
     }
@@ -341,15 +287,12 @@ var ingredients = [
     '1 1/2 teaspoons toasted sesame oil': {
       description: 'sesame oil',
       direction: 'toasted',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '1 1/2'
     }
   }, {
     '1/2 teaspoon red pepper flakes': {
       description: 'red pepper flakes',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1/2'
     }
@@ -357,7 +300,6 @@ var ingredients = [
     '4 teaspoons cracked black peppercorns (or cracked white peppercorns)': {
       description: 'black peppercorns',
       direction: 'cracked (or cracked white peppercorns)',
-      isMain: false,
       measurement: 'teaspoons',
       quantity: '4'
     }
@@ -365,7 +307,6 @@ var ingredients = [
     '4 ounces salt pork, trimmed of rind and cut into 1/2-inch cubes': {
       description: 'salt pork',
       direction: 'trimmed of rind and cut into 1/2-inch cubes',
-      isMain: false,
       measurement: 'ounces',
       quantity: '4'
     }
@@ -373,7 +314,6 @@ var ingredients = [
     '2 ounces bacon (2 slices), cut into 1/4-inch pieces': {
       description: 'bacon',
       direction: 'cut into 1/4-inch pieces',
-      isMain: false,
       measurement: 'ounces',
       quantity: '2',
       alt: '2 slices'
@@ -382,7 +322,6 @@ var ingredients = [
     '1 medium onion, chopped fine': {
       description: 'onion',
       direction: 'chopped fine',
-      isMain: false,
       measurement: 'medium',
       quantity: '1'
     }
@@ -390,15 +329,12 @@ var ingredients = [
     '1/2 cup mild molasses': {
       description: 'molasses',
       direction: 'mild',
-      isMain: false,
       measurement: 'cup',
       quantity: '1/2'
     }
   }, {
     '1 1/2 tablespoons brown mustard': {
       description: 'brown mustard',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '1 1/2'
     }
@@ -406,7 +342,6 @@ var ingredients = [
     '1 pound dried small white beans (about 2 cups), rinsed and picked over': {
       description: 'dried small white beans',
       direction: 'rinsed and picked over',
-      isMain: false,
       measurement: 'pound',
       quantity: '1',
       alt: 'about 2 cups'
@@ -418,8 +353,6 @@ var ingredients = [
   }, {
     '1 teaspoon cider vinegar': {
       description: 'cider vinegar',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1'
     }
@@ -431,16 +364,12 @@ var ingredients = [
   }, {
     '3 1/2 tablespoons soy sauce': {
       description: 'soy sauce',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '3 1/2'
     }
   }, {
     '3 tablespoons rice wine': {
       description: 'rice wine',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '3'
     }
@@ -448,7 +377,6 @@ var ingredients = [
     '2 tablespoons minced scallions': {
       description: 'scallions',
       direction: 'minced',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '2'
     }
@@ -456,23 +384,18 @@ var ingredients = [
     '2 tablespoons minced fresh ginger': {
       description: 'ginger',
       direction: 'fresh, minced',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '2'
     }
   }, {
     '1 1/2 tablespoons black Chinese vinegar or Worcestershire sauce': {
       description: 'black Chinese vinegar or Worcestershire sauce',
-      direction: '',
-      isMain: false,
       measurement: 'tablespoons',
       quantity: '1 1/2'
     }
   }, {
     '1 teaspoon sesame oil': {
       description: 'sesame oil',
-      direction: '',
-      isMain: false,
       measurement: 'teaspoon',
       quantity: '1'
     }
@@ -480,15 +403,13 @@ var ingredients = [
     '1/2 pound medium shrimp, peeled and butterflied': {
       description: 'shrimp',
       direction: 'medium, peeled and butterflied',
-      isMain: false,
-      measurement: 'pound',
+      measurement: 'pound medium', // should return really just pound
       quantity: '1/2'
     }
   }, {
     '1/2 pound scallops, sliced horizontally in half': {
       description: 'scallops',
       direction: 'sliced horizontally in half',
-      isMain: false,
       measurement: 'pound',
       quantity: '1/2'
     }
@@ -496,7 +417,6 @@ var ingredients = [
     '1 quart Quick Broth (see related recipe)': {
       description: 'quick broth',
       direction: 'see related recipe',
-      isMain: false,
       measurement: 'quart',
       quantity: '1'
     }
@@ -505,8 +425,7 @@ var ingredients = [
     '2 inch piece fresh ginger, sliced thin': {
       description: 'ginger',
       direction: 'fresh, sliced thin',
-      isMain: false,
-      measurement: '2 inch piece',
+      measurement: 'inch piece',
       quantity: '2'
     }
   }, {
@@ -572,13 +491,13 @@ var ingredients = [
           {
             description: 'small Napa cabbage',
             direction: 'halved lengthwise and cored, leaves cut into 2-inch squares',
-            measurement: 'head',
+            measurement: 'large head',
             quantity: '1',
             alt: 'about 2 1/2 pounds'
           }, {
             description: 'celery cabbage',
             direction: 'halved lengthwise and cored, leaves cut into 2-inch squares',
-            measurement: 'head',
+            measurement: 'large head',
             quantity: '1',
             alt: 'about 2 1/2 pounds'
           }
@@ -589,7 +508,6 @@ var ingredients = [
     '1/2 pound snow peas, ends snapped and strings removed': {
       description: 'snow peas',
       direction: 'ends snapped and strings removed',
-      isMain: false,
       measurement: 'pound',
       quantity: '1/2'
     }
@@ -733,6 +651,26 @@ function getQuantityFromValue(value) {
   return quantity;
 }
 
+function getMeasurementFromValue(value) {
+  var measurement;
+
+  if (_.isArray(value)) {
+    measurement = _.map(value, function(val) {
+      if (val.isDivider) {
+        return _.pluck(val.ingredients, 'measurement');
+      } else {
+        return val.measurement;
+      }
+    });
+  } else {
+    measurement = value.measurement;
+  }
+  if (_.isArray(measurement)) {
+    return measurement;
+  }
+  return [measurement];
+}
+
 var measurments = [
   'bag',
   'batch',
@@ -760,6 +698,7 @@ var measurments = [
   'handful',
   'head',
   'heart',
+  'inch',
   'large',
   'leaf',
   'liter',
@@ -804,8 +743,8 @@ var measurments = [
   'dozen', 'small', 'medium', 'large', 'mini', 'whole'
 ].forEach(pluralize.addUncountableRule);
 
-measurments = _.union(measurments, _.map(measurments, function(measurment) {
-  return pluralize.plural(measurment);
+measurments = _.union(measurments, _.map(measurments, function(measurement) {
+  return pluralize.plural(measurement);
 })).sort();
 
 var pluralizeTests = [
@@ -913,30 +852,58 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it('should parse description', function() {
-    var key,
+  it('should parse measurement', function() {
+    var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]';
+
+    var tokenizer = new natural.WordTokenizer(),
+        expectedMeasurement,
+        measurement,
+        tokens,
+        key,
         value,
-        quantity;
+        found,
+        text;
 
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
+      text = pruneQuantity(key);
+      expectedMeasurement = getMeasurementFromValue(value);
+      measurement = undefined;
+      found = 0;
 
-      console.log(pruneQuantity(key));
-
-      /*
-      quantity = _.first(_.map(parseQuantity(key), function(duple) {
-        if (duple.whole && duple.part) {
-          return duple.whole + ' ' + duple.part;
-        } else if (duple.whole) {
-          return duple.whole;
-        } else if (duple.part) {
-          return duple.part;
+      tokens = _.first(tokenizer.tokenize(text), 2);
+      for (var i = 0, l = tokens.length; i < l; i++) {
+        if (_.indexOf(measurments, tokens[i], true) >= 0) {
+          found = i + 1;
+        } else {
+          break;
         }
-      }));
+      }
 
-      */
-      //console.log('Quantity: ' + quantity);
+      console.log(found + ': ' + text);
+      for (i=0, l=found; i < l; i++) {
+        text = text.replace(new RegExp(tokens[i] + punctStr + '?'), '').trim();
+      }
+      //console.log(text);
+      tokens.length = found;
+      if (tokens.length) {
+        measurement = tokens.join(' ');
+      }
+      console.log('Found: ' + measurement);
+      // large head   -    [ [ 'large head', 'large head' ] ]
+      // pound        -    [ 'pound' ]
+
+      _.each(expectedMeasurement, function(expected) {
+        if (_.isArray(expected)) {
+          _.each(expected, function(expectedChild) {
+            expect(expectedChild).to.equal(measurement);
+          });
+        } else {
+          expect(expected).to.equal(measurement);
+        }
+        console.log('Measurement: ' + measurement);
+      });
     });
   });
 });
