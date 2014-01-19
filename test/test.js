@@ -413,12 +413,9 @@ var ingredients = [
     }
   }, {
     '1/2 pound medium shrimp, peeled and butterflied': {
-      description: 'shrimp',
-      direction: 'peeled and butterflied', // should reall return 'medium, peeled...'
-      measurement: 'pound medium', // should return really just pound
-      //description: 'medium shrimp',
-      //direction: 'peeled and butterflied',
-      //measurement: 'pound',
+      description: 'medium shrimp',
+      direction: 'peeled and butterflied',
+      measurement: 'pound',
       quantity: '1/2'
     }
   }, {
@@ -658,7 +655,13 @@ function chopWordsFromFront(text, array, from) {
   var tokens = _.first(tokenizer.tokenize(text), from);
   for (var i = 0, l = tokens.length; i < l; i++) {
     if (_.indexOf(array, tokens[i].toLowerCase(), true) >= 0) {
-      found = i + 1;
+      if (i > 0) {
+        if (_.indexOf(_uncountableWords, tokens[i].toLowerCase()) < 0) {
+          found = i + 1;
+        }
+      } else {
+        found = i + 1;
+      }
     } else {
       break;
     }
@@ -944,9 +947,10 @@ var _measurements = [
   'whole'
 ];
 
-[
+var _uncountableWords = [
   'dozen', 'small', 'medium', 'large', 'mini', 'whole'
-].forEach(pluralize.addUncountableRule);
+];
+_uncountableWords.forEach(pluralize.addUncountableRule);
 
 _measurements = _.union(_measurements, _.map(_measurements, function(measurement) {
   return pluralize.plural(measurement);
