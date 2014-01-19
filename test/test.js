@@ -1,5 +1,4 @@
 /*global require, describe, it */
-// tokenizer: https://github.com/NaturalNode/natural
 var assert = require('assert'),
     pluralize = require('pluralize'),
     natural = require('natural'),
@@ -138,8 +137,8 @@ var ingredients = [
       description: 'yellow onions',
       direction: 'sliced 1/4 inch thick',
       measurement: 'pound',
-      //quantity: '1 (4 small or 3 medium)'
-      quantity: '1'
+      quantity: '1',
+      alt: '4 small or 3 medium'
     }
   }, {
     '1 cup port, preferably ruby port': {
@@ -571,8 +570,14 @@ var ingredients = [
 //(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?.*$/;
 //
 
-//var reNumber = /(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?.*$/;
-var reNumber = /(?:about\s+)?(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?(.*)$/;
+var quantiyRe = /(?:about\s+)?(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?(.*)$/;
+
+var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]';
+var parenthesesRe = /\(([^\)]*)\)/;
+var whiteSpaceRe = /\s{2,}/g;
+var directionTokenizerRe = /[,_]/;
+var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
+var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
 
 function remove(array, from, to) {
   var rest = array.slice((to || from) + 1 || array.length);
@@ -599,7 +604,7 @@ function parseQuantity(text) {
       retval = [],
       matches;
 
-  matches = text.match(reNumber);
+  matches = text.match(quantiyRe);
 
   if (!matches) {
     return retval;
@@ -629,7 +634,7 @@ function parseQuantity(text) {
 }
 
 function pruneQuantity(text) {
-  var matches = text.match(reNumber);
+  var matches = text.match(quantiyRe);
 
   if (!matches) {
     return;
@@ -642,8 +647,7 @@ function pruneQuantity(text) {
 }
 
 function chopWordsFromFront(text, array, from) {
-  var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]',
-      tokenizer = new natural.WordTokenizer(),
+  var tokenizer = new natural.WordTokenizer(),
       matched,
       found = 0;
 
@@ -671,11 +675,9 @@ function chopWordsFromFront(text, array, from) {
 }
 
 function getDirections(text) {
-  var parenthesesRe = /\(([^\)]*)\)/;
-  var whiteSpaceRe = /\s{2,}/g;
   var obj = getDescriptions(text),
       tokenizer = new natural.WordTokenizer(),
-      tokenizerComma = new natural.RegexpTokenizer({pattern: /[,_]/}),
+      tokenizerComma = new natural.RegexpTokenizer({pattern: directionTokenizerRe}),
       descriptions = obj.descriptions,
       matchedDescriptions = obj.matchedDescriptions,
       parentheses = obj.parentheses,
@@ -725,18 +727,14 @@ function getDirections(text) {
         });
         tokens = _.filter(tokens, function(token) {
           if (tokenizer.tokenize(token).length <= 5) {
-            //console.log(tokenizer.tokenize(token))
             isQty = isQuantity(token);
-            //console.log('isQty: ', isQty);
             if (isQty) { found = true; }
             return !isQty;
           }
           return true;
         });
         if (found) {
-          //console.log('Direction before: ', direction);
           direction = tokens.join(', ');
-          //console.log('Direction  after: ', direction);
         }
       }
     }
@@ -763,7 +761,6 @@ function getDirections(text) {
         retval.push(tmp.join(', '));
       }
     }
-
   }
 
   //console.log(obj);
@@ -772,10 +769,6 @@ function getDirections(text) {
 }
 
 function getDescriptions(text) {
-  var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
-  var parenthesesRe = /\(([^\)]*)\)/;
-  var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
-
   var description = (chopWordsFromFront(pruneQuantity(text), _measurements, 2) || {}).pruned,
       matchedDescriptions = [],
       parentheses = undefined,
@@ -842,7 +835,7 @@ function getDescriptions(text) {
   // clean up
   descriptions = _.map(descriptions, function(desc) {
     // trim and replace extra spaces with one
-    return desc.trim().replace(/\s{2,}/g, ' ');
+    return desc.trim().replace(whiteSpaceRe, ' ');
   });
 
   var tmp;
