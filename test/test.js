@@ -297,12 +297,19 @@ var ingredients = [
       quantity: '1/2'
     }
   }, {
-    '4 teaspoons cracked black peppercorns (or cracked white peppercorns)': {
-      description: 'black peppercorns',
-      direction: 'cracked (or cracked white peppercorns)',
-      measurement: 'teaspoons',
-      quantity: '4'
-    }
+    '4 teaspoons cracked black peppercorns (or cracked white peppercorns)': [
+      {
+        description: 'black peppercorns',
+        direction: 'cracked',
+        measurement: 'teaspoons',
+        quantity: '4'
+      }, {
+        description: 'white peppercorns',
+        direction: 'cracked',
+        measurement: 'teaspoons',
+        quantity: '4'
+      }
+    ]
   }, {
     '4 ounces salt pork, trimmed of rind and cut into 1/2-inch cubes': {
       description: 'salt pork',
@@ -388,11 +395,17 @@ var ingredients = [
       quantity: '2'
     }
   }, {
-    '1 1/2 tablespoons black Chinese vinegar or Worcestershire sauce': {
-      description: 'black Chinese vinegar or Worcestershire sauce',
-      measurement: 'tablespoons',
-      quantity: '1 1/2'
-    }
+    '1 1/2 tablespoons black Chinese vinegar or Worcestershire sauce': [
+      {
+        description: 'black Chinese vinegar',
+        measurement: 'tablespoons',
+        quantity: '1 1/2'
+      }, {
+        description: 'Worcestershire sauce',
+        measurement: 'tablespoons',
+        quantity: '1 1/2'
+      }
+    ]
   }, {
     '1 teaspoon sesame oil': {
       description: 'sesame oil',
@@ -514,29 +527,6 @@ var ingredients = [
   }
 ];
 
-function parseIngredient(text) {
-  var breakdown = {},
-      matches;
-
-  matches = text.match(/^([-\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
-
-  if (matches && matches.length) {
-    breakdown.quantity = matches[1].trim();
-    breakdown.measurement = matches[2];
-
-    if (matches[3].indexOf(',') > 0) {
-      text = matches[3];
-      matches = text.match(/(.*), ([^,]*$)/i);
-      breakdown.product = matches[1];
-      breakdown.direction = matches[2];
-    } else {
-      breakdown.product = matches[3];
-    }
-
-    return breakdown;
-  }
-}
-
 //(\d++(?! */))? *-? *(?:(\d+) */ *(\d+))?.*$  original
 //Match the regular expression below and capture its match into backreference number 1 «(\d++(?! */))?»
    //Between zero and one times, as many times as possible, giving back as needed (greedy) «?»
@@ -637,7 +627,7 @@ function pruneQuantity(text) {
   }
 }
 
-var getMeasurement = function(text) {
+var calcMeasurement = function(text) {
   text = pruneQuantity(text);
   var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]',
       tokenizer = new natural.WordTokenizer(),
@@ -661,48 +651,31 @@ var getMeasurement = function(text) {
     measurement = tokens.join(' ');
   }
 
-  return measurement;
+  return {
+    pruned: text,
+    measurement: measurement
+  }
 }
 
 // test helper functions
-function getQuantityFromValue(value) {
-  var quantity;
+function getKeyFromTestData(value, key) {
+  var retval;
 
   if (_.isArray(value)) {
-    quantity = _.map(value, function(val) {
+    retval = _.map(value, function(val) {
       if (val.isDivider) {
-        return _.pluck(val.ingredients, 'quantity');
+        return _.pluck(val.ingredients, key);
       } else {
-        return val.quantity;
+        return val[key];
       }
     });
   } else {
-    quantity = value.quantity;
+    retval = value[key];
   }
-  if (_.isArray(quantity)) {
-    return quantity;
+  if (_.isArray(retval)) {
+    return retval;
   }
-  return [quantity];
-}
-
-function getMeasurementFromValue(value) {
-  var measurement;
-
-  if (_.isArray(value)) {
-    measurement = _.map(value, function(val) {
-      if (val.isDivider) {
-        return _.pluck(val.ingredients, 'measurement');
-      } else {
-        return val.measurement;
-      }
-    });
-  } else {
-    measurement = value.measurement;
-  }
-  if (_.isArray(measurement)) {
-    return measurement;
-  }
-  return [measurement];
+  return [retval];
 }
 
 var measurments = [
@@ -872,7 +845,7 @@ describe('cooks illustrated instructions parser', function() {
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
-      expectedQuantity = getQuantityFromValue(value);
+      expectedQuantity = getKeyFromTestData(value, 'quantity');
       //console.log(expectedQuantity);
       quantity = undefined;
 
@@ -899,7 +872,7 @@ describe('cooks illustrated instructions parser', function() {
         } else {
           expect(expected).to.equal(quantity);
         }
-        console.log('Quantity: ' + quantity);
+        //console.log('Quantity: ' + quantity);
       });
     });
   });
@@ -920,7 +893,7 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       text = pruneQuantity(key);
-      expectedMeasurement = getMeasurementFromValue(value);
+      expectedMeasurement = getKeyFromTestData(value, 'measurement');
       measurement = undefined;
       found = 0;
 
@@ -952,7 +925,7 @@ describe('cooks illustrated instructions parser', function() {
         } else {
           expect(expected).to.equal(measurement);
         }
-        console.log('Measurement: ' + measurement);
+        //console.log('Measurement: ' + measurement);
       });
 
     });
@@ -967,8 +940,8 @@ describe('cooks illustrated instructions parser', function() {
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
-      expectedMeasurement = getMeasurementFromValue(value);
-      measurement = getMeasurement(key);
+      expectedMeasurement = getKeyFromTestData(value, 'measurement');
+      measurement = (calcMeasurement(key)).measurement;
 
       _.each(expectedMeasurement, function(expected) {
         if (_.isArray(expected)) {
@@ -978,15 +951,109 @@ describe('cooks illustrated instructions parser', function() {
         } else {
           expect(expected).to.equal(measurement);
         }
-        console.log('Measurement: ' + measurement);
+        //console.log('Measurement: ' + measurement);
       });
 
     });
   });
 
-  it.skip('should parse description', function() {
+  it('should parse description', function() {
+    var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
+    var parenthesesRe = /\(([^\)]*)\)/;
+    var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
+
+    var expectedDescription,
+        descriptions,
+        description,
+        parentheses,
+        matches,
+        value,
+        key;
+
     _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+      value = _.first(_.values(ingredient));
+      expectedDescription = getKeyFromTestData(value, 'description');
+      description = (calcMeasurement(key) || {}).pruned;
+      parentheses = undefined;
+
+      //console.log('>' + description);
+      matches = description.match(commaRe);
+
+      // remove the first element
+      remove(matches, 0, 0);
+      description = _.first(matches);
+
+      // unsalted butter (1 stick)
+      // smoked paprika (sweet or bittersweet)
+      // unsalted butter (1 stick)
+      // yellow onions (4 small or 3 medium)
+      // bread flour (2 cups)
+      // water (1 cup)
+      // bread flour (3 cups)
+      // water (1 1/3 cups)
+      // bacon (2 slices)
+      // dried small white beans (about 2 cups)
+      // ground black pepper
+      // grated fresh horseradish
+      // minced fresh ginger
+      // fresh ginger
+      // minced scallions
+      // toasted sesame oil
+      // chopped fresh thyme
+      // cloves garlic
+      // Salt and ground black pepper
+      // black Chinese vinegar or Worcestershire sauce
+      // vegetable oil or peanut oil
+      // small Napa cabbage or celery cabbage
+      // cracked black peppercorns (or cracked white peppercorns)
+
+      // strip out parentheses.  match(/\([^\)]*\)/)
+      // split on `or` or `and`  .split(/(?:\s+)?(?:or|and)\s+/i)
+      // if first word contained in parentheses is `or` then split
+      //   ex, (or cracked white peppercorns) vs (sweet or bittersweet)
+
+      // strip out parentheses
+      matches = description.match(parenthesesRe);
+      if (matches) {
+        remove(matches, 0, 0); // remove the first element
+        parentheses = _.first(matches);
+        // remove the parentheses from the description
+        description = description.replace(parenthesesRe, '');
+      }
+
+      // split on `or` or `and`
+      descriptions = description.split(andOrSplitterRe);
+
+      // if first word contained in parentheses is `or` then split
+      if (parentheses && parentheses.indexOf('or') === 0) {
+        descriptions.push(parentheses.split(andOrSplitterRe)[1]);
+      }
+
+      // clean up
+      descriptions = _.map(descriptions, function(desc) {
+        // trim and replace extra spaces with one
+        return desc.trim().replace(/\s{2,}/g, ' ');
+      });
+
+
+      //descriptions = _.map(descriptions, function(desc) {
+      //});
+
+
+      //console.log(descriptions);
+      //console.log(expectedDescription);
+
+      for (var i = 0, l = expectedDescription.length; i < l; i++) {
+        if (_.isArray(expectedDescription[i])) {
+          for (var j = 0, ll = expectedDescription[i].length; j < ll; j++) {
+            expect(expectedDescription[i][j]).to.equal(descriptions[j]);
+          }
+        } else {
+          expect(expectedDescription[i]).to.equal(descriptions[i]);
+        }
+      }
+
     });
   });
 });
-
