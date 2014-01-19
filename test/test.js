@@ -877,60 +877,6 @@ describe('cooks illustrated instructions parser', function() {
   });
 
   it('should parse measurement', function() {
-    var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]';
-
-    var tokenizer = new natural.WordTokenizer(),
-        expectedMeasurement,
-        measurement,
-        tokens,
-        key,
-        value,
-        found,
-        text;
-
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      value = _.first(_.values(ingredient));
-      text = pruneQuantity(key);
-      expectedMeasurement = getKeyFromTestData(value, 'measurement');
-      measurement = undefined;
-      found = 0;
-
-      tokens = _.first(tokenizer.tokenize(text), 2);
-      for (var i = 0, l = tokens.length; i < l; i++) {
-        if (_.indexOf(_measurements, tokens[i], true) >= 0) {
-          found = i + 1;
-        } else {
-          break;
-        }
-      }
-
-      //console.log(found + ': ' + text);
-      for (i=0, l=found; i < l; i++) {
-        text = text.replace(new RegExp(tokens[i] + punctStr + '?'), '').trim();
-      }
-      //console.log(text);
-      tokens.length = found;
-      if (tokens.length) {
-        measurement = tokens.join(' ');
-      }
-      //console.log('Found: ' + measurement);
-
-      _.each(expectedMeasurement, function(expected) {
-        if (_.isArray(expected)) {
-          _.each(expected, function(expectedChild) {
-            expect(expectedChild).to.equal(measurement);
-          });
-        } else {
-          expect(expected).to.equal(measurement);
-        }
-        //console.log('Measurement: ' + measurement);
-      });
-
-    });
-  });
-
-  it('should parse measurement 2', function() {
     var expectedMeasurement,
         measurement,
         key,
