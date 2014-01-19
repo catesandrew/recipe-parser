@@ -105,7 +105,7 @@ var ingredients = [
       direction: 'minced or pressed through garlic press',
       measurement: 'medium',
       quantity: '3',
-      alt: '1 tablespoon'
+      alt: '1 generous tablespoon'
     }
   }, {
     '1/2 teaspoon ground black pepper': {
@@ -678,7 +678,7 @@ function chopWordsFromFront(text, array, from) {
   }
 }
 
-function getDirections(text) {
+function getDirectionsAndAlts(text) {
   var obj = getDescriptions(text),
       tokenizer = new natural.WordTokenizer(),
       tokenizerComma = new natural.RegexpTokenizer({pattern: directionTokenizerRe}),
@@ -694,24 +694,19 @@ function getDirections(text) {
       matched,
       found,
       desc,
+      alt,
       tmp;
 
   for (var i = 0, l = descriptions.length; i < l; i++) {
-    directionParentheses = undefined;
-    tmp = undefined;
-    found = false;
-
+    tmp = tmp = directionParentheses = undefined;
     matched = matchedDescriptions[i];
     desc = descriptions[i];
+    found = false;
 
     if (matched) { // create tokens array of matched descriptions
       tokens = _.map(tokenizer.tokenize(matched), function(token) {
         return token.toLowerCase();
       });
-
-      if (tokens) {
-        //console.log('Tokens:', tokens);
-      }
     }
 
     if (direction) { // strip out parentheses from direction
@@ -719,6 +714,7 @@ function getDirections(text) {
       if (matches) {
         remove(matches, 0, 0); // remove the first element
         directionParentheses = _.first(matches);
+        alt = directionParentheses;
         direction = direction.replace(parenthesesRe, ''); // remove the parentheses from the direction
         direction = direction.trim().replace(whiteSpaceRe, ' '); // trim and replace extra spaces with one
       }
@@ -726,13 +722,15 @@ function getDirections(text) {
         var isQty;
         // lets try tokenizing the direction and look for a `quantity` missing parentheses
         tokens = _.map(tokenizerComma.tokenize(direction), function(token) {
-          // TODO we will want to capture the `quantity` as an alt later on...
           return token.trim().toLowerCase();
         });
         tokens = _.filter(tokens, function(token) {
-          if (tokenizer.tokenize(token).length <= 5) {
+          if (tokenizer.tokenize(token).length <= 5) { // hacky
             isQty = isQuantity(token);
-            if (isQty) { found = true; }
+            if (isQty) {
+              found = true;
+              alt = token;
+            }
             return !isQty;
           }
           return true;
@@ -745,26 +743,31 @@ function getDirections(text) {
 
     if (parentheses) { // is parentheses a `quanity` or just a `note`?
       if (!isQuantity(parentheses)) {
-        // TODO we will want to capture the `quantity` as an alt later on...
         direction = _.compact([direction, parentheses]).join(', ');
       } else {
-        // do something else...
+        alt = parentheses;
       }
+    }
+
+    var obj = {
+      alt: alt,
+      direction: null
     }
 
     if (desc == 'black pepper' && tokens) {
       if (_.indexOf(tokens, 'ground') >= 0) {
-        retval.push('freshly ground');
+        obj.direction = 'freshly ground';
       }
     }
     else {
       tmp = _.compact([matched, direction]);
       if (_.isEmpty(tmp)) {
-        retval.push(undefined);
+        obj.direction = undefined;
       } else {
-        retval.push(tmp.join(', '));
+        obj.direction = tmp.join(', ');
       }
     }
+    retval.push(obj);
   }
 
   //console.log(obj);
@@ -788,30 +791,6 @@ function getDescriptions(text) {
   remove(matches, 0, 0);
   description = _.first(matches);
   direction = matches[1];
-
-  // unsalted butter (1 stick)
-  // smoked paprika (sweet or bittersweet)
-  // unsalted butter (1 stick)
-  // yellow onions (4 small or 3 medium)
-  // bread flour (2 cups)
-  // water (1 cup)
-  // bread flour (3 cups)
-  // water (1 1/3 cups)
-  // bacon (2 slices)
-  // dried small white beans (about 2 cups)
-  // ground black pepper
-  // grated fresh horseradish
-  // minced fresh ginger
-  // fresh ginger
-  // minced scallions
-  // toasted sesame oil
-  // chopped fresh thyme
-  // cloves garlic
-  // Salt and ground black pepper
-  // black Chinese vinegar or Worcestershire sauce
-  // vegetable oil or peanut oil
-  // small Napa cabbage or celery cabbage
-  // cracked black peppercorns (or cracked white peppercorns)
 
   // strip out parentheses.  match(/\([^\)]*\)/)
   // split on `or` or `and`  .split(/(?:\s+)?(?:or|and)\s+/i)
@@ -862,7 +841,6 @@ function getDescriptions(text) {
     }
     return desc;
   });
-  //console.log(matchedDescriptions.length === descriptions.length);
 
   return {
     isOrSplit: !!isOrSplit,
@@ -1147,8 +1125,9 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it('should parse direction', function() {
+  it('should parse directions and alts', function() {
     var expectedDirections,
+        expectedAlts,
         directions,
         value,
         key;
@@ -1157,15 +1136,18 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedDirections = getKeyFromTestData(value, 'direction');
-      directions = getDirections(key);
+      expectedAlts = getKeyFromTestData(value, 'alt');
+      directions = getDirectionsAndAlts(key);
 
       for (var i = 0, l = expectedDirections.length; i < l; i++) {
         if (_.isArray(expectedDirections[i])) {
           for (var j = 0, ll = expectedDirections[i].length; j < ll; j++) {
-            expect(expectedDirections[i][j]).to.equal(directions[j]);
+            expect(expectedDirections[i][j]).to.equal(directions[j].direction);
+            expect(expectedAlts[i][j]).to.equal(directions[j].alt);
           }
         } else {
-          expect(expectedDirections[i]).to.equal(directions[i]);
+          expect(expectedDirections[i]).to.equal(directions[i].direction);
+          expect(expectedAlts[i]).to.equal(directions[i].alt);
         }
       }
 
