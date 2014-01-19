@@ -333,10 +333,10 @@ var ingredients = [
       quantity: '1/2'
     }
   }, {
-    '1 1/2 tablespoons brown mustard': {
+    '1 1/2 to 2 tablespoons brown mustard': {
       description: 'brown mustard',
       measurement: 'tablespoons',
-      quantity: '1 1/2'
+      quantity: '1 1/2 to 2'
     }
   }, {
     '1 pound dried small white beans (about 2 cups), rinsed and picked over': {
@@ -617,6 +617,10 @@ function parseQuantity(text) {
     }
   }
 
+  // remove anything after 2nd element
+  // retval[0] represents from (where there is a `to` in the quantity)
+  // retval[1] represents to (where there is a `to` in the quantity)
+  remove(retval, 2, 50);
   return retval;
 }
 
@@ -637,18 +641,20 @@ function getQuantityFromValue(value) {
   var quantity;
 
   if (_.isArray(value)) {
-    quantity = _.first(_.uniq(_.map(value, function(val) {
+    quantity = _.map(value, function(val) {
       if (val.isDivider) {
-        return _.first(_.uniq(_.pluck(val.ingredients, 'quantity')));
+        return _.pluck(val.ingredients, 'quantity');
       } else {
         return val.quantity;
       }
-    })));
-    //console.log('Q: ' + quantity);
+    });
   } else {
     quantity = value.quantity;
   }
-  return quantity;
+  if (_.isArray(quantity)) {
+    return quantity;
+  }
+  return [quantity];
 }
 
 function getMeasurementFromValue(value) {
@@ -828,17 +834,21 @@ describe('pluralize', function () {
 
 describe('cooks illustrated instructions parser', function() {
   it('should parse quantity', function() {
-    var key,
+    var expectedQuantity,
+        quantity,
+        key,
         value,
-        retval,
-        quantity;
+        tokens,
+        retval;
 
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
-      quantity = getQuantityFromValue(value);
+      expectedQuantity = getQuantityFromValue(value);
+      //console.log(expectedQuantity);
+      quantity = undefined;
 
-      retval = _.map(parseQuantity(key), function(duple) {
+      tokens = _.compact(_.map(parseQuantity(key), function(duple) {
         if (duple.whole && duple.part) {
           return duple.whole + ' ' + duple.part;
         } else if (duple.whole) {
@@ -846,9 +856,23 @@ describe('cooks illustrated instructions parser', function() {
         } else if (duple.part) {
           return duple.part;
         }
+      }));
+      //console.log(tokens);
+      if (tokens.length) {
+        quantity = tokens.join(' to ');
+      }
+      //console.log(quantity);
+
+      _.each(expectedQuantity, function(expected) {
+        if (_.isArray(expected)) {
+          _.each(expected, function(expectedChild) {
+            expect(expectedChild).to.equal(quantity);
+          });
+        } else {
+          expect(expected).to.equal(quantity);
+        }
+        console.log('Quantity: ' + quantity);
       });
-      expect(_.first(retval)).to.equal(quantity);
-      //console.log('Computed: ' + _.first(retval) + ', Expected: ' + quantity);
     });
   });
 
@@ -881,7 +905,7 @@ describe('cooks illustrated instructions parser', function() {
         }
       }
 
-      console.log(found + ': ' + text);
+      //console.log(found + ': ' + text);
       for (i=0, l=found; i < l; i++) {
         text = text.replace(new RegExp(tokens[i] + punctStr + '?'), '').trim();
       }
@@ -890,9 +914,7 @@ describe('cooks illustrated instructions parser', function() {
       if (tokens.length) {
         measurement = tokens.join(' ');
       }
-      console.log('Found: ' + measurement);
-      // large head   -    [ [ 'large head', 'large head' ] ]
-      // pound        -    [ 'pound' ]
+      //console.log('Found: ' + measurement);
 
       _.each(expectedMeasurement, function(expected) {
         if (_.isArray(expected)) {
