@@ -637,6 +637,34 @@ function pruneQuantity(text) {
   }
 }
 
+var getMeasurement = function(text) {
+  text = pruneQuantity(text);
+  var punctStr = '[-!"#$%&\'()\\*+,\\.\\/:;<=>?@\\^_`{|}~]',
+      tokenizer = new natural.WordTokenizer(),
+      measurement,
+      found = 0;
+
+  var tokens = _.first(tokenizer.tokenize(text), 2);
+  for (var i = 0, l = tokens.length; i < l; i++) {
+    if (_.indexOf(measurments, tokens[i], true) >= 0) {
+      found = i + 1;
+    } else {
+      break;
+    }
+  }
+
+  for (i=0, l=found; i < l; i++) {
+    text = text.replace(new RegExp(tokens[i] + punctStr + '?'), '').trim();
+  }
+  tokens.length = found;
+  if (tokens.length) {
+    measurement = tokens.join(' ');
+  }
+
+  return measurement;
+}
+
+// test helper functions
 function getQuantityFromValue(value) {
   var quantity;
 
@@ -926,6 +954,38 @@ describe('cooks illustrated instructions parser', function() {
         }
         console.log('Measurement: ' + measurement);
       });
+
+    });
+  });
+
+  it('should parse measurement 2', function() {
+    var expectedMeasurement,
+        measurement,
+        key,
+        value;
+
+    _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+      value = _.first(_.values(ingredient));
+      expectedMeasurement = getMeasurementFromValue(value);
+      measurement = getMeasurement(key);
+
+      _.each(expectedMeasurement, function(expected) {
+        if (_.isArray(expected)) {
+          _.each(expected, function(expectedChild) {
+            expect(expectedChild).to.equal(measurement);
+          });
+        } else {
+          expect(expected).to.equal(measurement);
+        }
+        console.log('Measurement: ' + measurement);
+      });
+
+    });
+  });
+
+  it.skip('should parse description', function() {
+    _.each(ingredients, function(ingredient) {
     });
   });
 });
