@@ -416,6 +416,9 @@ var ingredients = [
       description: 'shrimp',
       direction: 'peeled and butterflied', // should reall return 'medium, peeled...'
       measurement: 'pound medium', // should return really just pound
+      //description: 'medium shrimp',
+      //direction: 'peeled and butterflied',
+      //measurement: 'pound',
       quantity: '1/2'
     }
   }, {
@@ -577,7 +580,8 @@ var parenthesesRe = /\(([^\)]*)\)/;
 var whiteSpaceRe = /\s{2,}/g;
 var directionTokenizerRe = /[,_]/;
 var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
-var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
+var andSplitterRe = /(?:\s+)?and\s+/i;
+var orSplitterRe = /(?:\s+)?or\s+/i;
 
 function remove(array, from, to) {
   var rest = array.slice((to || from) + 1 || array.length);
@@ -773,6 +777,7 @@ function getDescriptions(text) {
       matchedDescriptions = [],
       parentheses = undefined,
       descriptions,
+      isOrSplit,
       direction,
       matches;
 
@@ -823,13 +828,18 @@ function getDescriptions(text) {
   }
 
   // split on `or` or `and`
-  descriptions = description.split(andOrSplitterRe);
+  descriptions = description.split(andSplitterRe);
+  if (descriptions.length < 2) {
+    descriptions = description.split(orSplitterRe);
+    isOrSplit = true; // so callee can build `isDivider` data struct
+  }
 
   // if first word contained in parentheses is `or` then split,
   // think of it as an alternate ingredient.
   if (parentheses && parentheses.indexOf('or') === 0) {
-    descriptions.push(parentheses.split(andOrSplitterRe)[1]);
+    descriptions.push(parentheses.split(orSplitterRe)[1]);
     parentheses = undefined;
+    isOrSplit = true;
   }
 
   // clean up
@@ -855,6 +865,7 @@ function getDescriptions(text) {
   //console.log(matchedDescriptions.length === descriptions.length);
 
   return {
+    isOrSplit: !!isOrSplit,
     descriptions: descriptions,
     matchedDescriptions: matchedDescriptions,
     parentheses: parentheses,
