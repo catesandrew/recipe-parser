@@ -35,7 +35,7 @@ var ingredients = [
   }, {
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
-      direction: 'ground',
+      direction: 'freshly ground',
       measurement: 'teaspoon',
       quantity: '1/2'
     }
@@ -48,7 +48,7 @@ var ingredients = [
   }, {
     '1/4 cup grated fresh horseradish': {
       description: 'horseradish',
-      direction: 'fresh, grated',
+      direction: 'grated fresh',
       measurement: 'cup',
       quantity: '1/4'
     }
@@ -68,6 +68,7 @@ var ingredients = [
   }, {
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
+      direction: 'freshly ground',
       measurement: 'teaspoon',
       quantity: '1/2'
     }
@@ -110,7 +111,7 @@ var ingredients = [
   }, {
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
-      direction: 'ground',
+      direction: 'freshly ground',
       measurement: 'teaspoon',
       quantity: '1/2'
     }
@@ -150,7 +151,7 @@ var ingredients = [
   }, {
     '1 teaspoon chopped fresh thyme leaves': {
       description: 'thyme leaves',
-      direction: 'fresh, chopped',
+      direction: 'chopped fresh',
       measurement: 'teaspoon',
       quantity: '1'
     }
@@ -171,16 +172,16 @@ var ingredients = [
   }, {
     '1/2 teaspoon ground black pepper': {
       description: 'black pepper',
-      direction: 'ground',
+      direction: 'freshly ground',
       measurement: 'teaspoon',
       quantity: '1/2'
     }
   }, {
     '11 ounces bread flour (2 cups)': {
       description: 'bread flour',
-      direction: '(2 cups)',
       measurement: 'ounces',
-      quantity: '11'
+      quantity: '11',
+      alt: '2 cups'
     }
   }, {
     '1/4 teaspoon instant yeast': {
@@ -242,7 +243,7 @@ var ingredients = [
         description: 'kosher salt'
       }, {
         description: 'black pepper',
-        direction: 'ground'
+        direction: 'freshly ground'
       }
     ]
   }, {
@@ -279,7 +280,7 @@ var ingredients = [
   }, {
     '2 teaspoons minced fresh ginger': {
       description: 'ginger',
-      direction: 'fresh, minced',
+      direction: 'minced fresh',
       measurement: 'teaspoons',
       quantity: '2'
     }
@@ -335,7 +336,6 @@ var ingredients = [
   }, {
     '1/2 cup mild molasses': {
       description: 'mild molasses',
-      direction: '',
       measurement: 'cup',
       quantity: '1/2'
     }
@@ -366,7 +366,7 @@ var ingredients = [
   }, {
     'Ground black pepper': {
       description: 'black pepper',
-      direction: 'ground'
+      direction: 'freshly ground'
     }
   }, {
     '3 1/2 tablespoons soy sauce': {
@@ -390,7 +390,7 @@ var ingredients = [
   }, {
     '2 tablespoons minced fresh ginger': {
       description: 'ginger',
-      direction: 'fresh, minced',
+      direction: 'minced fresh',
       measurement: 'tablespoons',
       quantity: '2'
     }
@@ -415,7 +415,7 @@ var ingredients = [
   }, {
     '1/2 pound medium shrimp, peeled and butterflied': {
       description: 'shrimp',
-      direction: 'medium, peeled and butterflied',
+      direction: 'peeled and butterflied', // should reall return 'medium, peeled...'
       measurement: 'pound medium', // should return really just pound
       quantity: '1/2'
     }
@@ -506,7 +506,7 @@ var ingredients = [
             direction: 'halved lengthwise and cored, leaves cut into 2-inch squares',
             measurement: 'large head',
             quantity: '1',
-            alt: 'about 2 1/2 pounds'
+            alt: 'about 2 1/2 pounds' // since about 2 1/2 pounds is not in a parentheses we don't parse it correctly
           }, {
             description: 'celery cabbage',
             direction: 'halved lengthwise and cored, leaves cut into 2-inch squares',
@@ -572,12 +572,26 @@ var ingredients = [
 //
 
 //var reNumber = /(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d++(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?.*$/;
-var reNumber = /(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?(.*)$/;
+var reNumber = /(?:about\s+)?(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)? *(?:-|to)? *(\d+(?:\.\d{1,2})?(?! *\/))? *(\d+ *\/ *\d+)?(.*)$/;
 
 function remove(array, from, to) {
   var rest = array.slice((to || from) + 1 || array.length);
   array.length = from < 0 ? array.length + from : from;
   return array.push.apply(array, rest);
+}
+
+function isQuantity(text) {
+  if (!text) {
+    return false;
+  }
+
+  // retval[0] represents from (where there is a `to` in the quantity)
+  // retval[1] represents to (where there is a `to` in the quantity)
+  var quantities = parseQuantity(text);
+  var found = _.find(quantities, function(qty) {
+    return qty.whole || qty.part;
+  });
+  return !!found;
 }
 
 function parseQuantity(text) {
@@ -656,14 +670,117 @@ function chopWordsFromFront(text, array, from) {
   }
 }
 
+function getDirections(text) {
+  var parenthesesRe = /\(([^\)]*)\)/;
+  var whiteSpaceRe = /\s{2,}/g;
+  var obj = getDescriptions(text),
+      tokenizer = new natural.WordTokenizer(),
+      tokenizerComma = new natural.RegexpTokenizer({pattern: /[,_]/}),
+      descriptions = obj.descriptions,
+      matchedDescriptions = obj.matchedDescriptions,
+      parentheses = obj.parentheses,
+      direction = obj.direction,
+      directionParentheses,
+      matches,
+      tokens;
+
+  var retval = [],
+      matched,
+      found,
+      desc,
+      tmp;
+
+  for (var i = 0, l = descriptions.length; i < l; i++) {
+    directionParentheses = undefined;
+    tmp = undefined;
+    found = false;
+
+    matched = matchedDescriptions[i];
+    desc = descriptions[i];
+
+    if (matched) { // create tokens array of matched descriptions
+      tokens = _.map(tokenizer.tokenize(matched), function(token) {
+        return token.toLowerCase();
+      });
+
+      if (tokens) {
+        //console.log('Tokens:', tokens);
+      }
+    }
+
+    if (direction) { // strip out parentheses from direction
+      matches = direction.match(parenthesesRe);
+      if (matches) {
+        remove(matches, 0, 0); // remove the first element
+        directionParentheses = _.first(matches);
+        direction = direction.replace(parenthesesRe, ''); // remove the parentheses from the direction
+        direction = direction.trim().replace(whiteSpaceRe, ' '); // trim and replace extra spaces with one
+      }
+      else {
+        var isQty;
+        // lets try tokenizing the direction and look for a `quantity` missing parentheses
+        tokens = _.map(tokenizerComma.tokenize(direction), function(token) {
+          // TODO we will want to capture the `quantity` as an alt later on...
+          return token.trim().toLowerCase();
+        });
+        tokens = _.filter(tokens, function(token) {
+          if (tokenizer.tokenize(token).length <= 5) {
+            //console.log(tokenizer.tokenize(token))
+            isQty = isQuantity(token);
+            //console.log('isQty: ', isQty);
+            if (isQty) { found = true; }
+            return !isQty;
+          }
+          return true;
+        });
+        if (found) {
+          //console.log('Direction before: ', direction);
+          direction = tokens.join(', ');
+          //console.log('Direction  after: ', direction);
+        }
+      }
+    }
+
+    if (parentheses) { // is parentheses a `quanity` or just a `note`?
+      if (!isQuantity(parentheses)) {
+        // TODO we will want to capture the `quantity` as an alt later on...
+        direction = _.compact([direction, parentheses]).join(', ');
+      } else {
+        // do something else...
+      }
+    }
+
+    if (desc == 'black pepper' && tokens) {
+      if (_.indexOf(tokens, 'ground') >= 0) {
+        retval.push('freshly ground');
+      }
+    }
+    else {
+      tmp = _.compact([matched, direction]);
+      if (_.isEmpty(tmp)) {
+        retval.push(undefined);
+      } else {
+        retval.push(tmp.join(', '));
+      }
+    }
+
+  }
+
+  //console.log(obj);
+  //console.log('retval: ', retval);
+  return retval;
+}
+
 function getDescriptions(text) {
   var commaRe = /^([^,]*)(?:,\s+(.*))?$/;
   var parenthesesRe = /\(([^\)]*)\)/;
   var andOrSplitterRe = /(?:\s+)?(?:or|and)\s+/i;
 
   var description = (chopWordsFromFront(pruneQuantity(text), _measurements, 2) || {}).pruned,
+      matchedDescriptions = [],
       parentheses = undefined,
       descriptions,
+      direction,
       matches;
 
   //console.log('>' + description);
@@ -672,6 +789,7 @@ function getDescriptions(text) {
   // remove the first element
   remove(matches, 0, 0);
   description = _.first(matches);
+  direction = matches[1];
 
   // unsalted butter (1 stick)
   // smoked paprika (sweet or bittersweet)
@@ -714,9 +832,11 @@ function getDescriptions(text) {
   // split on `or` or `and`
   descriptions = description.split(andOrSplitterRe);
 
-  // if first word contained in parentheses is `or` then split
+  // if first word contained in parentheses is `or` then split,
+  // think of it as an alternate ingredient.
   if (parentheses && parentheses.indexOf('or') === 0) {
     descriptions.push(parentheses.split(andOrSplitterRe)[1]);
+    parentheses = undefined;
   }
 
   // clean up
@@ -725,8 +845,11 @@ function getDescriptions(text) {
     return desc.trim().replace(/\s{2,}/g, ' ');
   });
 
+  var tmp;
   descriptions = _.map(descriptions, function(desc) {
-    desc = (chopWordsFromFront(desc, _words, 2) || {}).pruned;
+    tmp = (chopWordsFromFront(desc, _words, 2) || {});
+    desc = tmp.pruned;
+    matchedDescriptions.push(tmp.matched);
     if (desc == 'cloves garlic') {
       return 'garlic cloves';
     } else if (desc.toLowerCase() == 'salt') {
@@ -736,8 +859,14 @@ function getDescriptions(text) {
     }
     return desc;
   });
+  //console.log(matchedDescriptions.length === descriptions.length);
 
-  return descriptions;
+  return {
+    descriptions: descriptions,
+    matchedDescriptions: matchedDescriptions,
+    parentheses: parentheses,
+    direction: direction
+  }
 }
 
 // test helper functions
@@ -1000,7 +1129,7 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedDescriptions = getKeyFromTestData(value, 'description');
-      descriptions = getDescriptions(key);
+      descriptions = (getDescriptions(key) || {}).descriptions;
 
       for (var i = 0, l = expectedDescriptions.length; i < l; i++) {
         if (_.isArray(expectedDescriptions[i])) {
@@ -1009,6 +1138,30 @@ describe('cooks illustrated instructions parser', function() {
           }
         } else {
           expect(expectedDescriptions[i]).to.equal(descriptions[i]);
+        }
+      }
+    });
+  });
+
+  it('should parse direction', function() {
+    var expectedDirections,
+        directions,
+        value,
+        key;
+
+    _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+      value = _.first(_.values(ingredient));
+      expectedDirections = getKeyFromTestData(value, 'direction');
+      directions = getDirections(key);
+
+      for (var i = 0, l = expectedDirections.length; i < l; i++) {
+        if (_.isArray(expectedDirections[i])) {
+          for (var j = 0, ll = expectedDirections[i].length; j < ll; j++) {
+            expect(expectedDirections[i][j]).to.equal(directions[j]);
+          }
+        } else {
+          expect(expectedDirections[i]).to.equal(directions[i]);
         }
       }
 
