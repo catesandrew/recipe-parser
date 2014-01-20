@@ -433,12 +433,17 @@ var ingredients = [
       quantity: '1'
     }
   }, {
-    // will want this to translate to qty:1, measure:2 inch piece
     '2 inch piece fresh ginger, sliced thin': {
       description: 'ginger',
       direction: 'fresh, sliced thin',
       measurement: 'inch piece',
-      quantity: '2'
+      quantity: '2',
+      finale: {
+        description: 'ginger',
+        direction: 'fresh, sliced thin',
+        measurement: '2-inch piece',
+        quantity: '1',
+      }
     }
   }, {
     '10 Chinese black mushrooms, softened in hot water, stems removed and caps cut into quarters': {
@@ -494,7 +499,6 @@ var ingredients = [
       quantity: '8'
     }
   }, {
-    // will want quantity to be '1 large'
     '1 large head small Napa cabbage or celery cabbage, about 2 1/2 pounds, halved lengthwise and cored, leaves cut into 2-inch squares': [
       {
         description: 'Or',
@@ -632,6 +636,25 @@ function parseQuantity(text) {
   // retval[1] represents to (where there is a `to` in the quantity)
   remove(retval, 2, 50);
   return retval;
+}
+
+function getQuantity(text) {
+  var tokens = _.compact(_.map(parseQuantity(text), function(duple) {
+    if (duple.whole && duple.part) {
+      return duple.whole + ' ' + duple.part;
+    } else if (duple.whole) {
+      return duple.whole;
+    } else if (duple.part) {
+      return duple.part;
+    }
+  }));
+  if (tokens.length) {
+    return tokens.join(' to ');
+  }
+}
+
+function getMeasurement(text) {
+  return (chopWordsFromFront(pruneQuantity(text), _measurements, 2) || {}).matched;
 }
 
 function pruneQuantity(text) {
@@ -810,10 +833,12 @@ function getDescriptions(text) {
   }
 
   // split on `or` or `and`
-  descriptions = description.split(andSplitterRe);
+  descriptions = description.split(andSplitterRe); // first try `and`
   if (descriptions.length < 2) {
-    descriptions = description.split(orSplitterRe);
-    isOrSplit = true; // so callee can build `isDivider` data struct
+    descriptions = description.split(orSplitterRe); // then try `or`
+    if (descriptions.length > 1) {
+      isOrSplit = true; // so callee can build `isDivider` data struct
+    }
   }
 
   // if first word contained in parentheses is `or` then split,
@@ -851,6 +876,25 @@ function getDescriptions(text) {
     matchedDescriptions: matchedDescriptions,
     parentheses: parentheses,
     direction: direction
+  }
+}
+
+function getAllPieces(text) {
+  var quantity = getQuantity(text);
+  var measurement = getMeasurement(text);
+  var descriptions = getDescriptions(text); // isOrSplit, descriptions, matchedDescriptions, parentheses, direction
+  var directions = getDirectionsAndAlts(text); // [{direction, alt}[,{}, ...n]]
+
+  if (quantity == '2' && measurement == 'inch piece') {
+    measurement = quantity + '-' + measurement;
+    quantity = '1';
+  }
+
+  return {
+    quantity: quantity,
+    measurement: measurement,
+    descriptions: descriptions,
+    directions: directions
   }
 }
 
@@ -1039,32 +1083,14 @@ describe('cooks illustrated instructions parser', function() {
   it('should parse quantity', function() {
     var expectedQuantity,
         quantity,
-        key,
         value,
-        tokens,
-        retval;
+        key;
 
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedQuantity = getKeyFromTestData(value, 'quantity');
-      //console.log(expectedQuantity);
-      quantity = undefined;
-
-      tokens = _.compact(_.map(parseQuantity(key), function(duple) {
-        if (duple.whole && duple.part) {
-          return duple.whole + ' ' + duple.part;
-        } else if (duple.whole) {
-          return duple.whole;
-        } else if (duple.part) {
-          return duple.part;
-        }
-      }));
-      //console.log(tokens);
-      if (tokens.length) {
-        quantity = tokens.join(' to ');
-      }
-      //console.log(quantity);
+      quantity = getQuantity(key);
 
       _.each(expectedQuantity, function(expected) {
         if (_.isArray(expected)) {
@@ -1074,7 +1100,6 @@ describe('cooks illustrated instructions parser', function() {
         } else {
           expect(expected).to.equal(quantity);
         }
-        //console.log('Quantity: ' + quantity);
       });
     });
   });
@@ -1089,7 +1114,7 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedMeasurement = getKeyFromTestData(value, 'measurement');
-      measurement = (chopWordsFromFront(pruneQuantity(key), _measurements, 2) || {}).matched;
+      measurement = getMeasurement(key);
 
       _.each(expectedMeasurement, function(expected) {
         if (_.isArray(expected)) {
@@ -1099,9 +1124,7 @@ describe('cooks illustrated instructions parser', function() {
         } else {
           expect(expected).to.equal(measurement);
         }
-        //console.log('Measurement: ' + measurement);
       });
-
     });
   });
 
@@ -1158,4 +1181,75 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
+  it('should collate all data, [quantity, measurement, description, direction, and alts]', function() {
+    var descriptionObjs,
+        descriptions,
+        measurement,
+        directions,
+        allPieces,
+        quantity,
+        values,
+        key;
+
+    _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+      values = _.first(_.values(ingredient));
+
+      allPieces = getAllPieces(key);
+      quantity = allPieces.quantity;
+      measurement = allPieces.measurement;
+      descriptionObjs = allPieces.descriptions;
+      descriptions = descriptionObjs.descriptions;
+      directions = allPieces.directions;
+
+      function arrayWalker(array) {
+        var obj = array[0],
+            desc = array[1],
+            dir = array[2];
+        if (obj.finale) {
+          expect(quantity).to.equal(obj.finale.quantity);
+          expect(measurement).to.equal(obj.finale.measurement);
+          expect(desc).to.equal(obj.finale.description);
+          expect(dir.direction).to.equal(obj.finale.direction);
+          expect(dir.alt).to.equal(obj.finale.alt);
+        } else {
+          expect(quantity).to.equal(obj.quantity);
+          expect(measurement).to.equal(obj.measurement);
+          expect(desc).to.equal(obj.description);
+          expect(dir.direction).to.equal(obj.direction);
+          expect(dir.alt).to.equal(obj.alt);
+        }
+      }
+
+      function zipWalker(arrays) {
+        _.each(arrays, function(array) {
+          arrayWalker(array);
+        });
+      }
+
+      (function walker(vals) {
+        if (_.isArray(vals)) {
+          if (vals.length > 1) {
+            // where an ingredient gets broken down into two or more sub
+            // ingredients, typically happens for `and` types. For example `salt
+            // and pepper` gets broken down into `salt` and `black pepper`
+            zipWalker(_.zip(vals, descriptions, directions));
+          } else {
+            // when an ingredient gets broken down into two or more sub
+            // ingredients, typically happens for `or` types. The typage is
+            // important as it denotes a grouping to the callee.
+            _.each(vals, function(val) {
+              walker(val);
+            })
+          }
+        } else if (vals.isDivider) {
+          zipWalker(_.zip(vals.ingredients, descriptions, directions));
+        } else {
+          zipWalker(_.zip([vals], descriptions, directions));
+        }
+      })(values);
+
+    });
+  });
 });
+
