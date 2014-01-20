@@ -1,5 +1,4 @@
 /* jshint indent: false */
-// Nodejs libs.
 var nodeUtil = require('util'),
     async = require('async'),
     nodeio = require('node.io'),

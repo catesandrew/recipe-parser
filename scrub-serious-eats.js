@@ -1,14 +1,14 @@
-var async = require('async'),
-    fs = require('fs'),
-    _ = require('underscore'),
+/* jshint indent: false */
+var nodeUtil = require('util'),
+    async = require('async'),
     nodeio = require('node.io'),
-    plist = require('plist'),
     program = require('commander'),
     http = require('http'),
-    URL = require('url'),
-    util = require('util');
+    URL = require('url');
 
-var Utils = require('./utils.js');
+var main = require('./main'),
+    util = main.util,
+    _ = util._;
 
 program
   .version('0.1')
@@ -52,10 +52,10 @@ var listHelper = function($, selector, chooseFirst, helper) {
     verbose(e);
     helper();
   }
-}
+};
 
 var addSummary = function($, obj) {
-  verbose('## Adding Summary')
+  verbose('## Adding Summary');
   obj.summaries || (obj.summaries = []);
   listHelper($, '.hrecipe .content-unit .summary p', false, function(summary) {
     if (!summary) { return; }
@@ -68,28 +68,28 @@ var addSummary = function($, obj) {
     } else if (child && child.name === 'small') {
       // do nothing
     } else {
-      obj.summaries.push(Utils.substituteFraction(Utils.trim(summary.innerHTML)));
+      obj.summaries.push(util.substituteFraction(util.trim(summary.innerHTML)));
     }
   });
-}
+};
 
 var addProcedure = function($, obj) {
-  verbose('## Adding Procedures')
+  verbose('## Adding Procedures');
   obj.procedures || (obj.procedures = []);
   listHelper($, '.hrecipe .procedure ol.instructions li .procedure-text', false, function(procedure) {
     if (!procedure) { return; }
-    obj.procedures.push(Utils.substituteDegree(Utils.substituteFraction(Utils.trim(procedure.striptags))));
+    obj.procedures.push(util.substituteDegree(util.substituteFraction(util.trim(procedure.striptags))));
   });
-}
+};
 
 var addTags = function($, obj) {
-  verbose('## Adding Tags')
+  verbose('## Adding Tags');
   obj.tags || (obj.tags = []);
   listHelper($, '.hrecipe .tags li', false, function(tag) {
     if (!tag) { return; }
-    obj.tags.push(Utils.trim(tag.striptags));
+    obj.tags.push(util.trim(tag.striptags));
   });
-}
+};
 
 var addImage = function($, obj) {
   verbose('## Adding Image');
@@ -101,7 +101,7 @@ var addImage = function($, obj) {
       alt: img.attribs.alt
     };
   });
-}
+};
 
 var addIngredients = function($, obj) {
   verbose('## Adding Ingredients');
@@ -128,17 +128,17 @@ var addIngredients = function($, obj) {
           text = matches[3];
           matches = text.match(/(.*), ([^,]*$)/i);
 
-          breakdown.product = Utils.substituteFraction(Utils.trim(matches[1]));
-          breakdown.direction = Utils.substituteFraction(Utils.trim(matches[2]));
+          breakdown.product = util.substituteFraction(util.trim(matches[1]));
+          breakdown.direction = util.substituteFraction(util.trim(matches[2]));
         } else {
-          breakdown.product = Utils.substituteFraction(Utils.trim(matches[3]));
+          breakdown.product = util.substituteFraction(util.trim(matches[3]));
         }
 
         obj.ingredients.push(breakdown);
       }
     }
   });
-}
+};
 
 var scrape = function(callback, url) {
   var methods = {
@@ -158,13 +158,13 @@ var scrape = function(callback, url) {
           addIngredients($, obj);
           addProcedure($, obj);
 
-          verbose('## Adding Servings')
+          verbose('## Adding Servings');
           var servings = $('.hrecipe .recipe-about td span.yield');
           if (servings) {
             obj.servings = servings.striptags;
           }
 
-          verbose('## Adding Times')
+          verbose('## Adding Times');
           var prepTime = $('.hrecipe .recipe-about td span.prepTime');
           if (prepTime) {
             obj.prepTime = prepTime.striptags;
@@ -202,13 +202,13 @@ if (program.url) {
   var exportRecipe = function(item) {
     var obj = {};
     obj['AFFILIATE_ID'] = -1;
-    obj['COURSE_ID'] = 2
-    obj['COURSE_NAME'] = 'Main'
+    obj['COURSE_ID'] = 2;
+    obj['COURSE_NAME'] = 'Main';
     obj['CUISINE_ID'] = -1;
     obj['DIFFICULTY'] = 0;
     obj['KEYWORDS'] = item.tags.join(', ');
     obj['MEASUREMENT_SYSTEM'] = 0;
-    obj['NAME'] = Utils.trim(item.title);
+    obj['NAME'] = util.trim(item.title);
     obj['NOTE'] = '';
     obj['NOTES_LIST'] = [];
     obj['NUTRITION'] = '';
@@ -218,7 +218,7 @@ if (program.url) {
     obj['SUMMARY'] = item.summaries.join('\n');
     obj['TYPE'] = 102;
     obj['URL'] = url;
-    obj['YIELD'] = Utils.trim(item.servings);
+    obj['YIELD'] = util.trim(item.servings);
 
     if (item.image.data) {
       obj['EXPORT_TYPE'] = 'BINARY';
@@ -233,7 +233,7 @@ if (program.url) {
         NAME: name,
         USER_ADDED: userAdded
       });
-    }
+    };
     //addCategory(206, 'Smoothies', false);
     //addCategory(88, 'Mixed Drinks', false);
     //addCategory(10, 'Holiday', false);
@@ -242,7 +242,7 @@ if (program.url) {
 
     var directions = obj['DIRECTIONS_LIST'] = [];
     _.each(item.procedures, function(procedure) {
-      procedure = Utils.trim(procedure);
+      procedure = util.trim(procedure);
       if (procedure) {
         procedure = procedure.replace(/\s{2,}/g, ' '); // replace extra spaces with one
         directions.push({
@@ -270,36 +270,35 @@ if (program.url) {
         TIME_UNIT_ID: hours > 0 ? 1 : 2,
         TIME_UNIT_2_ID: hours > 0 ? 2 : 1
       });
-    }
+    };
 
     if (item.prepTime) {
-      addTime(9, item.prepTime) // prep
+      addTime(9, item.prepTime); // prep
 
       if (item.totalTime) {
         var cookTime = parseInt(item.totalTime, 10) - parseInt(item.prepTime, 10);
-        addTime(5, cookTime) // cook
+        addTime(5, cookTime); // cook
       }
     }
 
     var ingredients = obj['INGREDIENTS_TREE'] = [];
     _.each(item.ingredients, function(ingredient) {
       ingredients.push({
-        DESCRIPTION: Utils.trim(ingredient.product),
-        DIRECTION: Utils.trim(ingredient.direction) || '',
+        DESCRIPTION: util.trim(ingredient.product),
+        DIRECTION: util.trim(ingredient.direction) || '',
         INCLUDED_RECIPE_ID: -1,
         IS_DIVIDER: false,
         IS_MAIN: false,
-        MEASUREMENT: Utils.trim(ingredient.measurement),
-        QUANTITY: Utils.trim(ingredient.quantity)
+        MEASUREMENT: util.trim(ingredient.measurement),
+        QUANTITY: util.trim(ingredient.quantity)
       });
     });
 
-    var plist_file = Utils.expandHomeDir('~/Desktop/recipe.mgourmet4');
-    Utils.writePlist(function(err, obj) {
+    var plist_file = util.expandHomeDir('~/Desktop/recipe.mgourmet4');
+    util.writePlist(function(err, obj) {
       if (err) { console.error(err); }
-      }, [obj], plist_file
-    );
-  }
+    }, [obj], plist_file);
+  };
 
   scrape(function(err, items) {
     if (err) { console.log(err); }
@@ -329,7 +328,9 @@ if (program.url) {
             done();
           });
           response.on('data', function (chunk) {
-            if (response.statusCode == 200) body += chunk;
+            if (response.statusCode === 200) {
+              body += chunk;
+            }
           });
         });
       } else {
