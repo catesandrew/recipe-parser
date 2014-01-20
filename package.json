@@ -15,7 +15,9 @@
     "pluralize": "0.0.6",
     "natural": "~0.1.25",
     "grunt": "~0.4.2",
-    "underscore.string": "~2.3.3"
+    "underscore.string": "~2.3.3",
+    "colors": "~0.6.2",
+    "css-parse": "~1.7.0"
   },
   "devDependencies": {
     "yeoman": "~0.9.6",

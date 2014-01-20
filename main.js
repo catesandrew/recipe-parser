@@ -11,8 +11,16 @@ function mRequire(name, file) {
   return main[name] = require('./lib/' + file);
 }
 
+main.option = {
+  debug: false,
+  verbose: false
+};
+
 var util = mRequire('util', 'util');
 var cooksIllustratedParser = mRequire('cooksIllustratedParser', 'cooks-illustrated-parser');
+var log = mRequire('log', 'log');
+var verbose = main.verbose = log.verbose;
+
 
 // Expose some metadata.
 main.package = require('./package.json');
