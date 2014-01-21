@@ -283,5 +283,59 @@ describe('cooks illustrated instructions parser', function() {
 
     });
   });
+
+  it('should collate and produce a pretty result', function() {
+    var descriptionObjs,
+        descriptions,
+        measurement,
+        directions,
+        allPieces,
+        quantity,
+        retval,
+        //values,
+        key;
+
+    _.each(ingredients, function(ingredient) {
+      key = _.first(_.keys(ingredient));
+
+      allPieces = parser.getAllPieces(key);
+      quantity = allPieces.quantity;
+      measurement = allPieces.measurement;
+      descriptionObjs = allPieces.descriptions;
+      descriptions = descriptionObjs.descriptions;
+      directions = allPieces.directions;
+
+      retval = _.map(_.zip(descriptions, directions), function(tuple) {
+        return {
+          quantity: quantity,
+          measurement: measurement,
+          description: tuple[0],
+          direction: tuple[1].direction,
+          alt: tuple[1].alt
+        };
+      });
+
+      _.each(retval, function(fixme) {
+        for (var key in fixme) {
+          if (!fixme[key]) {
+            delete fixme[key];
+          }
+        }
+      });
+
+      if (descriptionObjs.isOrSplit) {
+        retval = {
+          description: 'Or',
+          isDivider: true,
+          ingredients: retval
+        };
+      } else if (retval.length === 1) {
+        retval = _.first(retval);
+      }
+
+      console.log(retval);
+
+    });
+  });
 });
 

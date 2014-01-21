@@ -1,50 +1,20 @@
 /* jshint indent: false */
 var nodeUtil = require('util'),
     async = require('async'),
-    nodeio = require('node.io'),
+    request = require('request'),
+    cheerio = require('cheerio'),
     program = require('commander'),
-    cssParse = require('css-parse'),
     http = require('http'),
     URL = require('url');
 
 var main = require('./main'),
+    parser = main.cooksIllustratedParser,
     util = main.util,
     log = main.log,
     _ = util._;
 
-//https://github.com/MatthewMueller/cheerio
-//https://github.com/chriso/node.io
-/*
-Node.io: this library is no longer maintained.
-
-I wrote node.io in 2010 when node.js was still in its infancy and the npm repository didn't have the amazing choice of libraries as it does today.
-
-Since it's now quite trivial to write your own scraper I've decided to stop maintaining the library.
-
-Here's an example using [request](https://github.com/mikeal/request), [cheerio](https://github.com/MatthewMueller/cheerio) and [async](https://github.com/caolan/async).
-
-```javascript
-var request = require('request')
-  , cheerio = require('cheerio')
-  , async = require('async')
-  , format = require('util').format;
-
-var reddits = [ 'programming', 'javascript', 'node' ]
-  , concurrency = 2;
-
-async.eachLimit(reddits, concurrency, function (reddit, next) {
-    var url = format('http://reddit.com/r/%s', reddit);
-    request(url, function (err, response, body) {
-        if (err) throw err;
-        var $ = cheerio.load(body);
-        $('a.title').each(function () {
-            console.log('%s (%s)', $(this).text(), $(this).attr('href'));
-        });
-        next();
-    });
-});
-```
-*/
+//https://github.com/chriso/validator.js
+//https://github.com/fb55/node-entities
 
 program
   .version('0.1')
@@ -69,53 +39,69 @@ var verbose = function() {
   }
 };
 
-var listHelper = function($, selector, chooseFirst, helper) {
+var listHelper = function($, selector, callback) {
   try {
     var elements = $(selector);
+    log.debug(elements.length);
     if (elements.length) {
-      log.writelns('  count: ' + elements.length);
+      elements.each(function(index, element) {
+        return callback.call(this, index, element);
+      });
+    }
+    /*
+    else if (elements.children && elements.children.length) {
+      //log.writelns('  count: ' + elements.children.length);
       if (chooseFirst) {
-        helper(_.first(elements));
-      } else {
-        elements.each(function(ele) {
-          helper(ele);
-        });
-      }
-    } else if (elements.children && elements.children.length) {
-      log.writelns('  count: ' + elements.children.length);
-      if (chooseFirst) {
-        helper(elements.children.first());
+        callback(elements.children.first());
       } else {
         elements.children.each(function(ele) {
-          helper(ele);
+          callback(ele);
         });
       }
     } else {
-      log.writelns('  count: 1');
-      helper(elements);
+      //log.writelns('  count: 1');
+      callback(elements);
     }
+    */
   } catch(e) {
     log.errorlns(e);
-    helper();
   }
 };
 
+var addImage = function($, obj) {
+  obj.image || (obj.image = {});
+  log.writelns('Adding Image');
+
+  var patternRe = /\((.+?)\)/g,
+      backgroundImage,
+      match;
+
+  listHelper($, '.recipe-image .image', function(index, img) {
+    var backgroundImage = _.first(util.splitCSS(this.css('background')));
+    match = patternRe.exec(backgroundImage);
+
+    if (match && match.length) {
+      log.ok(match[1]);
+      obj.image = {
+        src: match[1]
+      };
+    }
+    return false; // stop iterating
+  });
+};
+
 var addSummary = function($, obj) {
-  verbose('## Adding Summary');
   obj.summaries || (obj.summaries = []);
-  listHelper($, '.hrecipe .content-unit .summary p', false, function(summary) {
-    if (!summary) { return; }
-    var child;
-    if (summary.children) {
-      child = summary.children.first();
-    }
-    if (summary.attribs && summary.attribs.class) {
-      // do nothing
-    } else if (child && child.name === 'small') {
-      // do nothing
-    } else {
-      obj.summaries.push(util.substituteFraction(util.trim(summary.innerHTML)));
-    }
+  log.writelns('Adding Summary');
+  var text;
+
+  listHelper($, '.why .full p', function(index, summary) {
+    //console.log(this);  // refers to the $ wrapped summary element
+    //console.log(summary); //refers to the plain summary element
+    //if (!summary) { return; }
+    text = util.substituteFraction(util.trim(util.fulltext(summary)));
+    log.ok(text);
+    obj.summaries.push(text);
   });
 };
 
@@ -128,112 +114,86 @@ var addProcedure = function($, obj) {
   });
 };
 
-var addImage = function($, obj) {
-  log.writelns('Adding Image');
-
-  listHelper($, '.recipe-image .image', true, function(img) {
-    if (!img) { return; }
-    console.log(img.attribs.style);
-    console.log(img);
-    console.log(cssParse(img.attribs.style));
-    obj.image = {
-      src: img.attribs.src,
-      alt: img.attribs.alt
-    };
-  });
-};
-
 var addIngredients = function($, obj) {
   verbose('## Adding Ingredients');
   obj.ingredients || (obj.ingredients = []);
-  var ingredients = $('.hrecipe .content-unit .ingredients ul li'),
-      text,
-      matches,
-      breakdown,
-      description;
+  // [itemprop="ingredients"]
+  var ingredients = $('.ingredients > ul li'),
+      descriptionObjs,
+      descriptions,
+      measurement,
+      directions,
+      allPieces,
+      quantity,
+      text;
 
-  ingredients.each(function(ingredient) {
-    breakdown = {};
-    text = ingredient.striptags;
-    //console.log(text);
-    if (text) {
-      matches = text.match(/^([-\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
-      //console.log('match: ' + matches);
+  listHelper($, '.ingredients > ul li', function(index, ingredient) {
+    if (this.attr('itemprop') === 'ingredients') {
+      text = util.trim(util.fulltext(ingredient));
+      log.ok(text);
+      //log.ok(this.text());
+      //log.ok(util.trim(util.fulltext(ingredient)));
+      //log.ok(util.trim(util.striptags(ingredient)));
+      allPieces = parser.getAllPieces(text);
+      quantity = allPieces.quantity;
+      measurement = allPieces.measurement;
+      descriptionObjs = allPieces.descriptions;
+      descriptions = descriptionObjs.descriptions;
+      directions = allPieces.directions;
 
-      if (matches && matches.length) {
-        breakdown.quantity = matches[1];
-        breakdown.measurement = matches[2];
 
-        if (matches[3].indexOf(',') > 0) {
-          text = matches[3];
-          matches = text.match(/(.*), ([^,]*$)/i);
-
-          breakdown.product = util.substituteFraction(util.trim(matches[1]));
-          breakdown.direction = util.substituteFraction(util.trim(matches[2]));
-        } else {
-          breakdown.product = util.substituteFraction(util.trim(matches[3]));
-        }
-
-        obj.ingredients.push(breakdown);
-      }
     }
+
+    //obj.ingredients.push(breakdown);
   });
 };
 
 var scrape = function(callback, url) {
-  var methods = {
-    input: false,
-    run: function() {
-      var self = this;
-      this.getHtml(url, function(err, $) {
-        if (err) { this.exit(err); }
-        var obj = {};
+  request(url, function (err, response, body) {
+    if (err) { throw err; }
+    var $ = cheerio.load(body, {
+      verbose: true,
+      ignoreWhitespace: true
+    });
+    var obj = {};
 
-        try {
-          obj.title = $('.recipe.content h2[itemprop="name"]').striptags;
-          log.oklns(obj.title);
+    try {
+      obj.title = util.text($('.recipe.content h2[itemprop="name"]')).trim();
+      log.oklns(obj.title);
 
-          addImage($, obj);
-          addSummary($, obj);
-          addIngredients($, obj);
-          addProcedure($, obj);
+      //log.oklns(util.striptags($('.why')));
+      //log.oklns(util.rawtext($('.why > h3')));
+      //log.oklns(util.fulltext($('.ingredients > ul')));
+      //log.oklns(util.text($('.why > h3')));
 
-          verbose('## Adding Servings');
-          var servings = $('.hrecipe .recipe-about td span.yield');
-          if (servings) {
-            obj.servings = servings.striptags;
-          }
+      //addImage($, obj);
+      //addSummary($, obj);
+      addIngredients($, obj);
+      /*
+      addProcedure($, obj);
 
-          verbose('## Adding Times');
-          var prepTime = $('.hrecipe .recipe-about td span.prepTime');
-          if (prepTime) {
-            obj.prepTime = prepTime.striptags;
-          }
+      verbose('## Adding Servings');
+      var servings = $('.hrecipe .recipe-about td span.yield');
+      if (servings) {
+        obj.servings = servings.striptags;
+      }
 
-          var totalTime = $('.hrecipe .recipe-about td span.totalTime');
-          if (totalTime) {
-            obj.totalTime = totalTime.striptags;
-          }
-        } catch(e) {
-          verbose(e);
-        }
+      verbose('## Adding Times');
+      var prepTime = $('.hrecipe .recipe-about td span.prepTime');
+      if (prepTime) {
+        obj.prepTime = prepTime.striptags;
+      }
 
-        this.emit(obj);
-      });
+      var totalTime = $('.hrecipe .recipe-about td span.totalTime');
+      if (totalTime) {
+        obj.totalTime = totalTime.striptags;
+      }
+      */
+    } catch(e) {
+      callback(e, obj);
     }
-  };
-
-  var job = new nodeio.Job({
-    auto_retry: true,
-    timeout: 20,
-    retries: 3,
-    silent: true
-  }, methods);
-
-  nodeio.start(job, {}, function(err, data) {
-    if (err) { callback(err); }
-    callback(null, data);
-  }, true);
+    callback(null, obj);
+  });
 };
 
 if (program.url) {
@@ -344,7 +304,9 @@ if (program.url) {
 
   scrape(function(err, items) {
     if (err) { console.log(err); }
+    //console.log('done', items);
 
+    /*
     async.forEach(items, function(item, done) {
       if (item.image.src) {
         var oURL = URL.parse(item.image.src),
@@ -384,7 +346,7 @@ if (program.url) {
         console.log('Done: ' + item.title);
       });
     });
-
+    */
   }, url);
 }
 else {
