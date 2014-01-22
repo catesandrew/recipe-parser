@@ -1,15 +1,3 @@
-'use strict';
-
-// Nodejs libs.
-var nodeUtil = require('util'),
-    pluralize = require('pluralize'),
-    natural = require('natural'),
-    path = require('path');
-
-var main = require('../../main'),
-    util = main.util,
-    _ = util._;
-
 module.exports = [
   {
     '2 pounds russet potatoes, unpeeled and scrubbed': {

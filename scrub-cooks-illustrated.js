@@ -1,6 +1,7 @@
 /* jshint indent: false */
 var nodeUtil = require('util'),
     async = require('async'),
+    fs = require('fs'),
     request = require('request'),
     cheerio = require('cheerio'),
     program = require('commander'),
@@ -18,10 +19,10 @@ var main = require('./main'),
 
 program
   .version('0.1')
-  .description('Scrub a recipe from cooksillustrated.com')
-  .option('-u, --url <string>', 'url of recipe to scrub from')
-  .option('-s, --save <string>', 'filename to save scrubbed and parsed ingredients to. (useful for testing and regression)')
-  .option('-d, --debug', 'output extra debug information')
+  .description('Scrub a recipe from cooksillustrated.com.')
+  .option('-u, --url <string>', 'url of recipe to scrub from.')
+  .option('-s, --save', 'save scrubbed ingredients (used for regression)?')
+  .option('-d, --debug', 'output extra debug information?')
   .parse(process.argv);
 
 main.option.debug = program.debug;
@@ -121,7 +122,8 @@ var addIngredients = function($, obj) {
   var ingredients = $('.ingredients > ul li'),
       retval,
       output,
-      text;
+      text,
+      tmp;
 
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
@@ -153,8 +155,10 @@ var addIngredients = function($, obj) {
       })(retval);
 
       //log.ok(JSON.stringify(retval));
+      tmp = {};
+      tmp[text] = retval;
+      obj.ingredients.push(tmp);
     }
-    //obj.ingredients.push(breakdown);
   });
 };
 
@@ -202,16 +206,17 @@ var scrape = function(callback, url) {
     } catch(e) {
       callback(e, obj);
     }
-    callback(null, obj);
+    callback(null, [obj]);
   });
 };
 
 if (program.url) {
-  var url = program.url,
-      dataFile = program.save;
+  var url = program.url;
+
   //var tmp = URL.parse(url, true);
   //log.debug(tmp.protocol + '//' + tmp.host + ( tmp.port || '' ) + tmp.pathname);
 
+  var whiteSpaceRe = /\s{2,}/g;
   var exportRecipe = function(item) {
     var obj = {};
     obj['AFFILIATE_ID'] = -1;
@@ -257,7 +262,7 @@ if (program.url) {
     _.each(item.procedures, function(procedure) {
       procedure = util.trim(procedure);
       if (procedure) {
-        procedure = procedure.replace(/\s{2,}/g, ' '); // replace extra spaces with one
+        procedure = procedure.replace(whiteSpaceRe, ' '); // replace extra spaces with one
         directions.push({
           VARIATION_ID: -1,
           LABEL_TEXT: '',
@@ -315,7 +320,18 @@ if (program.url) {
 
   scrape(function(err, items) {
     if (err) { console.log(err); }
-    //console.log('done', items);
+
+    if (program.save) {
+      var data = require(parser.dataFile);
+      _.each(items, function(item) {
+        _.each(item.ingredients, function(ingredient) {
+          data.push(ingredient);
+        });
+
+        fs.writeFileSync(parser.dataFile, 'module.exports = '
+                         + JSON.stringify(data, null, 2) + ';');
+      });
+    }
 
     /*
     async.forEach(items, function(item, done) {
