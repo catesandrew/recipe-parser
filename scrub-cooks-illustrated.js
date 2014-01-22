@@ -40,9 +40,16 @@ var verbose = function() {
   }
 };
 
-var listHelper = function($, selector, callback) {
+var listHelper = function($, selector, context, callback) {
+  if (context) {
+    if (_.isFunction(context)) {
+      callback = context;
+      context = undefined;
+    }
+  }
+
   try {
-    var elements = $(selector);
+    var elements = $(selector, context);
     log.debug(elements.length);
     if (elements.length) {
       elements.each(function(index, element) {
@@ -67,6 +74,34 @@ var listHelper = function($, selector, callback) {
   } catch(e) {
     log.errorlns(e);
   }
+};
+
+var addTitle = function($, obj) {
+  log.writelns('Adding Title');
+  var text;
+
+  listHelper($, '.recipe.content h2[itemprop="name"]', function(index, title) {
+    //console.log(this);  // refers to the $ wrapped title element
+    //console.log(title); //refers to the plain title element
+    obj.title = _.trim(util.text(this));
+    log.oklns(obj.title);
+  });
+};
+
+var addDatePublished = function($, obj) {
+  log.writelns('Adding Date Published');
+  listHelper($, 'meta[itemprop="datePublished"]', function(index, meta) {
+    obj.datePublished = _.trim(this.attr('content'));
+    log.oklns(obj.datePublished);
+  });
+};
+
+var addServings = function($, obj) {
+  log.writelns('Adding Servings');
+  listHelper($, 'h4[itemprop="recipeYield"]', function(index, h4) {
+    obj.servings = _.trim(util.text(this));
+    log.oklns(obj.servings);
+  });
 };
 
 var addImage = function($, obj) {
@@ -99,25 +134,15 @@ var addSummary = function($, obj) {
   listHelper($, '.why .full p', function(index, summary) {
     //console.log(this);  // refers to the $ wrapped summary element
     //console.log(summary); //refers to the plain summary element
-    //if (!summary) { return; }
-    text = util.substituteFraction(util.trim(util.fulltext(summary)));
-    log.ok(text);
+    text = util.substituteFraction(_.trim(util.fulltext(summary)));
+    log.ok(index + 1 + '- ' + text);
     obj.summaries.push(text);
   });
 };
 
-var addProcedure = function($, obj) {
-  verbose('## Adding Procedures');
-  obj.procedures || (obj.procedures = []);
-  listHelper($, '.hrecipe .procedure ol.instructions li .procedure-text', false, function(procedure) {
-    if (!procedure) { return; }
-    obj.procedures.push(util.substituteDegree(util.substituteFraction(util.trim(procedure.striptags))));
-  });
-};
-
 var addIngredients = function($, obj) {
-  verbose('## Adding Ingredients');
   obj.ingredients || (obj.ingredients = []);
+  log.writelns('Adding Ingredients');
   // [itemprop="ingredients"]
   var ingredients = $('.ingredients > ul li'),
       retval,
@@ -127,11 +152,11 @@ var addIngredients = function($, obj) {
 
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
-      text = util.trim(util.fulltext(ingredient));
+      text = _.trim(util.fulltext(ingredient));
       //log.ok(text);
       //log.ok(this.text());
-      //log.ok(util.trim(util.fulltext(ingredient)));
-      //log.ok(util.trim(util.striptags(ingredient)));
+      //log.ok(_.trim(util.fulltext(ingredient)));
+      //log.ok(_.trim(util.striptags(ingredient)));
       retval = parser.parseIngredient(text);
 
       (function walker(vals) {
@@ -146,19 +171,120 @@ var addIngredients = function($, obj) {
           log.oklns('OR');
           walker(vals.ingredients);
         } else {
-          output = _.compact([vals.quantity, vals.measurement, vals.description]).join(' ');
+          output = _.compact([vals.quantity, vals.measurement,
+                             util.substituteFraction(vals.description)]).join(' ');
           if (vals.direction) {
             output += ', ' + vals.direction;
           }
-          log.ok(output);
+          if (vals.alt) {
+            output += ' (' + util.substituteFraction(vals.alt) + ')';
+          }
+          log.ok(index + 1 + '- ' + output);
         }
       })(retval);
 
-      //log.ok(JSON.stringify(retval));
       tmp = {};
       tmp[text] = retval;
       obj.ingredients.push(tmp);
     }
+  });
+};
+
+var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
+var addProcedures = function($, obj) {
+  log.writelns('Adding Procedures');
+  obj.procedures || (obj.procedures = []);
+  var match,
+      text;
+
+  listHelper($, '.instructions ol li[itemprop="recipeInstructions"] div', function(index, procedure) {
+    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(procedure))));
+    match = text.match(removeLeadingDigitPeriodRe);
+    if (match) {
+      text = match[1];
+    }
+
+    obj.procedures.push(text);
+    log.oklns(index + 1 + '- ' + text);
+  });
+};
+
+var addNotes = function($, obj) {
+  log.writelns('Adding Notes');
+  obj.notes || (obj.notes = []);
+  var text;
+
+  listHelper($, '.serves > p', function(index, note) {
+    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(note))));
+
+    obj.notes.push(text);
+    log.oklns(index + 1 + '- ' + text);
+  });
+};
+
+var addTimes = function($, obj) {
+  log.writelns('Adding Times');
+  var text;
+
+  listHelper($, '.other-attributes meta[itemprop="totalTime"]', function(index, meta) {
+    text = _.trim(this.attr('content'));
+    //PT0H0M  - 0 hours, 0 mins
+    //PT1H20M - 1 hour, 20 mins
+    obj.totalTime = text; // TODO - parse
+    log.oklns(text);
+  });
+};
+
+var addCourse = function($, obj) {
+  log.writelns('Adding Course');
+  listHelper($, '.other-attributes meta[itemprop="recipeCategory"]', function(index, meta) {
+    obj.courseName = _.trim(this.attr('content'));
+    log.oklns(obj.courseName);
+    // Side Dishes, Main Courses, Appetizers
+  });
+};
+
+var addAsideNotes = function($, obj) {
+  log.writelns('Adding Aside Notes');
+  obj.aisdeNotes || (obj.aisdeNotes = []);
+  var match, text, note, img, h4, h3;
+
+  listHelper($, '.asides > .aside', function(i, aside) {
+    listHelper($, 'h4', this, function() {
+      h4 = _.trim(util.text(this));
+    });
+    listHelper($, 'h3', this, function() {
+      h3 = _.trim(util.text(this));
+    });
+
+    note = {
+      h4: h4,
+      h3: h3,
+      notes: []
+    };
+
+    listHelper($, '.page-item', this, function() {
+      listHelper($, 'figure > img', this, function() {
+        img = this.attr('src');
+      });
+      listHelper($, 'figure > figcaption', this, function() {
+        text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(this))));
+        match = text.match(removeLeadingDigitPeriodRe);
+        if (match) {
+          text = match[1];
+        }
+      });
+      note.notes.push({
+        text: text,
+        img: img
+      });
+    });
+
+    log.ok(note.h4 + ' : ' + note.h3);
+    _.each(note.notes, function(note, i) {
+      log.ok(i + 1 + '- ' + note.text);
+      log.ok(i + 1 + '- ' + note.img);
+    });
   });
 };
 
@@ -172,37 +298,23 @@ var scrape = function(callback, url) {
     var obj = {};
 
     try {
-      obj.title = util.text($('.recipe.content h2[itemprop="name"]')).trim();
-      log.oklns(obj.title);
-
       //log.oklns(util.striptags($('.why')));
       //log.oklns(util.rawtext($('.why > h3')));
       //log.oklns(util.fulltext($('.ingredients > ul')));
       //log.oklns(util.text($('.why > h3')));
 
-      //addImage($, obj);
-      //addSummary($, obj);
+      addTitle($, obj);
+      addDatePublished($, obj);
+      addServings($, obj);
+      addImage($, obj);
+      addSummary($, obj);
       addIngredients($, obj);
-      /*
-      addProcedure($, obj);
+      addProcedures($, obj);
+      addNotes($, obj);
+      addTimes($, obj);
+      addCourse($, obj);
+      addAsideNotes($, obj);
 
-      verbose('## Adding Servings');
-      var servings = $('.hrecipe .recipe-about td span.yield');
-      if (servings) {
-        obj.servings = servings.striptags;
-      }
-
-      verbose('## Adding Times');
-      var prepTime = $('.hrecipe .recipe-about td span.prepTime');
-      if (prepTime) {
-        obj.prepTime = prepTime.striptags;
-      }
-
-      var totalTime = $('.hrecipe .recipe-about td span.totalTime');
-      if (totalTime) {
-        obj.totalTime = totalTime.striptags;
-      }
-      */
     } catch(e) {
       callback(e, obj);
     }
@@ -211,10 +323,11 @@ var scrape = function(callback, url) {
 };
 
 if (program.url) {
-  var url = program.url;
+  var url = program.url,
+      parsedUrl = URL.parse(url, true);
 
-  //var tmp = URL.parse(url, true);
-  //log.debug(tmp.protocol + '//' + tmp.host + ( tmp.port || '' ) + tmp.pathname);
+  delete parsedUrl.query;
+  delete parsedUrl.search;
 
   var whiteSpaceRe = /\s{2,}/g;
   var exportRecipe = function(item) {
@@ -224,19 +337,19 @@ if (program.url) {
     obj['COURSE_NAME'] = 'Main';
     obj['CUISINE_ID'] = -1;
     obj['DIFFICULTY'] = 0;
-    obj['KEYWORDS'] = item.tags.join(', ');
+    //obj['KEYWORDS'] = item.tags.join(', ');
     obj['MEASUREMENT_SYSTEM'] = 0;
-    obj['NAME'] = util.trim(item.title);
+    obj['NAME'] = item.title;
     obj['NOTE'] = '';
-    obj['NOTES_LIST'] = [];
+    obj['NOTES_LIST'] = []; // item.notes.join(util.linefeed)
     obj['NUTRITION'] = '';
-    obj['PUBLICATION_PAGE'] = url;
+    obj['PUBLICATION_PAGE'] = URL.format(parsedUrl);
     obj['SERVINGS'] = 1;
-    obj['SOURCE'] = 'Serious Eats';
-    obj['SUMMARY'] = item.summaries.join('\n');
+    obj['SOURCE'] = 'Cooks Illustrated';
+    obj['SUMMARY'] = item.summaries.join(util.linefeed);
     obj['TYPE'] = 102;
-    obj['URL'] = url;
-    obj['YIELD'] = util.trim(item.servings);
+    obj['URL'] = URL.format(parsedUrl);
+    obj['YIELD'] = item.servings;
 
     if (item.image.data) {
       obj['EXPORT_TYPE'] = 'BINARY';
@@ -260,7 +373,7 @@ if (program.url) {
 
     var directions = obj['DIRECTIONS_LIST'] = [];
     _.each(item.procedures, function(procedure) {
-      procedure = util.trim(procedure);
+      procedure = _.trim(procedure);
       if (procedure) {
         procedure = procedure.replace(whiteSpaceRe, ' '); // replace extra spaces with one
         directions.push({
@@ -272,43 +385,56 @@ if (program.url) {
       }
     });
 
+    /*
     var preps = obj['PREP_TIMES'] = [];
     var addTime = function(id, time) {
       var hours,
-          minutes;
+          minutes,
+          matches;
 
-      time = parseInt(time, 10);
-      hours = parseInt(time/60, 10);
-      minutes = time%60;
+      matches = time.match(/(\d+)H(\d+)M/i); // PT1H0M
+      if (matches) {
+        hours = parseInt(matches[1], 10);
+        minutes = parseInt(matches[2], 10);
 
-      preps.push({
-        TIME_TYPE_ID: id,
-        AMOUNT: hours > 0 ? hours : minutes,
-        AMOUNT_2: hours > 0 ? minutes : 0,
-        TIME_UNIT_ID: hours > 0 ? 1 : 2,
-        TIME_UNIT_2_ID: hours > 0 ? 2 : 1
-      });
+        preps.push({
+          TIME_TYPE_ID: id,
+          AMOUNT: hours > 0 ? hours : minutes,
+          AMOUNT_2: hours > 0 ? minutes : 0,
+          TIME_UNIT_ID: hours > 0 ? 1 : 2,
+          TIME_UNIT_2_ID: hours > 0 ? 2 : 1
+        });
+      }
     };
 
     if (item.prepTime) {
       addTime(9, item.prepTime); // prep
-
-      if (item.totalTime) {
-        var cookTime = parseInt(item.totalTime, 10) - parseInt(item.prepTime, 10);
-        addTime(5, cookTime); // cook
-      }
     }
 
+    if (item.cookTime) {
+      addTime(5, item.cookTime); // cook
+    }
+
+    if (item.totalTime) {
+      addTime(30, item.totalTime); // total
+    }
+
+    if (item.inactiveTime) {
+      addTime(28, item.inactiveTime); // inactive
+    }
+    */
+
+    // TODO update
     var ingredients = obj['INGREDIENTS_TREE'] = [];
     _.each(item.ingredients, function(ingredient) {
       ingredients.push({
-        DESCRIPTION: util.trim(ingredient.product),
-        DIRECTION: util.trim(ingredient.direction) || '',
+        DESCRIPTION: _.trim(ingredient.product),
+        DIRECTION: _.trim(ingredient.direction) || '',
         INCLUDED_RECIPE_ID: -1,
         IS_DIVIDER: false,
         IS_MAIN: false,
-        MEASUREMENT: util.trim(ingredient.measurement),
-        QUANTITY: util.trim(ingredient.quantity)
+        MEASUREMENT: _.trim(ingredient.measurement),
+        QUANTITY: _.trim(ingredient.quantity)
       });
     });
 
@@ -333,7 +459,6 @@ if (program.url) {
       });
     }
 
-    /*
     async.forEach(items, function(item, done) {
       if (item.image.src) {
         var oURL = URL.parse(item.image.src),
@@ -370,10 +495,9 @@ if (program.url) {
     }, function(err) {
       _.each(items, function(item) {
         exportRecipe(item);
-        console.log('Done: ' + item.title);
+        log.ok('Ok. Finished scrubbing "' + item.title + '"');
       });
     });
-    */
   }, url);
 }
 else {
