@@ -300,15 +300,21 @@ module.exports = [
   }, {
     '4 teaspoons cracked black peppercorns (or cracked white peppercorns)': [
       {
-        description: 'black peppercorns',
-        direction: 'cracked',
-        measurement: 'teaspoons',
-        quantity: '4'
-      }, {
-        description: 'white peppercorns',
-        direction: 'cracked',
-        measurement: 'teaspoons',
-        quantity: '4'
+        description: 'Or',
+        isDivider: true,
+        ingredients: [
+          {
+            description: 'black peppercorns',
+            direction: 'cracked',
+            measurement: 'teaspoons',
+            quantity: '4'
+          }, {
+            description: 'white peppercorns',
+            direction: 'cracked',
+            measurement: 'teaspoons',
+            quantity: '4'
+          }
+        ]
       }
     ]
   }, {
@@ -397,13 +403,19 @@ module.exports = [
   }, {
     '1 1/2 tablespoons black Chinese vinegar or Worcestershire sauce': [
       {
-        description: 'black Chinese vinegar',
-        measurement: 'tablespoons',
-        quantity: '1 1/2'
-      }, {
-        description: 'Worcestershire sauce',
-        measurement: 'tablespoons',
-        quantity: '1 1/2'
+        description: 'Or',
+        isDivider: true,
+        ingredients: [
+          {
+            description: 'black Chinese vinegar',
+            measurement: 'tablespoons',
+            quantity: '1 1/2'
+          }, {
+            description: 'Worcestershire sauce',
+            measurement: 'tablespoons',
+            quantity: '1 1/2'
+          }
+        ]
       }
     ]
   }, {

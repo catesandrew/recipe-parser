@@ -8,7 +8,7 @@ var assert = require('assert'),
 
 var expect = chai.expect;
 var util = main.util,
-    _ = util._;
+    _ = util._,
     parser = main.cooksIllustratedParser;
 
 // test helper functions
@@ -272,7 +272,7 @@ describe('cooks illustrated instructions parser', function() {
             // important as it denotes a grouping to the callee.
             _.each(vals, function(val) {
               walker(val);
-            })
+            });
           }
         } else if (vals.isDivider) {
           zipWalker(_.zip(vals.ingredients, descriptions, directions));
@@ -285,55 +285,21 @@ describe('cooks illustrated instructions parser', function() {
   });
 
   it('should collate and produce a pretty result', function() {
-    var descriptionObjs,
-        descriptions,
-        measurement,
-        directions,
-        allPieces,
-        quantity,
+    var values,
         retval,
-        //values,
         key;
 
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
+      values = _.first(_.values(ingredient));
 
-      allPieces = parser.getAllPieces(key);
-      quantity = allPieces.quantity;
-      measurement = allPieces.measurement;
-      descriptionObjs = allPieces.descriptions;
-      descriptions = descriptionObjs.descriptions;
-      directions = allPieces.directions;
+      retval = parser.parseIngredient(key);
 
-      retval = _.map(_.zip(descriptions, directions), function(tuple) {
-        return {
-          quantity: quantity,
-          measurement: measurement,
-          description: tuple[0],
-          direction: tuple[1].direction,
-          alt: tuple[1].alt
-        };
-      });
-
-      _.each(retval, function(fixme) {
-        for (var key in fixme) {
-          if (!fixme[key]) {
-            delete fixme[key];
-          }
-        }
-      });
-
-      if (descriptionObjs.isOrSplit) {
-        retval = {
-          description: 'Or',
-          isDivider: true,
-          ingredients: retval
-        };
-      } else if (retval.length === 1) {
-        retval = _.first(retval);
+      if (values.finale) {
+        expect(retval).to.deep.equal(values.finale);
+      } else {
+        expect(retval).to.deep.equal(values);
       }
-
-      console.log(retval);
 
     });
   });

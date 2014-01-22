@@ -119,31 +119,41 @@ var addIngredients = function($, obj) {
   obj.ingredients || (obj.ingredients = []);
   // [itemprop="ingredients"]
   var ingredients = $('.ingredients > ul li'),
-      descriptionObjs,
-      descriptions,
-      measurement,
-      directions,
-      allPieces,
-      quantity,
+      retval,
+      output,
       text;
 
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
       text = util.trim(util.fulltext(ingredient));
-      log.ok(text);
+      //log.ok(text);
       //log.ok(this.text());
       //log.ok(util.trim(util.fulltext(ingredient)));
       //log.ok(util.trim(util.striptags(ingredient)));
-      allPieces = parser.getAllPieces(text);
-      quantity = allPieces.quantity;
-      measurement = allPieces.measurement;
-      descriptionObjs = allPieces.descriptions;
-      descriptions = descriptionObjs.descriptions;
-      directions = allPieces.directions;
+      retval = parser.parseIngredient(text);
 
+      (function walker(vals) {
+        if (_.isArray(vals)) {
+          if (vals.length > 1) {
+            _.each(vals, function(val) {
+              walker(val);
+            });
+          }
+        } else if (vals.isDivider) {
+          //output('OR');
+          log.oklns('OR');
+          walker(vals.ingredients);
+        } else {
+          output = _.compact([vals.quantity, vals.measurement, vals.description]).join(' ');
+          if (vals.direction) {
+            output += ', ' + vals.direction;
+          }
+          log.ok(output);
+        }
+      })(retval);
 
+      //log.ok(JSON.stringify(retval));
     }
-
     //obj.ingredients.push(breakdown);
   });
 };
@@ -197,7 +207,8 @@ var scrape = function(callback, url) {
 };
 
 if (program.url) {
-  var url = program.url;
+  var url = program.url,
+      dataFile = program.save;
   //var tmp = URL.parse(url, true);
   //log.debug(tmp.protocol + '//' + tmp.host + ( tmp.port || '' ) + tmp.pathname);
 
