@@ -197,21 +197,44 @@ var addIngredients = function($, obj) {
 };
 
 var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
+var removeEndingColonRe = /([^:]*):$/;
 var addProcedures = function($, obj) {
   log.writelns('Adding Procedures');
   obj.procedures || (obj.procedures = []);
-  var match,
+  var header,
+      match,
       text;
 
   listHelper($, '.instructions ol li[itemprop="recipeInstructions"] div', function(index, procedure) {
+    header = undefined;
+
+    listHelper($, 'b', this, function() {
+      header = _.trim(util.text(this));
+    });
+
     text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(procedure))));
     match = text.match(removeLeadingDigitPeriodRe);
     if (match) {
       text = match[1];
     }
+    if (header) {
+      text = _.trim(text.replace(header, ''));
+      match = header.match(removeEndingColonRe);
+      if (match) {
+        header = match[1];
+      }
+    }
 
-    obj.procedures.push(text);
-    log.oklns(index + 1 + '- ' + text);
+    obj.procedures.push({
+      header: header,
+      text: text
+    });
+
+    if (header) {
+      log.oklns(index + 1 + ' # ' + header + ' # ' + text);
+    } else {
+      log.oklns(index + 1 + ' - ' + text);
+    }
   });
 };
 
@@ -465,6 +488,7 @@ if (program.url) {
       });
     }
 
+    // TODO download aside images
     async.forEach(items, function(item, done) {
       if (item.image.src) {
         var oURL = URL.parse(item.image.src),
