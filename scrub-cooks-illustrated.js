@@ -51,21 +51,6 @@ var listHelper = function($, selector, context, callback) {
         return callback.call(this, index, element);
       });
     }
-    /*
-    else if (elements.children && elements.children.length) {
-      //log.writelns('  count: ' + elements.children.length);
-      if (chooseFirst) {
-        callback(elements.children.first());
-      } else {
-        elements.children.each(function(ele) {
-          callback(ele);
-        });
-      }
-    } else {
-      //log.writelns('  count: 1');
-      callback(elements);
-    }
-    */
   } catch(e) {
     log.errorlns(e);
   }
