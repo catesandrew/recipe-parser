@@ -34,12 +34,6 @@ main.option.debug = program.debug;
 //log.fail('fail');       // fail
 //log.debug('debug');     // [D] debug
 
-var verbose = function() {
-  if (program.debug) {
-    console.log.apply(null, arguments);
-  }
-};
-
 var listHelper = function($, selector, context, callback) {
   if (context) {
     if (_.isFunction(context)) {
@@ -275,7 +269,7 @@ var addCourse = function($, obj) {
 
 var addAsideNotes = function($, obj) {
   log.writelns('Adding Aside Notes');
-  obj.aisdeNotes || (obj.aisdeNotes = []);
+  obj.asideNotes || (obj.asideNotes = []);
   var match, text, note, img, h4, h3;
 
   listHelper($, '.asides > .aside', function(i, aside) {
@@ -305,14 +299,18 @@ var addAsideNotes = function($, obj) {
       });
       note.notes.push({
         text: text,
-        img: img
+        image: {
+          src: img
+        }
       });
     });
+
+    obj.asideNotes.push(note);
 
     log.ok(note.h4 + ' : ' + note.h3);
     _.each(note.notes, function(note, i) {
       log.ok(i + 1 + '- ' + note.text);
-      log.ok(i + 1 + '- ' + note.img);
+      log.ok(i + 1 + '- ' + note.image.src);
     });
   });
 };
@@ -358,7 +356,6 @@ if (program.url) {
   delete parsedUrl.query;
   delete parsedUrl.search;
 
-  var whiteSpaceRe = /\s{2,}/g;
   var exportRecipe = function(item) {
     var obj = {};
     obj['AFFILIATE_ID'] = -1;
@@ -404,7 +401,7 @@ if (program.url) {
     _.each(item.procedures, function(procedure) {
       procedure = _.trim(procedure);
       if (procedure) {
-        procedure = procedure.replace(whiteSpaceRe, ' '); // replace extra spaces with one
+        procedure = util.trimMultipleWhiteSpace(procedure);
         directions.push({
           VARIATION_ID: -1,
           LABEL_TEXT: '',
@@ -413,45 +410,6 @@ if (program.url) {
         });
       }
     });
-
-    /*
-    var preps = obj['PREP_TIMES'] = [];
-    var addTime = function(id, time) {
-      var hours,
-          minutes,
-          matches;
-
-      matches = time.match(/(\d+)H(\d+)M/i); // PT1H0M
-      if (matches) {
-        hours = parseInt(matches[1], 10);
-        minutes = parseInt(matches[2], 10);
-
-        preps.push({
-          TIME_TYPE_ID: id,
-          AMOUNT: hours > 0 ? hours : minutes,
-          AMOUNT_2: hours > 0 ? minutes : 0,
-          TIME_UNIT_ID: hours > 0 ? 1 : 2,
-          TIME_UNIT_2_ID: hours > 0 ? 2 : 1
-        });
-      }
-    };
-
-    if (item.prepTime) {
-      addTime(9, item.prepTime); // prep
-    }
-
-    if (item.cookTime) {
-      addTime(5, item.cookTime); // cook
-    }
-
-    if (item.totalTime) {
-      addTime(30, item.totalTime); // total
-    }
-
-    if (item.inactiveTime) {
-      addTime(28, item.inactiveTime); // inactive
-    }
-    */
 
     // TODO update
     var ingredients = obj['INGREDIENTS_TREE'] = [];
@@ -488,36 +446,59 @@ if (program.url) {
       });
     }
 
-    // TODO download aside images
-    async.forEach(items, function(item, done) {
+    var downloadImage = function(src, callback) {
+      var oURL = URL.parse(src);
+      var request = http.request({
+        port: 80,
+        host: oURL.hostname,
+        method: 'GET',
+        path: oURL.pathname
+      });
+
+      request.end();
+      request.on('response', function (response) {
+        var type = response.headers['content-type'],
+            prefix = 'data:' + type + ';base64,',
+            body = '';
+
+        response.setEncoding('binary');
+        response.on('end', function () {
+          var base64 = new Buffer(body, 'binary').toString('base64'),
+          data = prefix + base64;
+          callback(null, base64);
+        });
+        response.on('data', function (chunk) {
+          if (response.statusCode === 200) {
+            body += chunk;
+          }
+        });
+      });
+    };
+
+    // collate all images
+    var images = [];
+    _.each(items, function(item) {
       if (item.image.src) {
-        var oURL = URL.parse(item.image.src),
-            request = http.request({
-              port: 80,
-              host: oURL.hostname,
-              method: 'GET',
-              path: oURL.pathname
-            });
-
-        request.end();
-        request.on('response', function (response) {
-          var type = response.headers["content-type"],
-              prefix = 'data:' + type + ';base64,',
-              body = '';
-
-          response.setEncoding('binary');
-          response.on('end', function () {
-            var base64 = new Buffer(body, 'binary').toString('base64'),
-            data = prefix + base64;
-            //item.image.data = data;
-            item.image.data = base64;
-            done();
+        images.push(item.image);
+      }
+      if (item.asideNotes.length) {
+        _.each(item.asideNotes, function(asideNote) {
+          _.each(asideNote.notes, function(note) {
+            images.push(note.image);
           });
-          response.on('data', function (chunk) {
-            if (response.statusCode === 200) {
-              body += chunk;
-            }
-          });
+        });
+      }
+    });
+
+    // download all images
+    async.forEach(images, function(image, done) {
+      if (image.src) {
+        downloadImage(image.src, function(err, base64) {
+          if (!err) {
+            log.ok('Downloaded: ' + image.src);
+          }
+          image.data = base64;
+          done();
         });
       } else {
         done();
