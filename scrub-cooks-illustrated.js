@@ -9,6 +9,7 @@ var nodeUtil = require('util'),
     URL = require('url');
 
 var main = require('./main'),
+    constants = main.mgdConstants,
     parser = main.cooksIllustratedParser,
     util = main.util,
     log = main.log,
@@ -322,29 +323,20 @@ var scrape = function(callback, url) {
       verbose: true,
       ignoreWhitespace: true
     });
+
     var obj = {};
+    addTitle($, obj);
+    addDatePublished($, obj);
+    addServings($, obj);
+    addImage($, obj);
+    addSummary($, obj);
+    addIngredients($, obj);
+    addProcedures($, obj);
+    addNotes($, obj);
+    addTimes($, obj);
+    addCourse($, obj);
+    addAsideNotes($, obj);
 
-    try {
-      //log.oklns(util.striptags($('.why')));
-      //log.oklns(util.rawtext($('.why > h3')));
-      //log.oklns(util.fulltext($('.ingredients > ul')));
-      //log.oklns(util.text($('.why > h3')));
-
-      addTitle($, obj);
-      addDatePublished($, obj);
-      addServings($, obj);
-      addImage($, obj);
-      addSummary($, obj);
-      addIngredients($, obj);
-      addProcedures($, obj);
-      addNotes($, obj);
-      addTimes($, obj);
-      addCourse($, obj);
-      addAsideNotes($, obj);
-
-    } catch(e) {
-      callback(e, obj);
-    }
     callback(null, [obj]);
   });
 };

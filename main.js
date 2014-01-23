@@ -18,6 +18,7 @@ main.option = {
 
 var util = mRequire('util', 'util');
 var cooksIllustratedParser = mRequire('cooksIllustratedParser', 'cooks-illustrated-parser');
+mRequire('mgdConstants', 'mac-gourmet-constants');
 var log = mRequire('log', 'log');
 var verbose = main.verbose = log.verbose;
 
