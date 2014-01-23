@@ -256,26 +256,40 @@ var addTimes = function($, obj) {
 };
 
 var addCourse = function($, obj) {
+  obj.categories || (obj.categories = []);
   log.writelns('Adding Course');
-  var name;
+  var name, val, cat;
 
   listHelper($, '.other-attributes meta[itemprop="recipeCategory"]', function(index, meta) {
     name = _.trim(this.attr('content'));
     if (name) {
       if (name === 'Side Dishes') {
-        // TODO add to the categories
+        cat = 'Side Dishes';
       } else if (name === 'Main Courses') {
-        obj.course = {
-          id: constants.COURSES['Main'],
-          name: 'Main'
-        };
+        cat = 'Main Dish';
+        val = 'Main';
+      } else if (name === 'Desserts or Baked Goods') {
+        cat = 'Desserts';
+        val = 'Dessert';
       } else if (name === 'Appetizers') {
+        val = cat = 'Appetizer';
+      }
+
+      if (val) {
         obj.course = {
-          id: constants.COURSES['Appetizer'],
-          name: 'Appetizer'
+          id: constants.COURSES[val],
+          name: val
         };
       }
+
+      if (cat) {
+        obj.categories.push({
+          id: constants.CATEGORIES[cat],
+          name: cat
+        });
+      }
     }
+
     if (obj.course) {
       log.oklns(obj.course.id + ' - ' + obj.course.name);
     }
@@ -376,11 +390,10 @@ if (program.url) {
         USER_ADDED: userAdded
       });
     };
-    addCategory(206, 'Smoothies', false);
-    //addCategory(88, 'Mixed Drinks', false);
-    //addCategory(10, 'Holiday', false);
-    //addCategory(14, 'Thanksgiving', false);
-    //addCategory(21, 'Side Dishes', false);
+    _.each(item.categories, function(category) {
+      //addCategory(206, 'Smoothies', false);
+      addCategory(category.id, category.name, false);
+    });
 
     // Add course
     if (item.course) {
@@ -434,7 +447,7 @@ if (program.url) {
           IS_DIVIDER: true,
           IS_MAIN: false,
           MEASUREMENT: '',
-          QUANTITY: array.ingredients.length
+          QUANTITY: '' + array.ingredients.length
         };
 
         var children = [];
