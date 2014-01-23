@@ -103,7 +103,7 @@ var addImage = function($, obj) {
   obj.image || (obj.image = {});
   log.writelns('Adding Image');
 
-  var patternRe = /\((.+?)\)/g,
+  var patternRe = /\('(.+?)'\)/g,
       backgroundImage,
       match;
 
@@ -369,56 +369,81 @@ if (program.url) {
   var exportRecipe = function(item) {
     var obj = {};
     obj['AFFILIATE_ID'] = -1;
-    if (obj.course) {
-      obj['COURSE_ID'] = obj.course.id;
-      obj['COURSE_NAME'] = obj.course.name;
-    }
     obj['CUISINE_ID'] = -1;
     obj['DIFFICULTY'] = 0;
-    //obj['KEYWORDS'] = item.tags.join(', ');
-    obj['MEASUREMENT_SYSTEM'] = 0;
+    obj['MEASUREMENT_SYSTEM'] = 0;  // US Standard
     obj['NAME'] = item.title;
-    obj['NOTE'] = '';
-    obj['NOTES_LIST'] = []; // item.notes.join(util.linefeed)
-    obj['NUTRITION'] = '';
     obj['PUBLICATION_PAGE'] = URL.format(parsedUrl);
     obj['SERVINGS'] = 1;
     obj['SOURCE'] = 'Cooks Illustrated';
-    obj['SUMMARY'] = item.summaries.join(util.linefeed);
     obj['TYPE'] = 102;
     obj['URL'] = URL.format(parsedUrl);
     obj['YIELD'] = item.servings;
+    //obj['KEYWORDS'] = item.tags.join(', ');
+    //obj['NOTE'] = '';
+    //obj['NUTRITION'] = '';
 
+    // Add Summary
+    obj['SUMMARY'] = _.map(item.summaries, function(summary) {
+      return '<p>' + summary + '</p>';
+    })
+    .join(util.linefeed);
+
+    // Add main picture
     if (item.image.data) {
       obj['EXPORT_TYPE'] = 'BINARY';
       obj['IMAGE'] = item.image.data;
     }
 
-    var categories = obj['CATEGORIES'] = [];
-    var addCategory = function(id, name, userAdded) {
-      categories.push({
-        CATEGORY_ID: id,
-        ITEM_TYPE_ID: 102,
-        NAME: name,
-        USER_ADDED: userAdded
-      });
-    };
-    //addCategory(206, 'Smoothies', false);
-    //addCategory(88, 'Mixed Drinks', false);
-    //addCategory(10, 'Holiday', false);
-    //addCategory(14, 'Thanksgiving', false);
-    //addCategory(21, 'Side Dishes', false);
+    // Add course
+    if (obj.course) {
+      obj['COURSE_ID'] = item.course.id;
+      obj['COURSE_NAME'] = item.course.name;
+    }
 
+    // Add Notes and Aside Notes (with pictures)
+    var notes = obj['NOTES_LIST'] = [];
+    var i = 0, tmp, title;
+    _.each(item.notes, function(note) {
+      tmp = {};
+      notes.push({
+        'NOTE_TEXT': note,
+        'SORT_ORDER': i++,
+        'TYPE_ID': 10
+      });
+    });
+    _.each(item.asideNotes, function(asideNote) {
+      title = [
+          '<h4>' + asideNote.h4 + '</h4>',
+          '<h3>' + asideNote.h3 + '</h3>' ];
+
+      _.each(asideNote.notes, function(note) {
+        tmp = {
+          'NOTE_TEXT': title.concat(['<p>' + note.text + '</p>']).join(util.linefeed),
+          'SORT_ORDER': i++,
+          'TYPE_ID': 10
+        };
+        title = []; // reset the <h4> and <h3>
+
+        if (note.image && note.image.data) {
+          tmp['IMAGE'] = note.image.data;
+        }
+        notes.push(tmp);
+      });
+    });
+
+    // Add directions
     var directions = obj['DIRECTIONS_LIST'] = [];
+    var text;
     _.each(item.procedures, function(procedure) {
-      procedure = _.trim(procedure);
-      if (procedure) {
-        procedure = util.trimMultipleWhiteSpace(procedure);
+      text = _.trim(procedure.text);
+      if (text) {
+        text = util.trimMultipleWhiteSpace(text);
         directions.push({
           VARIATION_ID: -1,
-          LABEL_TEXT: '',
+          LABEL_TEXT: procedure.header || '',
           IS_HIGHLIGHTED: false,
-          DIRECTION_TEXT: procedure
+          DIRECTION_TEXT: text
         });
       }
     });
@@ -436,6 +461,22 @@ if (program.url) {
         QUANTITY: _.trim(ingredient.quantity)
       });
     });
+
+    // Add Categories
+    var categories = obj['CATEGORIES'] = [];
+    var addCategory = function(id, name, userAdded) {
+      categories.push({
+        CATEGORY_ID: id,
+        ITEM_TYPE_ID: 102,
+        NAME: name,
+        USER_ADDED: userAdded
+      });
+    };
+    //addCategory(206, 'Smoothies', false);
+    //addCategory(88, 'Mixed Drinks', false);
+    //addCategory(10, 'Holiday', false);
+    //addCategory(14, 'Thanksgiving', false);
+    //addCategory(21, 'Side Dishes', false);
 
     var plist_file = util.expandHomeDir('~/Desktop/recipe.mgourmet4');
     util.writePlist(function(err, obj) {
@@ -459,6 +500,9 @@ if (program.url) {
     }
 
     var downloadImage = function(src, callback) {
+      if (src.indexOf('//') === 0) {
+        src = src.replace('//', 'http://');
+      }
       var oURL = URL.parse(src);
       var request = http.request({
         port: 80,
@@ -475,8 +519,7 @@ if (program.url) {
 
         response.setEncoding('binary');
         response.on('end', function () {
-          var base64 = new Buffer(body, 'binary').toString('base64'),
-          data = prefix + base64;
+          var base64 = new Buffer(body, 'binary').toString('base64');
           callback(null, base64);
         });
         response.on('data', function (chunk) {
