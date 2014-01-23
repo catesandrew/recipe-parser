@@ -143,8 +143,8 @@ var addSummary = function($, obj) {
 var addIngredients = function($, obj) {
   obj.ingredients || (obj.ingredients = []);
   log.writelns('Adding Ingredients');
-  // [itemprop="ingredients"]
   var ingredients = $('.ingredients > ul li'),
+      list = obj.ingredients,
       retval,
       output,
       text,
@@ -153,10 +153,6 @@ var addIngredients = function($, obj) {
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
       text = _.trim(util.fulltext(ingredient));
-      //log.ok(text);
-      //log.ok(this.text());
-      //log.ok(_.trim(util.fulltext(ingredient)));
-      //log.ok(_.trim(util.striptags(ingredient)));
       retval = parser.parseIngredient(text);
 
       (function walker(vals) {
@@ -171,23 +167,33 @@ var addIngredients = function($, obj) {
           log.oklns('OR');
           walker(vals.ingredients);
         } else {
-          output = _.compact([vals.quantity, vals.measurement,
-                             util.substituteFraction(vals.description)]).join(' ');
+          output = _.compact([vals.quantity, vals.measurement, vals.description]).join(' ');
           if (vals.direction) {
             output += ', ' + vals.direction;
           }
           if (vals.alt) {
-            output += ' (' + util.substituteFraction(vals.alt) + ')';
+            output += ' (' + vals.alt + ')';
           }
-          log.ok(index + 1 + '- ' + output);
+          log.ok(index + 1 + '- ' + util.substituteDegree(util.substituteFraction(output)));
         }
       })(retval);
 
       tmp = {};
       tmp[text] = retval;
-      obj.ingredients.push(tmp);
+      list.push(tmp);
+    } else {
+      listHelper($, 'h5', this, function() {
+        log.ok('Group: ' + _.trim(util.text(this)));
+        var parent = {
+          name: _.trim(util.text(this)),
+          children: []
+        };
+        list.push(parent);
+        list = parent.children;
+      });
     }
   });
+  //console.log(JSON.stringify(obj.ingredients, null, 2));
 };
 
 var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
