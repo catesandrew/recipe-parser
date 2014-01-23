@@ -9,7 +9,7 @@ var nodeUtil = require('util'),
     URL = require('url');
 
 var main = require('./main'),
-    constants = main.mgdConstants,
+    constants = main.mgdConstants.constants,
     parser = main.cooksIllustratedParser,
     util = main.util,
     log = main.log,
@@ -261,10 +261,28 @@ var addTimes = function($, obj) {
 
 var addCourse = function($, obj) {
   log.writelns('Adding Course');
+  var name;
+
   listHelper($, '.other-attributes meta[itemprop="recipeCategory"]', function(index, meta) {
-    obj.courseName = _.trim(this.attr('content'));
-    log.oklns(obj.courseName);
-    // Side Dishes, Main Courses, Appetizers
+    name = _.trim(this.attr('content'));
+    if (name) {
+      if (name === 'Side Dishes') {
+        // TODO add to the categories
+      } else if (name === 'Main Courses') {
+        obj.course = {
+          id: constants.COURSES['Main'],
+          name: 'Main'
+        };
+      } else if (name === 'Appetizers') {
+        obj.course = {
+          id: constants.COURSES['Appetizer'],
+          name: 'Appetizer'
+        };
+      }
+    }
+    if (obj.course) {
+      log.oklns(obj.course.id + ' - ' + obj.course.name);
+    }
   });
 };
 
@@ -351,8 +369,10 @@ if (program.url) {
   var exportRecipe = function(item) {
     var obj = {};
     obj['AFFILIATE_ID'] = -1;
-    obj['COURSE_ID'] = 2;
-    obj['COURSE_NAME'] = 'Main';
+    if (obj.course) {
+      obj['COURSE_ID'] = obj.course.id;
+      obj['COURSE_NAME'] = obj.course.name;
+    }
     obj['CUISINE_ID'] = -1;
     obj['DIFFICULTY'] = 0;
     //obj['KEYWORDS'] = item.tags.join(', ');
