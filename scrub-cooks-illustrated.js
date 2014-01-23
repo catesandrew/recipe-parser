@@ -139,11 +139,11 @@ var addIngredients = function($, obj) {
   obj.ingredients || (obj.ingredients = []);
   log.writelns('Adding Ingredients');
   var ingredients = $('.ingredients > ul li'),
+      top = obj.ingredients,
       list = obj.ingredients,
       retval,
       output,
-      text,
-      tmp;
+      text;
 
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
@@ -152,14 +152,11 @@ var addIngredients = function($, obj) {
 
       (function walker(vals) {
         if (_.isArray(vals)) {
-          if (vals.length > 1) {
-            _.each(vals, function(val) {
-              walker(val);
-            });
-          }
+          _.each(vals, function(val) {
+            walker(val);
+          });
         } else if (vals.isDivider) {
-          //output('OR');
-          log.oklns('OR');
+          log.oklns(vals.description);
           walker(vals.ingredients);
         } else {
           output = _.compact([vals.quantity, vals.measurement, vals.description]).join(' ');
@@ -169,22 +166,21 @@ var addIngredients = function($, obj) {
           if (vals.alt) {
             output += ' (' + vals.alt + ')';
           }
-          log.ok(index + 1 + '- ' + util.substituteDegree(util.substituteFraction(output)));
+          log.ok(util.substituteDegree(util.substituteFraction(output)));
         }
       })(retval);
 
-      tmp = {};
-      tmp[text] = retval;
-      list.push(tmp);
+      list.push(retval);
     } else {
       listHelper($, 'h5', this, function() {
         log.ok('Group: ' + _.trim(util.text(this)));
         var parent = {
-          name: _.trim(util.text(this)),
-          children: []
+          description: _.trim(util.text(this)),
+          isDivider: true,
+          ingredients: []
         };
-        list.push(parent);
-        list = parent.children;
+        top.push(parent);
+        list = parent.ingredients;
       });
     }
   });
@@ -379,9 +375,9 @@ if (program.url) {
     obj['TYPE'] = 102;
     obj['URL'] = URL.format(parsedUrl);
     obj['YIELD'] = item.servings;
-    //obj['KEYWORDS'] = item.tags.join(', ');
-    //obj['NOTE'] = '';
-    //obj['NUTRITION'] = '';
+    obj['KEYWORDS'] = '';
+    obj['NOTE'] = '';
+    obj['NUTRITION'] = '';
 
     // Add Summary
     obj['SUMMARY'] = _.map(item.summaries, function(summary) {
@@ -396,7 +392,7 @@ if (program.url) {
     }
 
     // Add course
-    if (obj.course) {
+    if (item.course) {
       obj['COURSE_ID'] = item.course.id;
       obj['COURSE_NAME'] = item.course.name;
     }
@@ -448,19 +444,52 @@ if (program.url) {
       }
     });
 
-    // TODO update
-    var ingredients = obj['INGREDIENTS_TREE'] = [];
-    _.each(item.ingredients, function(ingredient) {
-      ingredients.push({
-        DESCRIPTION: _.trim(ingredient.product),
-        DIRECTION: _.trim(ingredient.direction) || '',
-        INCLUDED_RECIPE_ID: -1,
-        IS_DIVIDER: false,
-        IS_MAIN: false,
-        MEASUREMENT: _.trim(ingredient.measurement),
-        QUANTITY: _.trim(ingredient.quantity)
-      });
-    });
+    var list = obj['INGREDIENTS_TREE'] = [];
+    (function walker(array, list) {
+      if (_.isArray(array)) {
+        _.each(array, function(item) {
+          walker(item, list);
+        });
+      } else if (array.isDivider) {
+        var tmp = {};
+        tmp['DIVIDER_INGREDIENT'] = {
+          DESCRIPTION: array.description,
+          DIRECTION: '',
+          INCLUDED_RECIPE_ID: -1,
+          IS_DIVIDER: true,
+          IS_MAIN: false,
+          MEASUREMENT: '',
+          QUANTITY: array.ingredients.length
+        };
+
+        var children = [];
+        tmp['INGREDIENTS'] = children;
+        list.push(tmp);
+
+        walker(array.ingredients, children);
+      } else {
+
+        var tmp = '';
+        if (array.direction) {
+          tmp += array.direction;
+        }
+        if (array.alt) {
+          tmp = tmp + ' (' + array.alt + ')';
+        }
+        tmp = util.substituteDegree(util.substituteFraction(tmp));
+
+        list.push({
+          DESCRIPTION: array.description,
+          DIRECTION: tmp,
+          INCLUDED_RECIPE_ID: -1,
+          IS_DIVIDER: false,
+          IS_MAIN: false,
+          MEASUREMENT: array.measurement || '',
+          QUANTITY: array.quantity || ''
+        });
+      }
+    })(item.ingredients, list);
+
 
     // Add Categories
     var categories = obj['CATEGORIES'] = [];
@@ -472,7 +501,7 @@ if (program.url) {
         USER_ADDED: userAdded
       });
     };
-    //addCategory(206, 'Smoothies', false);
+    addCategory(206, 'Smoothies', false);
     //addCategory(88, 'Mixed Drinks', false);
     //addCategory(10, 'Holiday', false);
     //addCategory(14, 'Thanksgiving', false);

@@ -294,6 +294,9 @@ describe('cooks illustrated instructions parser', function() {
       values = _.first(_.values(ingredient));
 
       retval = parser.parseIngredient(key);
+      if (retval.isDivider) {
+        retval = [retval]; // to match test data
+      }
 
       if (values.finale) {
         expect(retval).to.deep.equal(values.finale);
