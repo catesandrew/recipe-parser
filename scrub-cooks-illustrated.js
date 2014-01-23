@@ -365,68 +365,34 @@ if (program.url) {
   var exportRecipe = function(item) {
     var obj = {};
     obj['AFFILIATE_ID'] = -1;
-    obj['CUISINE_ID'] = -1;
-    obj['DIFFICULTY'] = 0;
-    obj['MEASUREMENT_SYSTEM'] = 0;  // US Standard
-    obj['NAME'] = item.title;
-    obj['PUBLICATION_PAGE'] = URL.format(parsedUrl);
-    obj['SERVINGS'] = 1;
-    obj['SOURCE'] = 'Cooks Illustrated';
-    obj['TYPE'] = 102;
-    obj['URL'] = URL.format(parsedUrl);
-    obj['YIELD'] = item.servings;
-    obj['KEYWORDS'] = '';
-    obj['NOTE'] = '';
-    obj['NUTRITION'] = '';
 
-    // Add Summary
-    obj['SUMMARY'] = _.map(item.summaries, function(summary) {
-      return '<p>' + summary + '</p>';
-    })
-    .join(util.linefeed);
-
-    // Add main picture
-    if (item.image.data) {
-      obj['EXPORT_TYPE'] = 'BINARY';
-      obj['IMAGE'] = item.image.data;
-    }
+    // Add Categories
+    var categories = obj['CATEGORIES'] = [];
+    var addCategory = function(id, name, userAdded) {
+      categories.push({
+        CATEGORY_ID: id,
+        ITEM_TYPE_ID: 102,
+        NAME: name,
+        USER_ADDED: userAdded
+      });
+    };
+    addCategory(206, 'Smoothies', false);
+    //addCategory(88, 'Mixed Drinks', false);
+    //addCategory(10, 'Holiday', false);
+    //addCategory(14, 'Thanksgiving', false);
+    //addCategory(21, 'Side Dishes', false);
 
     // Add course
     if (item.course) {
-      obj['COURSE_ID'] = item.course.id;
+      obj['COURSE_ID'] = parseInt(item.course.id, 10);
       obj['COURSE_NAME'] = item.course.name;
+    } else {
+      obj['COURSE_ID'] = 2;
+      obj['COURSE_NAME'] = 'Main';
     }
 
-    // Add Notes and Aside Notes (with pictures)
-    var notes = obj['NOTES_LIST'] = [];
-    var i = 0, tmp, title;
-    _.each(item.notes, function(note) {
-      tmp = {};
-      notes.push({
-        'NOTE_TEXT': note,
-        'SORT_ORDER': i++,
-        'TYPE_ID': 10
-      });
-    });
-    _.each(item.asideNotes, function(asideNote) {
-      title = [
-          '<h4>' + asideNote.h4 + '</h4>',
-          '<h3>' + asideNote.h3 + '</h3>' ];
-
-      _.each(asideNote.notes, function(note) {
-        tmp = {
-          'NOTE_TEXT': title.concat(['<p>' + note.text + '</p>']).join(util.linefeed),
-          'SORT_ORDER': i++,
-          'TYPE_ID': 10
-        };
-        title = []; // reset the <h4> and <h3>
-
-        if (note.image && note.image.data) {
-          tmp['IMAGE'] = note.image.data;
-        }
-        notes.push(tmp);
-      });
-    });
+    obj['CUISINE_ID'] = -1;
+    obj['DIFFICULTY'] = 0;
 
     // Add directions
     var directions = obj['DIRECTIONS_LIST'] = [];
@@ -444,6 +410,15 @@ if (program.url) {
       }
     });
 
+    // EQUIPMENT
+
+    // Add main picture
+    if (item.image.data) {
+      obj['EXPORT_TYPE'] = 'BINARY';
+      obj['IMAGE'] = item.image.data;
+    }
+
+    // Add Ingredients
     var list = obj['INGREDIENTS_TREE'] = [];
     (function walker(array, list) {
       if (_.isArray(array)) {
@@ -490,22 +465,56 @@ if (program.url) {
       }
     })(item.ingredients, list);
 
+    obj['KEYWORDS'] = '';
+    obj['MEASUREMENT_SYSTEM'] = 0;  // US Standard
+    obj['NAME'] = item.title;
+    obj['NOTE'] = '';
 
-    // Add Categories
-    var categories = obj['CATEGORIES'] = [];
-    var addCategory = function(id, name, userAdded) {
-      categories.push({
-        CATEGORY_ID: id,
-        ITEM_TYPE_ID: 102,
-        NAME: name,
-        USER_ADDED: userAdded
+    // Add Notes and Aside Notes (with pictures)
+    var notes = obj['NOTES_LIST'] = [];
+    var i = 0, tmp, title;
+    _.each(item.notes, function(note) {
+      tmp = {};
+      notes.push({
+        'NOTE_TEXT': note,
+        'SORT_ORDER': i++,
+        'TYPE_ID': 10
       });
-    };
-    addCategory(206, 'Smoothies', false);
-    //addCategory(88, 'Mixed Drinks', false);
-    //addCategory(10, 'Holiday', false);
-    //addCategory(14, 'Thanksgiving', false);
-    //addCategory(21, 'Side Dishes', false);
+    });
+    _.each(item.asideNotes, function(asideNote) {
+      title = [
+          '<h4>' + asideNote.h4 + '</h4>',
+          '<h3>' + asideNote.h3 + '</h3>' ];
+
+      _.each(asideNote.notes, function(note) {
+        tmp = {
+          'NOTE_TEXT': title.concat(['<p>' + note.text + '</p>']).join(util.linefeed),
+          'SORT_ORDER': i++,
+          'TYPE_ID': 10
+        };
+        title = []; // reset the <h4> and <h3>
+
+        if (note.image && note.image.data) {
+          tmp['IMAGE'] = note.image.data;
+        }
+        notes.push(tmp);
+      });
+    });
+
+    obj['NUTRITION'] = '';
+    // PREP_TIMES
+    obj['PUBLICATION_PAGE'] = URL.format(parsedUrl);
+    obj['SERVINGS'] = 1;
+    obj['SOURCE'] = 'Cooks Illustrated';
+    // Add Summary
+    obj['SUMMARY'] = _.map(item.summaries, function(summary) {
+      return '<p>' + summary + '</p>';
+    })
+    .join(util.linefeed);
+
+    obj['TYPE'] = 102;
+    obj['URL'] = URL.format(parsedUrl);
+    obj['YIELD'] = item.servings;
 
     var plist_file = util.expandHomeDir('~/Desktop/recipe.mgourmet4');
     util.writePlist(function(err, obj) {
