@@ -1,6 +1,7 @@
 /*global require, describe, it */
 var assert = require('assert'),
     nodeUtil = require('util'),
+    natural = require('natural'),
     pluralize = require('pluralize'),
     chai = require('chai'),
     ingredients = require('./data/cooks-illustrated'),
@@ -307,4 +308,30 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 });
+
+
+describe('converting data', function() {
+  it.skip('should recommend categories', function() {
+    console.log(parser.guessCategories([
+      "black peppercorns",
+      "garlic",
+      "kosher salt",
+      "lemon",
+      "extra virgin olive oil",
+      "onions",
+      "broiler/fryer chicken",
+      "red wine",
+      "chicken stock",
+      "thyme",
+      "canola oil",
+      "Mirepoix",
+      "carrots",
+      "celery",
+      "Gremolata",
+      "Jus"
+    ]));
+  });
+
+});
+
 
