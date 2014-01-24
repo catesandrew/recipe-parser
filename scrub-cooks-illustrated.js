@@ -122,6 +122,7 @@ var addSummary = function($, obj) {
 
 var addIngredients = function($, obj) {
   obj.ingredients || (obj.ingredients = []);
+  obj.categories || (obj.categories = []);
   log.writelns('Adding Ingredients');
   var ingredients = $('.ingredients > ul li'),
       top = obj.ingredients,
@@ -130,6 +131,7 @@ var addIngredients = function($, obj) {
       output,
       text;
 
+  var descriptions = [];
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
       text = _.trim(util.fulltext(ingredient));
@@ -144,6 +146,9 @@ var addIngredients = function($, obj) {
           log.oklns(vals.description);
           walker(vals.ingredients);
         } else {
+          if (vals.description) {
+            descriptions.push(vals.description);
+          }
           output = _.compact([vals.quantity, vals.measurement, vals.description]).join(' ');
           if (vals.direction) {
             output += ', ' + vals.direction;
@@ -170,6 +175,16 @@ var addIngredients = function($, obj) {
     }
   });
   //console.log(JSON.stringify(obj.ingredients, null, 2));
+
+  log.writelns('Guessing Categories');
+  var categories = parser.guessCategories(descriptions);
+  _.each(categories, function(cat) {
+    obj.categories.push({
+      id: constants.CATEGORIES[cat.id],
+      name: cat.id
+    });
+    log.ok('"' + cat.id + '", with probability of ' + cat.avg);
+  });
 };
 
 var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
