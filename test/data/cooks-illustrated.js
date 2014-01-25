@@ -665,5 +665,63 @@ module.exports = [
       "description": "half-and-half",
       "direction": "warm"
     }
+  },
+  {
+    "2   tablespoons extra-virgin olive oil": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "extra-virgin olive oil"
+    }
+  },
+  {
+    "1   teaspoon extra-virgin olive oil for drizzling": {
+      "quantity": "1",
+      "measurement": "teaspoon",
+      "description": "extra-virgin olive oil",
+      "direction": "for drizzling"
+    }
+  },
+  {
+    "4   medium cloves garlic, cut crosswise into very thin (1/16-inch) slices (about 2 tablespoons)": {
+      "quantity": "4",
+      "measurement": "medium",
+      "description": "garlic cloves",
+      "direction": "cut crosswise into very thin slices (1/16-inch)",
+      "alt": "about 2 tablespoons"
+    }
+  },
+  {
+    "3   (10-ounce) bags flat-leaf spinach, stems removed, leaves washed and dried": {
+      "quantity": "3 (10-ounce)",
+      "measurement": "bags",
+      "description": "flat-leaf spinach",
+      "direction": "stems removed, leaves washed and dried"
+    }
+  },
+  {
+    "Table salt": {
+      "description": "table salt"
+    }
+  },
+  {
+    "pinch red pepper flakes": {
+      "measurement": "pinch",
+      "description": "red pepper flakes"
+    }
+  },
+  {
+    "1/2   teaspoon grated lemon zest": {
+      "quantity": "1/2",
+      "measurement": "teaspoon",
+      "description": "lemon zest",
+      "direction": "grated"
+    }
+  },
+  {
+    "2   teaspoons lemon juice": {
+      "quantity": "2",
+      "measurement": "teaspoons",
+      "description": "lemon juice"
+    }
   }
 ];
