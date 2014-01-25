@@ -79,7 +79,7 @@ var addDatePublished = function($, obj) {
 var addServings = function($, obj) {
   log.writelns('Adding Servings');
   listHelper($, 'h4[itemprop="recipeYield"]', function(index, h4) {
-    obj.servings = _.trim(util.text(this));
+    obj.servings = util.substituteFraction(_.trim(util.text(this)));
     log.oklns(obj.servings);
   });
 };
