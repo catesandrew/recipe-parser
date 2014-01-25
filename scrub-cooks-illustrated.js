@@ -122,20 +122,25 @@ var addSummary = function($, obj) {
 
 var addIngredients = function($, obj) {
   obj.ingredients || (obj.ingredients = []);
+  obj.saveIngredients || (obj.saveIngredients = []);
   obj.categories || (obj.categories = []);
   log.writelns('Adding Ingredients');
   var ingredients = $('.ingredients > ul li'),
       top = obj.ingredients,
       list = obj.ingredients,
+      descriptions = [],
+      saveInbObj,
       retval,
       output,
       text;
 
-  var descriptions = [];
   listHelper($, '.ingredients > ul li', function(index, ingredient) {
     if (this.attr('itemprop') === 'ingredients') {
       text = _.trim(util.fulltext(ingredient));
       retval = parser.parseIngredient(text);
+      saveInbObj = {};
+      saveInbObj[text] = retval;
+      obj.saveIngredients.push(saveInbObj);
 
       (function walker(vals) {
         if (_.isArray(vals)) {
@@ -541,7 +546,7 @@ if (program.url) {
     if (program.save) {
       var data = require(parser.dataFile);
       _.each(items, function(item) {
-        _.each(item.ingredients, function(ingredient) {
+        _.each(item.saveIngredients, function(ingredient) {
           data.push(ingredient);
         });
 

@@ -155,7 +155,7 @@ describe('cooks illustrated instructions parser', function() {
             expect(expectedChild).to.equal(measurement);
           });
         } else {
-          expect(expected).to.equal(measurement);
+          expect(measurement).to.equal(expected);
         }
       });
     });
@@ -308,30 +308,4 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 });
-
-
-describe('converting data', function() {
-  it.skip('should recommend categories', function() {
-    console.log(parser.guessCategories([
-      "black peppercorns",
-      "garlic",
-      "kosher salt",
-      "lemon",
-      "extra virgin olive oil",
-      "onions",
-      "broiler/fryer chicken",
-      "red wine",
-      "chicken stock",
-      "thyme",
-      "canola oil",
-      "Mirepoix",
-      "carrots",
-      "celery",
-      "Gremolata",
-      "Jus"
-    ]));
-  });
-
-});
-
 
