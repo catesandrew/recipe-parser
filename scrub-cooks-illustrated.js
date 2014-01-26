@@ -188,7 +188,7 @@ var addIngredients = function($, obj) {
       id: constants.CATEGORIES[cat.id],
       name: cat.id
     });
-    log.ok('"' + cat.id + '", with probability of ' + cat.avg);
+    //log.ok('"' + cat.id + '", with probability of ' + cat.avg);
   });
 };
 
@@ -438,29 +438,45 @@ if (program.url) {
 
     // Add Ingredients
     var list = obj['INGREDIENTS_TREE'] = [];
-    (function walker(array, list) {
+    (function walker(array, list, isTop) {
       if (_.isArray(array)) {
         _.each(array, function(item) {
-          walker(item, list);
+          walker(item, list, isTop);
         });
-      } else if (array.isDivider) {
-        var tmp = {};
-        tmp['DIVIDER_INGREDIENT'] = {
-          DESCRIPTION: array.description,
-          DIRECTION: '',
-          INCLUDED_RECIPE_ID: -1,
-          IS_DIVIDER: true,
-          IS_MAIN: false,
-          MEASUREMENT: '',
-          QUANTITY: '' + array.ingredients.length
-        };
+      }
+      else if (array.isDivider) {
+        if (/*!isTop &&*/ array.description === 'Or') { //flatten if not on top
+          var tmpDesc = _.map(array.ingredients, function(ingredient) {
+            return ingredient.description;
+          }).join(' or ');
 
-        var children = [];
-        tmp['INGREDIENTS'] = children;
-        list.push(tmp);
+          walker({
+            quantity: array.ingredients[0].quantity,
+            measurement: array.ingredients[0].measurement,
+            description: tmpDesc,
+            direction: array.ingredients[0].direction,
+            alt: array.ingredients[0].alt
+          }, list, isTop);
+        }
+        else {
+          var tmp = {};
+          tmp['DIVIDER_INGREDIENT'] = {
+            DESCRIPTION: array.description,
+            DIRECTION: '',
+            INCLUDED_RECIPE_ID: -1,
+            IS_DIVIDER: true,
+            IS_MAIN: false,
+            MEASUREMENT: '',
+            QUANTITY: '' + array.ingredients.length
+          };
 
-        walker(array.ingredients, children);
-      } else {
+          var children = [];
+          tmp['INGREDIENTS'] = children;
+          list.push(tmp);
+          walker(array.ingredients, children, false);
+        }
+      }
+      else {
 
         var tmp = '';
         if (array.direction) {
@@ -481,7 +497,7 @@ if (program.url) {
           QUANTITY: array.quantity || ''
         });
       }
-    })(item.ingredients, list);
+    })(item.ingredients, list, true);
 
     obj['KEYWORDS'] = '';
     obj['MEASUREMENT_SYSTEM'] = 0;  // US Standard
