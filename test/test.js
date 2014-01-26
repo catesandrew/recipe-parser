@@ -147,7 +147,7 @@ describe('cooks illustrated instructions parser', function() {
       key = _.first(_.keys(ingredient));
       value = _.first(_.values(ingredient));
       expectedMeasurement = getKeyFromTestData(value, 'measurement');
-      measurement = parser.getMeasurement(key);
+      measurement = (parser.getMeasurement(key) || {}).matched;
 
       _.each(expectedMeasurement, function(expected) {
         if (_.isArray(expected)) {

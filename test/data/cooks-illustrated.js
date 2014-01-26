@@ -677,8 +677,13 @@ module.exports = [
     "1   teaspoon extra-virgin olive oil for drizzling": {
       "quantity": "1",
       "measurement": "teaspoon",
-      "description": "extra-virgin olive oil",
-      "direction": "for drizzling"
+      "description": "extra-virgin olive oil for drizzling",
+      "finale": {
+        "quantity": "1",
+        "measurement": "teaspoon",
+        "description": "extra-virgin olive oil",
+        "direction": "for drizzling",
+      }
     }
   },
   {
