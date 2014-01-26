@@ -214,7 +214,7 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it.skip('should collate all data, [quantity, measurement, description, direction, and alts]', function() {
+  it('should collate all data, [quantity, measurement, description, direction, and alts]', function() {
     var descriptionObjs,
         descriptions,
         measurement,
@@ -285,7 +285,7 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it.skip('should collate and produce a pretty result', function() {
+  it('should collate and produce a pretty result', function() {
     var values,
         retval,
         key;
