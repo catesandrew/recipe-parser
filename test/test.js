@@ -185,7 +185,7 @@ describe('cooks illustrated instructions parser', function() {
     });
   });
 
-  it.skip('should parse directions and alts', function() {
+  it('should parse directions and alts', function() {
     var expectedDirections,
         expectedAlts,
         directions,

@@ -691,7 +691,7 @@ module.exports = [
       "quantity": "4",
       "measurement": "medium",
       "description": "garlic cloves",
-      "direction": "cut crosswise into very thin slices (1/16-inch)",
+      "direction": "cut crosswise into very thin (1/16-inch) slices",
       "alt": "about 2 tablespoons"
     }
   },
