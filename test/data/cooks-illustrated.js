@@ -692,10 +692,18 @@ module.exports = [
   },
   {
     "3   (10-ounce) bags flat-leaf spinach, stems removed, leaves washed and dried": {
-      "quantity": "3 (10-ounce)",
+      "quantity": "3",
       "measurement": "bags",
+      "altMeasurement": "10-ounce",
       "description": "flat-leaf spinach",
-      "direction": "stems removed, leaves washed and dried"
+      "direction": "stems removed, leaves washed and dried",
+      "finale": {
+        "quantity": "3 (10-ounce)",
+        "measurement": "bags",
+        "description": "flat-leaf spinach",
+        "direction": "stems removed, leaves washed and dried",
+      }
+
     }
   },
   {
