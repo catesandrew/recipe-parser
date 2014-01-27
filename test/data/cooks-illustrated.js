@@ -959,5 +959,18 @@ module.exports = [
         "alt": "3 1/2 ounces"
       }
     }
+  },
+  {
+    "1/2   cup light brown sugar packed": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "light brown sugar packed",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "light brown sugar",
+        "direction": "packed"
+      }
+    }
   }
 ];
