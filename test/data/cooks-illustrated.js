@@ -1059,7 +1059,7 @@ module.exports = [
         "measurement": "ounces",
         "description": "boneless, skinless chicken thighs",
         "direction": "trimmed of excess fat and cut into 1/4-inch-wide strips",
-        "alt": "about 4 thighs",
+        "alt": "about 4 thighs"
       }
     }
   },
@@ -1086,7 +1086,22 @@ module.exports = [
         "quantity": "5",
         "measurement": "leaves",
         "description": "romaine lettuce",
-        "direction": "washed, dried, and shredded",
+        "direction": "washed, dried, and shredded"
+      }
+    }
+  },
+  {
+    "1   medium clove garlic pressed through a garlic press or minced to paste (about 1 teaspoon)": {
+      "quantity": "1",
+      "measurement": "medium",
+      "description": "clove garlic pressed through a garlic press or minced to paste",
+      "alt": "about 1 teaspoon",
+      "finale": {
+        "quantity": "1",
+        "measurement": "medium",
+        "description": "garlic clove",
+        "direction": "pressed through a garlic press or minced to paste",
+        "alt": "about 1 teaspoon"
       }
     }
   }
