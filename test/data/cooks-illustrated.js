@@ -824,5 +824,19 @@ module.exports = [
         "alt": "about 10 ounces"
       }
     }
+  },
+  {
+    "4   boneless, skinless chicken breasts (about 1 1/4 pounds), trimmed of excess fat, tenderloins removed and halved lengthwise, breasts cut crosswise into 1/2-inch strips": {
+      "quantity": "4",
+      "description": "boneless",
+      "direction": "skinless chicken breasts trimmed of excess fat, tenderloins removed and halved lengthwise, breasts cut crosswise into 1/2-inch strips",
+      "alt": "about 1 1/4 pounds",
+      "finale": {
+        "quantity": "4",
+        "description": "boneless, skinless chicken breasts",
+        "direction": "trimmed of excess fat, tenderloins removed and halved lengthwise, breasts cut crosswise into 1/2-inch strips",
+        "alt": "about 1 1/4 pounds"
+      }
+    }
   }
 ];
