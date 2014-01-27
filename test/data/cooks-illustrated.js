@@ -1104,5 +1104,19 @@ module.exports = [
         "alt": "about 1 teaspoon"
       }
     }
+  },
+  {
+    "1/4   pound unsalted butter chilled, cut into 1/4-inch cubes": {
+      "quantity": "1/4",
+      "measurement": "pound",
+      "description": "unsalted butter chilled",
+      "direction": "cut into 1/4-inch cubes",
+      "finale": {
+        "quantity": "1/4",
+        "measurement": "pound",
+        "description": "unsalted butter",
+        "direction": "chilled, cut into 1/4-inch cubes"
+      }
+    }
   }
 ];
