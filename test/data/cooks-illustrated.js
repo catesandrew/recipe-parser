@@ -737,21 +737,21 @@ module.exports = [
       "direction": "torn into quarters"
     }
   },
-  //{
-    //"1 can (14 1/2 ounces) diced tomatoes, drained": {
-      //"quantity": "1",
-      //"measurement": "can",
-      //"altMeasurement": "14 1/2 ounces",
-      //"description": "diced tomatoes",
-      //"direction": "drained",
-      //"finale": {
-        //"quantity": "1 (10-ounce)",
-        //"measurement": "can",
-        //"description": "diced tomatoes",
-        //"direction": "drained"
-      //}
-    //}
-  //},
+  {
+    "1 can (14 1/2 ounces) diced tomatoes, drained": {
+      "quantity": "1",
+      "measurement": "can",
+      "altMeasurement": "14 1/2 ounces",
+      "description": "diced tomatoes",
+      "direction": "drained",
+      "finale": {
+        "quantity": "1 (14 1/2 ounces)",
+        "measurement": "can",
+        "description": "diced tomatoes",
+        "direction": "drained"
+      }
+    }
+  },
   //{
     //"1/4   cup coarsely chopped fresh basil leaves": {
       //"quantity": "1/4",
