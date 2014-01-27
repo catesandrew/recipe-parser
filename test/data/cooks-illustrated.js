@@ -1023,8 +1023,26 @@ module.exports = [
       "finale": {
         "quantity": "2",
         "description": "hard-boiled eggs whites and yolks",
-        "direction": "separated and pressed through a fine sieve",
+        "direction": "separated and pressed through a fine sieve"
       }
     }
+  },
+  {
+    "1 1/4   pounds meatloaf mix (or equal amounts 80 percent lean ground beef, ground veal, and ground pork)": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "1 1/4",
+          "measurement": "pounds",
+          "description": "meatloaf mix"
+        },
+        {
+          "quantity": "1 1/4",
+          "measurement": "pounds",
+          "description": "equal amounts 80 percent lean ground beef, ground veal, and ground pork"
+        }
+      ]
+    }]
   }
 ];
