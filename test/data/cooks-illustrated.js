@@ -863,5 +863,35 @@ module.exports = [
         "direction": "about 1 1/2 pounds each, prepared according to illustration"
       }
     }
+  },
+  {
+    "1   cup sifted cake flour (3 ounces)": {
+      "quantity": "1",
+      "measurement": "cup",
+      "description": "sifted cake flour",
+      "alt": "3 ounces",
+      "finale": {
+        "quantity": "1",
+        "measurement": "cup",
+        "description": "cake flour",
+        "direction": "sifted",
+        "alt": "3 ounces"
+      }
+    }
+  },
+  {
+    "1 1/2   cups sifted granulated sugar (10 1/2 ounces)": {
+      "quantity": "1 1/2",
+      "measurement": "cups",
+      "description": "sifted granulated sugar",
+      "alt": "10 1/2 ounces",
+      "finale": {
+        "quantity": "1 1/2",
+        "measurement": "cups",
+        "description": "granulated sugar",
+        "direction": "sifted",
+        "alt": "10 1/2 ounces"
+      }
+    }
   }
 ];
