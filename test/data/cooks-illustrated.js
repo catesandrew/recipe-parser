@@ -893,5 +893,18 @@ module.exports = [
         "alt": "10 1/2 ounces"
       }
     }
+  },
+  {
+    "1   tablespoon unsalted butter cut into 4 pieces": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "unsalted butter cut into 4 pieces",
+      "finale": {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "direction": "cut into 4 pieces",
+        "description": "unsalted butter"
+      }
+    }
   }
 ];
