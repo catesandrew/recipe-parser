@@ -5,6 +5,7 @@ var nodeUtil = require('util'),
     request = require('request'),
     cheerio = require('cheerio'),
     program = require('commander'),
+    changeCase = require('change-case'),
     http = require('http'),
     URL = require('url');
 
@@ -218,7 +219,7 @@ var addProcedures = function($, obj) {
       text = _.trim(text.replace(header, ''));
       match = header.match(removeEndingColonRe);
       if (match) {
-        header = match[1];
+        header = changeCase.titleCase(match[1]);
       }
     }
 
@@ -318,8 +319,16 @@ var addAsideNotes = function($, obj) {
     note = {
       h4: h4,
       h3: h3,
+      intros: [],
       notes: []
     };
+
+    $(this).children('p').each(function(index, element) {
+      text = util.substituteDegree(util.substituteFraction(_.trim(util.text(this))));
+      if (text) {
+        note.intros.push(text);
+      }
+    });
 
     listHelper($, '.page-item', this, function() {
       listHelper($, 'figure > img', this, function() {
@@ -523,6 +532,19 @@ if (program.url) {
       title = [
           '<h4>' + asideNote.h4 + '</h4>',
           '<h3>' + asideNote.h3 + '</h3>' ];
+
+      var intros = _.map(asideNote.intros, function(intro) {
+        return '<p>' + intro + '</p>';
+      }).join(util.linefeed);
+
+      if (intros && intros.length) {
+        notes.push({
+          'NOTE_TEXT': title.concat(intros).join(util.linefeed),
+          'SORT_ORDER': i++,
+          'TYPE_ID': 10
+        });
+        title = []; // reset the <h4> and <h3>
+      }
 
       _.each(asideNote.notes, function(note) {
         tmp = {
