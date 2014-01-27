@@ -1028,21 +1028,60 @@ module.exports = [
     }
   },
   {
-    "1 1/4   pounds meatloaf mix (or equal amounts 80 percent lean ground beef, ground veal, and ground pork)": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "1 1/4",
-          "measurement": "pounds",
-          "description": "meatloaf mix"
-        },
-        {
-          "quantity": "1 1/4",
-          "measurement": "pounds",
-          "description": "equal amounts 80 percent lean ground beef, ground veal, and ground pork"
-        }
-      ]
-    }]
-  }
+    "1 1/4   pounds meatloaf mix (or equal amounts 80 percent lean ground beef, ground veal, and ground pork)": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "1 1/4",
+            "measurement": "pounds",
+            "description": "meatloaf mix"
+          },
+          {
+            "quantity": "1 1/4",
+            "measurement": "pounds",
+            "description": "equal amounts 80 percent lean ground beef, ground veal, and ground pork"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "12   ounces boneless, skinless chicken thighs (about 4 thighs), trimmed of excess fat and cut into 1/4-inch-wide strips": {
+      "quantity": "12",
+      "measurement": "ounces",
+      "description": "boneless",
+      "direction": "skinless chicken thighs trimmed of excess fat and cut into 1/4-inch-wide strips",
+      "alt": "about 4 thighs",
+      "finale": {
+        "quantity": "12",
+        "measurement": "ounces",
+        "description": "boneless, skinless chicken thighs",
+        "direction": "trimmed of excess fat and cut into 1/4-inch-wide strips",
+        "alt": "about 4 thighs",
+      }
+    }
+  },
+  //{
+    //"2   cans tomato sauce (8 ounces each)": {
+      //"quantity": "2",
+      //"measurement": "cans",
+      //"description": "tomato sauce",
+      //"alt": "8 ounces each"
+    //}
+  //},
+  //{
+    //"Vegetable cooking spray": {
+      //"description": "Vegetable cooking spray"
+    //}
+  //},
+  //{
+    //"5   leaves romaine lettuce washed, dried, and shredded": {
+      //"quantity": "5",
+      //"measurement": "leaves",
+      //"description": "romaine lettuce washed",
+      //"direction": "dried, and shredded"
+    //}
+  //}
 ];
