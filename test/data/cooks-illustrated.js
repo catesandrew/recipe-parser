@@ -990,19 +990,19 @@ module.exports = [
       }
     }
   },
-  //{
-    //"1 1/2   pounds medium new potatoes boiled until tender and sliced thick": {
-      //"quantity": "1 1/2",
-      //"measurement": "pounds",
-      //"description": "medium new potatoes boiled until tender and sliced thick",
-      //"finale": {
-        //"quantity": "1 1/2",
-        //"measurement": "pounds",
-        //"description": "medium new potatoes",
-        //"direction": "boiled until tender and sliced thick"
-      //}
-    //}
-  //},
+  {
+    "1 1/2   pounds medium new potatoes boiled until tender and sliced thick": {
+      "quantity": "1 1/2",
+      "measurement": "pounds",
+      "description": "medium new potatoes boiled until tender and sliced thick",
+      "finale": {
+        "quantity": "1 1/2",
+        "measurement": "pounds",
+        "description": "medium new potatoes",
+        "direction": "boiled until tender and sliced thick"
+      }
+    }
+  },
   //{
     //"1   piece Parmigiano-Reggiano cheese for shaving": {
       //"quantity": "1",
