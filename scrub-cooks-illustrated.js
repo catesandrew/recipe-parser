@@ -114,7 +114,7 @@ var addSummary = function($, obj) {
   listHelper($, '.why .full p', function(index, summary) {
     //console.log(this);  // refers to the $ wrapped summary element
     //console.log(summary); //refers to the plain summary element
-    text = util.substituteFraction(_.trim(util.fulltext(summary)));
+    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(summary))));
     log.ok(index + 1 + '- ' + text);
     obj.summaries.push(text);
   });
