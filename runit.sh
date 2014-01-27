@@ -8,6 +8,10 @@ do
     then
         echo "Number: ${RECIPE}, press return to parse the next recipe."
         node scrub-cooks-illustrated.js --url ${URL}
+        NAME=`node scrub-cooks-illustrated.js --title --url ${URL}`
+        NAME=`echo "${NAME}" | grep -n 'Recipe Title' | awk -F'[:]' '{print $3}'`
+        QUERY="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${NAME}")"
+        python -mwebbrowser "http://images.google.com/search?tbm=isch&q=${QUERY}"
         python -mwebbrowser ${URL}
         read
     fi

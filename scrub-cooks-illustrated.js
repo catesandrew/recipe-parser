@@ -23,6 +23,7 @@ program
   .description('Scrub a recipe from cooksillustrated.com.')
   .option('-u, --url <string>', 'url of recipe to scrub from.')
   .option('-s, --save', 'save scrubbed ingredients (used for regression)?')
+  .option('-t, --title', 'just parse the title.')
   .option('-d, --debug', 'output extra debug information?')
   .parse(process.argv);
 
@@ -349,7 +350,7 @@ var addAsideNotes = function($, obj) {
   });
 };
 
-var scrape = function(callback, url) {
+var scrape = function(callback, url, justTitle) {
   request(url, function (err, response, body) {
     if (err) { throw err; }
     var $ = cheerio.load(body, {
@@ -359,16 +360,19 @@ var scrape = function(callback, url) {
 
     var obj = {};
     addTitle($, obj);
-    addDatePublished($, obj);
-    addServings($, obj);
-    addImage($, obj);
-    addSummary($, obj);
-    addIngredients($, obj);
-    addProcedures($, obj);
-    addNotes($, obj);
-    addTimes($, obj);
-    addCourse($, obj);
-    addAsideNotes($, obj);
+
+    if (!justTitle) {
+      addDatePublished($, obj);
+      addServings($, obj);
+      addImage($, obj);
+      addSummary($, obj);
+      addIngredients($, obj);
+      addProcedures($, obj);
+      addNotes($, obj);
+      addTimes($, obj);
+      addCourse($, obj);
+      addAsideNotes($, obj);
+    }
 
     callback(null, [obj]);
   });
@@ -431,7 +435,7 @@ if (program.url) {
     // EQUIPMENT
 
     // Add main picture
-    if (item.image.data) {
+    if (item.image && item.image.data) {
       obj['EXPORT_TYPE'] = 'BINARY';
       obj['IMAGE'] = item.image.data;
     }
@@ -605,15 +609,17 @@ if (program.url) {
     // collate all images
     var images = [];
     _.each(items, function(item) {
-      if (item.image.src) {
-        images.push(item.image);
-      }
-      if (item.asideNotes.length) {
-        _.each(item.asideNotes, function(asideNote) {
-          _.each(asideNote.notes, function(note) {
-            images.push(note.image);
+      if (item.image) {
+        if (item.image.src) {
+          images.push(item.image);
+        }
+        if (item.asideNotes.length) {
+          _.each(item.asideNotes, function(asideNote) {
+            _.each(asideNote.notes, function(note) {
+              images.push(note.image);
+            });
           });
-        });
+        }
       }
     });
 
@@ -632,11 +638,13 @@ if (program.url) {
       }
     }, function(err) {
       _.each(items, function(item) {
-        exportRecipe(item);
-        log.ok('Ok. Finished scrubbing "' + item.title + '"');
+        if (!program.title) {
+          exportRecipe(item);
+        }
+        log.ok('Recipe Title:' + item.title);
       });
     });
-  }, url);
+  }, url, program.title);
 }
 else {
   log.writelns(program.description());
