@@ -801,5 +801,13 @@ module.exports = [
         "direction": "freshly squeezed from 1 lemon"
       }
     }
+  },
+  {
+    "1   boneless pork loin roast, preferably blade-end, (about 2 1/2 pounds), tied at even intervals along length with 5 pieces butcher's twine": {
+      "quantity": "1",
+      "description": "boneless pork loin roast",
+      "direction": "preferably blade-end, tied at even intervals along length with 5 pieces butcher's twine",
+      "alt": "about 2 1/2 pounds"
+    }
   }
 ];
