@@ -1003,19 +1003,19 @@ module.exports = [
       }
     }
   },
-  //{
-    //"1   piece Parmigiano-Reggiano cheese for shaving": {
-      //"quantity": "1",
-      //"measurement": "piece",
-      //"description": "Parmigiano-Reggiano cheese for shaving",
-      //"finale": {
-        //"quantity": "1",
-        //"measurement": "piece",
-        //"description": "Parmigiano-Reggiano cheese",
-        //"direction": "for shaving"
-      //}
-    //}
-  //},
+  {
+    "1   piece Parmigiano-Reggiano cheese for shaving": {
+      "quantity": "1",
+      "measurement": "piece",
+      "description": "Parmigiano-Reggiano cheese for shaving",
+      "finale": {
+        "quantity": "1",
+        "measurement": "piece",
+        "description": "Parmigiano-Reggiano cheese",
+        "direction": "for shaving"
+      }
+    }
+  },
   //{
     //"2   hard-boiled eggs whites and yolks separated and pressed through a fine sieve": {
       //"quantity": "2",
