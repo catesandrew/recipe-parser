@@ -682,7 +682,7 @@ module.exports = [
         "quantity": "1",
         "measurement": "teaspoon",
         "description": "extra-virgin olive oil",
-        "direction": "for drizzling",
+        "direction": "for drizzling"
       }
     }
   },
@@ -706,9 +706,8 @@ module.exports = [
         "quantity": "3 (10-ounce)",
         "measurement": "bags",
         "description": "flat-leaf spinach",
-        "direction": "stems removed, leaves washed and dried",
+        "direction": "stems removed, leaves washed and dried"
       }
-
     }
   },
   {
@@ -731,10 +730,33 @@ module.exports = [
     }
   },
   {
-    "2   teaspoons lemon juice": {
-      "quantity": "2",
-      "measurement": "teaspoons",
-      "description": "lemon juice"
+    "3–4   slices white sandwich bread with crusts, torn into quarters": {
+      "quantity": "3 to 4",
+      "measurement": "slices",
+      "description": "white sandwich bread with crusts",
+      "direction": "torn into quarters"
     }
-  }
+  },
+  //{
+    //"1 can (14 1/2 ounces) diced tomatoes, drained": {
+      //"quantity": "1",
+      //"measurement": "can",
+      //"altMeasurement": "14 1/2 ounces",
+      //"description": "diced tomatoes",
+      //"direction": "drained",
+      //"finale": {
+        //"quantity": "1 (10-ounce)",
+        //"measurement": "can",
+        //"description": "diced tomatoes",
+        //"direction": "drained"
+      //}
+    //}
+  //},
+  //{
+    //"1/4   cup coarsely chopped fresh basil leaves": {
+      //"quantity": "1/4",
+      //"measurement": "cup",
+      //"description": "coarsely chopped fresh basil leaves"
+    //}
+  //}
 ];
