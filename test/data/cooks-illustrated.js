@@ -1016,11 +1016,15 @@ module.exports = [
       }
     }
   },
-  //{
-    //"2   hard-boiled eggs whites and yolks separated and pressed through a fine sieve": {
-      //"quantity": "2",
-      //"description": "hard-boiled eggs whites and yolks",
-      //"direction": "separated and pressed through a fine sieve"
-    //}
-  //}
+  {
+    "2   hard-boiled eggs whites and yolks separated and pressed through a fine sieve": {
+      "quantity": "2",
+      "description": "hard-boiled eggs whites and yolks separated and pressed through a fine sieve",
+      "finale": {
+        "quantity": "2",
+        "description": "hard-boiled eggs whites and yolks",
+        "direction": "separated and pressed through a fine sieve",
+      }
+    }
+  }
 ];
