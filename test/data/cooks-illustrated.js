@@ -849,5 +849,19 @@ module.exports = [
         "direction": "cut into wedges"
       }
     }
+  },
+  {
+    "2   whole bone-in, skin-on chicken breasts about 1 1/2 pounds each, prepared according to illustration": {
+      "quantity": "2",
+      "measurement": "whole",
+      "description": "bone-in",
+      "direction": "skin-on chicken breasts about 1 1/2 pounds each, prepared according to illustration",
+      "finale": {
+        "quantity": "2",
+        "measurement": "whole",
+        "description": "bone-in, skin-on chicken breasts",
+        "direction": "about 1 1/2 pounds each, prepared according to illustration"
+      }
+    }
   }
 ];
