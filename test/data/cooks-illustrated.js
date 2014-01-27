@@ -922,5 +922,25 @@ module.exports = [
       "description": "basil leaf",
       "direction": "shredded fresh"
     }
+  },
+  {
+    "8   ounces orzo or other small pasta (ditalini, tubetini, conchigliette)": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "8",
+          "measurement": "ounces",
+          "description": "orzo",
+          "direction": "ditalini, tubetini, conchigliette"
+        },
+        {
+          "quantity": "8",
+          "measurement": "ounces",
+          "description": "other small pasta",
+          "direction": "ditalini, tubetini, conchigliette"
+        }
+      ]
+    }]
   }
 ];
