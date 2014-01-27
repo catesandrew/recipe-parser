@@ -838,5 +838,16 @@ module.exports = [
         "alt": "about 1 1/4 pounds"
       }
     }
+  },
+  {
+    "2   limes cut into wedges": {
+      "quantity": "2",
+      "description": "limes cut into wedges",
+      "finale": {
+        "quantity": "2",
+        "description": "limes",
+        "direction": "cut into wedges"
+      }
+    }
   }
 ];
