@@ -1071,17 +1071,18 @@ module.exports = [
       //"alt": "8 ounces each"
     //}
   //},
-  //{
-    //"Vegetable cooking spray": {
-      //"description": "Vegetable cooking spray"
-    //}
-  //},
-  //{
-    //"5   leaves romaine lettuce washed, dried, and shredded": {
-      //"quantity": "5",
-      //"measurement": "leaves",
-      //"description": "romaine lettuce washed",
-      //"direction": "dried, and shredded"
-    //}
-  //}
+  {
+    "5   leaves romaine lettuce washed, dried, and shredded": {
+      "quantity": "5",
+      "measurement": "leaves",
+      "description": "romaine lettuce washed",
+      "direction": "dried, and shredded",
+      "finale": {
+        "quantity": "5",
+        "measurement": "leaves",
+        "description": "romaine lettuce",
+        "direction": "washed, dried, and shredded",
+      }
+    }
+  }
 ];
