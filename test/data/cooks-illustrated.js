@@ -1063,14 +1063,19 @@ module.exports = [
       }
     }
   },
-  //{
-    //"2   cans tomato sauce (8 ounces each)": {
-      //"quantity": "2",
-      //"measurement": "cans",
-      //"description": "tomato sauce",
-      //"alt": "8 ounces each"
-    //}
-  //},
+  {
+    "2   cans tomato sauce (8 ounces each)": {
+      "quantity": "2",
+      "measurement": "cans",
+      "description": "tomato sauce",
+      "alt": "8 ounces each",
+      "finale": {
+        "quantity": "2 (8 ounces each)",
+        "measurement": "cans",
+        "description": "tomato sauce"
+      }
+    }
+  },
   {
     "5   leaves romaine lettuce washed, dried, and shredded": {
       "quantity": "5",
