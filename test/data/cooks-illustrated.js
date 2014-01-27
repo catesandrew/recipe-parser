@@ -788,5 +788,18 @@ module.exports = [
         "direction": "for dusting"
       }
     }
+  },
+  {
+    "1/2   teaspoon lemon juice from 1 lemon": {
+      "quantity": "1/2",
+      "measurement": "teaspoon",
+      "description": "lemon juice from 1 lemon",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "teaspoon",
+        "description": "lemon juice",
+        "direction": "freshly squeezed from 1 lemon"
+      }
+    }
   }
 ];
