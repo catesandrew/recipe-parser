@@ -906,5 +906,21 @@ module.exports = [
         "description": "unsalted butter"
       }
     }
+  },
+  {
+    "1/2   cup chopped fresh parsley leaves": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "parsley leaves",
+      "direction": "chopped fresh"
+    }
+  },
+  {
+    "1/4   cup shredded fresh basil leaf": {
+      "quantity": "1/4",
+      "measurement": "cup",
+      "description": "basil leaf",
+      "direction": "shredded fresh"
+    }
   }
 ];
