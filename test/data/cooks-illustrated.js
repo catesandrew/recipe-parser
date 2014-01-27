@@ -924,23 +924,40 @@ module.exports = [
     }
   },
   {
-    "8   ounces orzo or other small pasta (ditalini, tubetini, conchigliette)": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "8",
-          "measurement": "ounces",
-          "description": "orzo",
-          "direction": "ditalini, tubetini, conchigliette"
-        },
-        {
-          "quantity": "8",
-          "measurement": "ounces",
-          "description": "other small pasta",
-          "direction": "ditalini, tubetini, conchigliette"
-        }
-      ]
-    }]
+    "8   ounces orzo or other small pasta (ditalini, tubetini, conchigliette)": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "8",
+            "measurement": "ounces",
+            "description": "orzo",
+            "direction": "ditalini, tubetini, conchigliette"
+          },
+          {
+            "quantity": "8",
+            "measurement": "ounces",
+            "description": "other small pasta",
+            "direction": "ditalini, tubetini, conchigliette"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "1/2   cup packed light brown sugar (3 1/2 ounces)": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "packed light brown sugar",
+      "alt": "3 1/2 ounces",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "light brown sugar",
+        "direction": "packed",
+        "alt": "3 1/2 ounces"
+      }
+    }
   }
 ];
