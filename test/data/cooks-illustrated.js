@@ -764,5 +764,29 @@ module.exports = [
         "direction": "coarsely chopped"
       }
     }
+  },
+  {
+    "3   ounces Gorgonzola cheese crumbled (about 3/4 cup)": {
+      "quantity": "3",
+      "measurement": "ounces",
+      "description": "Gorgonzola cheese crumbled",
+      "alt": "about 3/4 cup",
+      "finale": {
+        "quantity": "3",
+        "measurement": "ounces",
+        "description": "Gorgonzola cheese",
+        "direction": "crumbled",
+        "alt": "about 3/4 cup"
+      }
+    }
+  },
+  {
+    "Confectioners' sugar for dusting": {
+      "description": "Confectioners' sugar for dusting",
+      "finale": {
+        "description": "Confectioners' sugar",
+        "direction": "for dusting"
+      }
+    }
   }
 ];
