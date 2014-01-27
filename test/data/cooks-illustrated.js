@@ -809,5 +809,20 @@ module.exports = [
       "direction": "preferably blade-end, tied at even intervals along length with 5 pieces butcher's twine",
       "alt": "about 2 1/2 pounds"
     }
+  },
+  {
+    "8   slices thick-cut bacon (about 10 ounces) cut into 1/2-inch pieces": {
+      "quantity": "8",
+      "measurement": "slices",
+      "description": "thick-cut bacon cut into 1/2-inch pieces",
+      "alt": "about 10 ounces",
+      "finale": {
+        "quantity": "8",
+        "measurement": "slices",
+        "description": "thick-cut bacon",
+        "direction": "cut into 1/2-inch pieces",
+        "alt": "about 10 ounces"
+      }
+    }
   }
 ];
