@@ -752,11 +752,17 @@ module.exports = [
       }
     }
   },
-  //{
-    //"1/4   cup coarsely chopped fresh basil leaves": {
-      //"quantity": "1/4",
-      //"measurement": "cup",
-      //"description": "coarsely chopped fresh basil leaves"
-    //}
-  //}
+  {
+    "1/4   cup coarsely chopped fresh basil leaves": {
+      "quantity": "1/4",
+      "measurement": "cup",
+      "description": "coarsely chopped fresh basil leaves",
+      "finale": {
+        "quantity": "1/4",
+        "measurement": "cup",
+        "description": "fresh basil leaves",
+        "direction": "coarsely chopped"
+      }
+    }
+  }
 ];
