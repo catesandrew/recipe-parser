@@ -972,5 +972,55 @@ module.exports = [
         "direction": "packed"
       }
     }
-  }
+  },
+  {
+    "Ground white pepper": {
+      "description": "white pepper",
+      "direction": "freshly ground"
+    }
+  },
+  //{
+    //"2   shallots minced": {
+      //"quantity": "2",
+      //"description": "shallots minced",
+      //"finale": {
+        //"quantity": "2",
+        //"description": "shallots",
+        //"direction": "minced"
+      //}
+    //}
+  //},
+  //{
+    //"1 1/2   pounds medium new potatoes boiled until tender and sliced thick": {
+      //"quantity": "1 1/2",
+      //"measurement": "pounds",
+      //"description": "medium new potatoes boiled until tender and sliced thick",
+      //"finale": {
+        //"quantity": "1 1/2",
+        //"measurement": "pounds",
+        //"description": "medium new potatoes",
+        //"direction": "boiled until tender and sliced thick"
+      //}
+    //}
+  //},
+  //{
+    //"1   piece Parmigiano-Reggiano cheese for shaving": {
+      //"quantity": "1",
+      //"measurement": "piece",
+      //"description": "Parmigiano-Reggiano cheese for shaving",
+      //"finale": {
+        //"quantity": "1",
+        //"measurement": "piece",
+        //"description": "Parmigiano-Reggiano cheese",
+        //"direction": "for shaving"
+      //}
+    //}
+  //},
+  //{
+    //"2   hard-boiled eggs whites and yolks separated and pressed through a fine sieve": {
+      //"quantity": "2",
+      //"description": "hard-boiled eggs whites and yolks",
+      //"direction": "separated and pressed through a fine sieve"
+    //}
+  //}
 ];
