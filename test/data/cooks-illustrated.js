@@ -979,17 +979,17 @@ module.exports = [
       "direction": "freshly ground"
     }
   },
-  //{
-    //"2   shallots minced": {
-      //"quantity": "2",
-      //"description": "shallots minced",
-      //"finale": {
-        //"quantity": "2",
-        //"description": "shallots",
-        //"direction": "minced"
-      //}
-    //}
-  //},
+  {
+    "2   shallots minced": {
+      "quantity": "2",
+      "description": "shallots minced",
+      "finale": {
+        "quantity": "2",
+        "description": "shallots",
+        "direction": "minced"
+      }
+    }
+  },
   //{
     //"1 1/2   pounds medium new potatoes boiled until tender and sliced thick": {
       //"quantity": "1 1/2",
