@@ -33,7 +33,7 @@ module.exports = [
         "description": "black pepper",
         "direction": "freshly ground",
         "measurement": "teaspoon",
-        "quantity": "1/2",
+        "quantity": "1/2"
       }
     }
   },
@@ -77,7 +77,7 @@ module.exports = [
         "description": "black pepper",
         "direction": "freshly ground",
         "measurement": "teaspoon",
-        "quantity": "1/2",
+        "quantity": "1/2"
       }
     }
   },
@@ -125,7 +125,7 @@ module.exports = [
         "direction": "minced or pressed through garlic press",
         "measurement": "medium",
         "quantity": "3",
-        "alt": "1 generous tablespoon",
+        "alt": "1 generous tablespoon"
       }
     }
   },
@@ -139,7 +139,7 @@ module.exports = [
         "description": "black pepper",
         "direction": "freshly ground",
         "measurement": "teaspoon",
-        "quantity": "1/2",
+        "quantity": "1/2"
       }
     }
   },
@@ -215,7 +215,7 @@ module.exports = [
         "description": "black pepper",
         "direction": "freshly ground",
         "measurement": "teaspoon",
-        "quantity": "1/2",
+        "quantity": "1/2"
       }
     }
   },
@@ -302,7 +302,7 @@ module.exports = [
         "direction": "ground",
         "finale": {
           "description": "black pepper",
-          "direction": "freshly ground",
+          "direction": "freshly ground"
         }
       }
     ]
@@ -440,7 +440,7 @@ module.exports = [
     "Table salt": {
       "description": "Table salt",
       "finale": {
-        "description": "table salt",
+        "description": "table salt"
       }
     }
   },
@@ -457,7 +457,7 @@ module.exports = [
       "direction": "Ground",
       "finale": {
         "description": "black pepper",
-        "direction": "freshly ground",
+        "direction": "freshly ground"
       }
     }
   },
@@ -613,7 +613,7 @@ module.exports = [
         "description": "garlic cloves",
         "direction": "smashed and skins removed",
         "measurement": "medium",
-        "quantity": "8",
+        "quantity": "8"
       }
     }
   },
@@ -683,7 +683,7 @@ module.exports = [
         "quantity": "1/2",
         "measurement": "teaspoon",
         "description": "black pepper",
-        "direction": "freshly ground",
+        "direction": "freshly ground"
       }
     }
   },
@@ -750,7 +750,7 @@ module.exports = [
         "measurement": "medium",
         "description": "garlic cloves",
         "direction": "cut crosswise into very thin (1/16-inch) slices",
-        "alt": "about 2 tablespoons",
+        "alt": "about 2 tablespoons"
       }
     }
   },
@@ -1033,7 +1033,7 @@ module.exports = [
       "direction": "Ground",
       "finale": {
         "description": "white pepper",
-        "direction": "freshly ground",
+        "direction": "freshly ground"
       }
     }
   },
@@ -1184,5 +1184,41 @@ module.exports = [
       "description": "strawberries",
       "direction": "fresh, or thawed if frozen"
     }
-  }
+  },
+  //{
+    //"2   teaspoons table salt plus additional for sprinkling": {
+      //"quantity": "2",
+      //"measurement": "teaspoons",
+      //"description": "table salt plus additional for sprinkling",
+      //"finale": {
+        //"quantity": "2",
+        //"measurement": "teaspoons",
+        //"description": "table salt",
+        //"direction": "plus additional for sprinkling"
+      //}
+    //}
+  //},
+  //{
+    //"3   tablespoons virgin olive oil plus extra for drizzling": {
+      //"quantity": "3",
+      //"measurement": "tablespoons",
+      //"description": "virgin olive oil plus extra",
+      //"direction": "for drizzling",
+      //"finale": {
+        //"quantity": "3",
+        //"measurement": "tablespoons",
+        //"description": "virgin olive oil",
+        //"direction": "plus extra for drizzling",
+      //}
+    //}
+  //},
+  {
+    "1   bulb fennel medium (about 1 pound), sliced thin": {
+      "quantity": "1",
+      "measurement": "bulb",
+      "description": "fennel medium",
+      "direction": "sliced thin",
+      "alt": "about 1 pound"
+    }
+  },
 ];
