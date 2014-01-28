@@ -103,11 +103,18 @@ module.exports = [
   },
   {
     "3 medium cloves garlic, minced or pressed through garlic press (1 generous tablespoon)": {
-      "description": "garlic cloves",
+      "description": "cloves garlic",
       "direction": "minced or pressed through garlic press",
       "measurement": "medium",
       "quantity": "3",
-      "alt": "1 generous tablespoon"
+      "alt": "1 generous tablespoon",
+      "finale": {
+        "description": "garlic cloves",
+        "direction": "minced or pressed through garlic press",
+        "measurement": "medium",
+        "quantity": "3",
+        "alt": "1 generous tablespoon",
+      }
     }
   },
   {
@@ -261,7 +268,10 @@ module.exports = [
   {
     "Salt and ground black pepper": [
       {
-        "description": "kosher salt"
+        "description": "Salt",
+        "finale": {
+          "description": "kosher salt"
+        }
       },
       {
         "description": "black pepper",
@@ -400,7 +410,10 @@ module.exports = [
   },
   {
     "Table salt": {
-      "description": "table salt"
+      "description": "Table salt",
+      "finale": {
+        "description": "table salt",
+      }
     }
   },
   {
@@ -539,11 +552,6 @@ module.exports = [
     ]
   },
   {
-    "Table salt": {
-      "description": "table salt"
-    }
-  },
-  {
     "1 tablespoon vegetable oil or peanut oil": [
       {
         "description": "Or",
@@ -565,10 +573,16 @@ module.exports = [
   },
   {
     "8 medium cloves garlic, smashed and skins removed": {
-      "description": "garlic cloves",
+      "description": "cloves garlic",
       "direction": "smashed and skins removed",
       "measurement": "medium",
-      "quantity": "8"
+      "quantity": "8",
+      "finale": {
+        "description": "garlic cloves",
+        "direction": "smashed and skins removed",
+        "measurement": "medium",
+        "quantity": "8",
+      }
     }
   },
   {
@@ -690,9 +704,16 @@ module.exports = [
     "4   medium cloves garlic, cut crosswise into very thin (1/16-inch) slices (about 2 tablespoons)": {
       "quantity": "4",
       "measurement": "medium",
-      "description": "garlic cloves",
+      "description": "cloves garlic",
       "direction": "cut crosswise into very thin (1/16-inch) slices",
-      "alt": "about 2 tablespoons"
+      "alt": "about 2 tablespoons",
+      "finale": {
+        "quantity": "4",
+        "measurement": "medium",
+        "description": "garlic cloves",
+        "direction": "cut crosswise into very thin (1/16-inch) slices",
+        "alt": "about 2 tablespoons",
+      }
     }
   },
   {
@@ -708,11 +729,6 @@ module.exports = [
         "description": "flat-leaf spinach",
         "direction": "stems removed, leaves washed and dried"
       }
-    }
-  },
-  {
-    "Table salt": {
-      "description": "table salt"
     }
   },
   {

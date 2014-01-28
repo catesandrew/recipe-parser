@@ -128,7 +128,7 @@ describe('cooks illustrated instructions parser', function() {
       _.each(expectedQuantity, function(expected) {
         if (_.isArray(expected)) {
           _.each(expected, function(expectedChild) {
-            expect(expectedChild).to.equal(quantity);
+            expect(quantity).to.equal(expectedChild);
           });
         } else {
           expect(quantity).to.equal(expected);
@@ -176,7 +176,7 @@ describe('cooks illustrated instructions parser', function() {
       for (var i = 0, l = expectedDescriptions.length; i < l; i++) {
         if (_.isArray(expectedDescriptions[i])) {
           for (var j = 0, ll = expectedDescriptions[i].length; j < ll; j++) {
-            expect(expectedDescriptions[i][j]).to.equal(descriptions[j]);
+            expect(descriptions[j]).to.equal(expectedDescriptions[i][j]);
           }
         } else {
           expect(descriptions[i]).to.equal(expectedDescriptions[i]);
@@ -286,24 +286,31 @@ describe('cooks illustrated instructions parser', function() {
   });
 
   it('should collate and produce a pretty result', function() {
-    var values,
-        retval,
+    var expectedVals,
+        expectedVal,
+        actuals,
+        actual,
         key;
 
     _.each(ingredients, function(ingredient) {
       key = _.first(_.keys(ingredient));
-      values = _.first(_.values(ingredient));
+      expectedVals = _.first(_.values(ingredient));
 
-      retval = parser.parseIngredient(key);
-      if (retval.isDivider) {
-        retval = [retval]; // to match test data
-      }
+      actuals = parser.parseIngredient(key);
+      if (!_.isArray(actuals)) { actuals = [actuals]; }
+      if (!_.isArray(expectedVals)) { expectedVals = [expectedVals]; }
 
-      if (values.finale) {
-        expect(retval).to.deep.equal(values.finale);
-      } else {
-        expect(retval).to.deep.equal(values);
-      }
+      _.zip(actuals, expectedVals, function(tuple) {
+        actual = tuple[0];
+        expectedVal = tuple[1];
+
+        if (expectedVal.finale) {
+          expect(actual).to.deep.equal(expectedVal.finale);
+        } else {
+          expect(actual).to.deep.equal(expectedVal);
+        }
+
+      });
 
     });
   });
