@@ -1118,5 +1118,13 @@ module.exports = [
         "direction": "chilled, cut into 1/4-inch cubes"
       }
     }
+  },
+  {
+    "3   ounces fresh strawberries (or thawed if frozen)": {
+      "quantity": "3",
+      "measurement": "ounces",
+      "description": "strawberries",
+      "direction": "fresh, or thawed if frozen"
+    }
   }
 ];
