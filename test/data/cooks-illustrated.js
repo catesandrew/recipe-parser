@@ -1185,19 +1185,19 @@ module.exports = [
       "direction": "fresh, or thawed if frozen"
     }
   },
-  //{
-    //"2   teaspoons table salt plus additional for sprinkling": {
-      //"quantity": "2",
-      //"measurement": "teaspoons",
-      //"description": "table salt plus additional for sprinkling",
-      //"finale": {
-        //"quantity": "2",
-        //"measurement": "teaspoons",
-        //"description": "table salt",
-        //"direction": "plus additional for sprinkling"
-      //}
-    //}
-  //},
+  {
+    "2   teaspoons table salt plus additional for sprinkling": {
+      "quantity": "2",
+      "measurement": "teaspoons",
+      "description": "table salt plus additional for sprinkling",
+      "finale": {
+        "quantity": "2",
+        "measurement": "teaspoons",
+        "description": "table salt",
+        "direction": "plus additional for sprinkling"
+      }
+    }
+  },
   {
     "3   tablespoons virgin olive oil plus extra for drizzling": {
       "quantity": "3",
