@@ -1198,20 +1198,19 @@ module.exports = [
       //}
     //}
   //},
-  //{
-    //"3   tablespoons virgin olive oil plus extra for drizzling": {
-      //"quantity": "3",
-      //"measurement": "tablespoons",
-      //"description": "virgin olive oil plus extra",
-      //"direction": "for drizzling",
-      //"finale": {
-        //"quantity": "3",
-        //"measurement": "tablespoons",
-        //"description": "virgin olive oil",
-        //"direction": "plus extra for drizzling",
-      //}
-    //}
-  //},
+  {
+    "3   tablespoons virgin olive oil plus extra for drizzling": {
+      "quantity": "3",
+      "measurement": "tablespoons",
+      "description": "virgin olive oil plus extra for drizzling",
+      "finale": {
+        "quantity": "3",
+        "measurement": "tablespoons",
+        "description": "virgin olive oil",
+        "direction": "plus extra for drizzling",
+      }
+    }
+  },
   {
     "1   bulb fennel medium (about 1 pound), sliced thin": {
       "quantity": "1",
