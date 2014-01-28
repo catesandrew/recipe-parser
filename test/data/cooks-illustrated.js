@@ -26,9 +26,15 @@ module.exports = [
   {
     "1/2 teaspoon ground black pepper": {
       "description": "black pepper",
-      "direction": "freshly ground",
+      "direction": "ground",
       "measurement": "teaspoon",
-      "quantity": "1/2"
+      "quantity": "1/2",
+      "finale": {
+        "description": "black pepper",
+        "direction": "freshly ground",
+        "measurement": "teaspoon",
+        "quantity": "1/2",
+      }
     }
   },
   {
@@ -64,9 +70,15 @@ module.exports = [
   {
     "1/2 teaspoon ground black pepper": {
       "description": "black pepper",
-      "direction": "freshly ground",
+      "direction": "ground",
       "measurement": "teaspoon",
-      "quantity": "1/2"
+      "quantity": "1/2",
+      "finale": {
+        "description": "black pepper",
+        "direction": "freshly ground",
+        "measurement": "teaspoon",
+        "quantity": "1/2",
+      }
     }
   },
   {
@@ -120,9 +132,15 @@ module.exports = [
   {
     "1/2 teaspoon ground black pepper": {
       "description": "black pepper",
-      "direction": "freshly ground",
+      "direction": "ground",
       "measurement": "teaspoon",
-      "quantity": "1/2"
+      "quantity": "1/2",
+      "finale": {
+        "description": "black pepper",
+        "direction": "freshly ground",
+        "measurement": "teaspoon",
+        "quantity": "1/2",
+      }
     }
   },
   {
@@ -190,9 +208,15 @@ module.exports = [
   {
     "1/2 teaspoon ground black pepper": {
       "description": "black pepper",
-      "direction": "freshly ground",
+      "direction": "ground",
       "measurement": "teaspoon",
-      "quantity": "1/2"
+      "quantity": "1/2",
+      "finale": {
+        "description": "black pepper",
+        "direction": "freshly ground",
+        "measurement": "teaspoon",
+        "quantity": "1/2",
+      }
     }
   },
   {
@@ -275,7 +299,11 @@ module.exports = [
       },
       {
         "description": "black pepper",
-        "direction": "freshly ground"
+        "direction": "ground",
+        "finale": {
+          "description": "black pepper",
+          "direction": "freshly ground",
+        }
       }
     ]
   },
@@ -426,7 +454,11 @@ module.exports = [
   {
     "Ground black pepper": {
       "description": "black pepper",
-      "direction": "freshly ground"
+      "direction": "Ground",
+      "finale": {
+        "description": "black pepper",
+        "direction": "freshly ground",
+      }
     }
   },
   {
@@ -646,7 +678,13 @@ module.exports = [
       "quantity": "1/2",
       "measurement": "teaspoon",
       "description": "black pepper",
-      "direction": "freshly ground"
+      "direction": "ground",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "teaspoon",
+        "description": "black pepper",
+        "direction": "freshly ground",
+      }
     }
   },
   {
@@ -992,7 +1030,11 @@ module.exports = [
   {
     "Ground white pepper": {
       "description": "white pepper",
-      "direction": "freshly ground"
+      "direction": "Ground",
+      "finale": {
+        "description": "white pepper",
+        "direction": "freshly ground",
+      }
     }
   },
   {
