@@ -1207,7 +1207,7 @@ module.exports = [
         "quantity": "3",
         "measurement": "tablespoons",
         "description": "virgin olive oil",
-        "direction": "plus extra for drizzling",
+        "direction": "plus extra for drizzling"
       }
     }
   },
@@ -1220,4 +1220,31 @@ module.exports = [
       "alt": "about 1 pound"
     }
   },
+  {
+    "1/4   cup lemon juice from two lemons": {
+      "quantity": "1/4",
+      "measurement": "cup",
+      "description": "lemon juice from two lemons",
+      "finale": {
+        "quantity": "1/4",
+        "measurement": "cup",
+        "description": "lemon juice",
+        "direction": "freshly squeezed from two lemons"
+      }
+    }
+  },
+  {
+    "4   cups packed flat-leaf parsley leaf, washed and dried thoroughly": {
+      "quantity": "4",
+      "measurement": "cups",
+      "description": "packed flat-leaf parsley leaf",
+      "direction": "washed and dried thoroughly",
+      "finale": {
+        "quantity": "4",
+        "measurement": "cups",
+        "description": "flat-leaf parsley leaf",
+        "direction": "packed, washed and dried thoroughly"
+      }
+    }
+  }
 ];
