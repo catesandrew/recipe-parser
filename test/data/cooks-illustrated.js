@@ -1286,5 +1286,18 @@ module.exports = [
       "description": "eggs",
       "direction": "hard-cooked, each cut into 4 wedges"
     }
+  },
+  {
+    "3   tablespoons lime juice from 1 large lime": {
+      "quantity": "3",
+      "measurement": "tablespoons",
+      "description": "lime juice from 1 large lime",
+      "finale": {
+        "quantity": "3",
+        "measurement": "tablespoons",
+        "description": "lime juice",
+        "direction": "freshly squeezed from 1 large lime"
+      }
+    }
   }
 ];
