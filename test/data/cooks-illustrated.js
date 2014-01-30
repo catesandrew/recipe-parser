@@ -1299,5 +1299,27 @@ module.exports = [
         "direction": "freshly squeezed from 1 large lime"
       }
     }
+  },
+  {
+    "2 - 3   tablespoons minced fresh parsley leaves or finely shredded fresh basil": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "2 to 3",
+            "measurement": "tablespoons",
+            "description": "parsley leaves",
+            "direction": "minced fresh"
+          },
+          {
+            "quantity": "2 to 3",
+            "measurement": "tablespoons",
+            "description": "basil",
+            "direction": "finely shredded fresh"
+          }
+        ]
+      }
+    ]
   }
 ];

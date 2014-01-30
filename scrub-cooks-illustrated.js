@@ -270,6 +270,8 @@ var addCourse = function($, obj) {
   listHelper($, '.other-attributes meta[itemprop="recipeCategory"]', function(index, meta) {
     name = _.trim(this.attr('content'));
     if (name) {
+      log.oklns(name);
+
       if (name === 'Side Dishes') {
         cat = 'Side Dishes';
       } else if (name === 'Main Courses') {
