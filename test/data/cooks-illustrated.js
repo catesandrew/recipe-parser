@@ -1321,5 +1321,18 @@ module.exports = [
         ]
       }
     ]
+  },
+  {
+    "2   tablespoons thin-sliced scallions": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "thin-sliced scallions",
+      "finale": {
+        "quantity": "2",
+        "measurement": "tablespoons",
+        "description": "scallions",
+        "direction": "thinly sliced"
+      }
+    }
   }
 ];
