@@ -1261,20 +1261,30 @@ module.exports = [
     }
   },
   {
-    "3   ripe Bartlett pears or other pears": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "3",
-          "description": "Bartlett pears",
-          "direction": "ripe"
-        },
-        {
-          "quantity": "3",
-          "description": "other pears"
-        }
-      ]
-    }]
+    "3   ripe Bartlett pears or other pears": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "3",
+            "description": "Bartlett pears",
+            "direction": "ripe"
+          },
+          {
+            "quantity": "3",
+            "description": "other pears"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "3   large hard-cooked eggs, each cut into 4 wedges": {
+      "quantity": "3",
+      "measurement": "large",
+      "description": "eggs",
+      "direction": "hard-cooked, each cut into 4 wedges"
+    }
   }
 ];
