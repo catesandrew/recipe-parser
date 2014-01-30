@@ -1246,5 +1246,18 @@ module.exports = [
         "direction": "packed, washed and dried thoroughly"
       }
     }
+  },
+  {
+    "1   large egg beaten lightly": {
+      "quantity": "1",
+      "measurement": "large",
+      "description": "egg beaten lightly",
+      "finale": {
+        "quantity": "1",
+        "measurement": "large",
+        "description": "egg",
+        "direction": "beaten lightly"
+      }
+    }
   }
 ];
