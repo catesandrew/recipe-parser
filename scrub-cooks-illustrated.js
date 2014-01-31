@@ -1,6 +1,5 @@
 /* jshint indent: false */
-var nodeUtil = require('util'),
-    async = require('async'),
+var async = require('async'),
     fs = require('fs'),
     request = require('request'),
     cheerio = require('cheerio'),

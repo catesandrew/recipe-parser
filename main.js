@@ -1,8 +1,3 @@
-'use strict';
-
-// Nodejs libs.
-var path = require('path');
-
 // The module to be exported.
 var main = module.exports = {};
 
@@ -19,7 +14,6 @@ main.option = {
 var util = mRequire('util', 'util');
 var log = mRequire('log', 'log');
 var verbose = main.verbose = log.verbose;
-
 
 // Expose some metadata.
 main.package = require('./package.json');
