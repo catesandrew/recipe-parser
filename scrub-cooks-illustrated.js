@@ -9,15 +9,16 @@ var nodeUtil = require('util'),
     http = require('http'),
     URL = require('url');
 
+var constants = require('./lib/mac-gourmet-constants').constants,
+    Parser = require('./lib/cooks-illustrated-parser'),
+    CategoryClassifier = require('./lib/category-classifier'),
+    parser = new Parser(),
+    classifier = new CategoryClassifier();
+
 var main = require('./main'),
-    constants = main.mgdConstants.constants,
-    parser = main.cooksIllustratedParser,
     util = main.util,
     log = main.log,
     _ = util._;
-
-//https://github.com/chriso/validator.js
-//https://github.com/fb55/node-entities
 
 program
   .version('0.1')
@@ -184,7 +185,7 @@ var addIngredients = function($, obj) {
   //console.log(JSON.stringify(obj.ingredients, null, 2));
 
   log.writelns('Guessing Categories');
-  var categories = parser.guessCategories(descriptions);
+  var categories = classifier.guessCategories(descriptions);
   _.each(categories, function(cat) {
     obj.categories.push({
       id: constants.CATEGORIES[cat.id],
@@ -588,13 +589,13 @@ if (program.url) {
     if (err) { console.log(err); }
 
     if (program.save) {
-      var data = require(parser.dataFile);
+      var data = require(parser.get('dataFile'));
       _.each(items, function(item) {
         _.each(item.saveIngredients, function(ingredient) {
           data.push(ingredient);
         });
 
-        fs.writeFileSync(parser.dataFile, 'module.exports = '
+        fs.writeFileSync(parser.get('dataFile'), 'module.exports = '
                          + JSON.stringify(data, null, 2) + ';');
       });
     }

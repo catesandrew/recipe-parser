@@ -7,10 +7,13 @@ var assert = require('assert'),
     ingredients = require('./data/cooks-illustrated'),
     main = require('../main');
 
+var Parser = require('../lib/cooks-illustrated-parser'),
+    parser = new Parser();
+
 var expect = chai.expect;
 var util = main.util,
-    _ = util._,
-    parser = main.cooksIllustratedParser;
+    _ = util._;
+
 
 // test helper functions
 function getKeyFromTestData(value, key) {
