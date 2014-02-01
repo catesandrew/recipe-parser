@@ -585,7 +585,7 @@ if (program.url) {
   };
 
   scrape(function(err, items) {
-    if (err) { console.log(err); }
+    if (err) { log.error(err); }
 
     if (program.save) {
       var data = require(parser.get('dataFile'));
