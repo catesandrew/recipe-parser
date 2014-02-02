@@ -10,8 +10,10 @@ var async = require('async'),
 
 var constants = require('./lib/mac-gourmet-constants').constants,
     Parser = require('./lib/cooks-illustrated-parser'),
+    MacGourmetExport = require('./lib/mac-gourmet-export'),
     CategoryClassifier = require('./lib/category-classifier'),
     parser = new Parser(),
+    exporter = new MacGourmetExport(),
     classifier = new CategoryClassifier();
 
 var main = require('./main'),
@@ -244,7 +246,9 @@ var addNotes = function($, obj) {
   listHelper($, '.serves > p', function(index, note) {
     text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(note))));
 
-    obj.notes.push(text);
+    obj.notes.push({
+      text: text
+    });
     log.oklns(index + 1 + '- ' + text);
   });
 };
@@ -361,6 +365,61 @@ var addAsideNotes = function($, obj) {
   });
 };
 
+var combineNotes = function(obj) {
+  var asideNotes = obj.asideNotes,
+      notes = obj.notes,
+      dest = [];
+
+  delete obj.asideNotes;
+  delete obj.notes;
+
+  // Combine Notes and Aside Notes (with pictures)
+  // into new destination of notes (flattened).
+  var i = 0, noteObj, title;
+  _.each(notes, function(note) {
+    noteObj = {};
+    dest.push({
+      text: note.text,
+      order: i++,
+      kind: 10
+    });
+  });
+  _.each(asideNotes, function(asideNote) {
+    title = [
+        '<h4>' + asideNote.h4 + '</h4>',
+        '<h3>' + asideNote.h3 + '</h3>' ];
+
+    var intros = _.map(asideNote.intros, function(intro) {
+      return '<p>' + intro + '</p>';
+    }).join(util.linefeed);
+
+    if (intros && intros.length) {
+      dest.push({
+        text: title.concat(intros).join(util.linefeed),
+        order: i++,
+        kind: 10
+      });
+      title = []; // reset the <h4> and <h3>
+    }
+
+    _.each(asideNote.notes, function(note) {
+      noteObj = {
+        text: title.concat(['<p>' + note.text + '</p>']).join(util.linefeed),
+        order: i++,
+        kind: 10
+      };
+      title = []; // reset the <h4> and <h3>
+
+      if (note.image) {
+        noteObj.image = note.image;
+      }
+      dest.push(noteObj);
+    });
+  });
+
+  obj.notes = dest;
+};
+
 var scrape = function(callback, url, justTitle) {
   request(url, function (err, response, body) {
     if (err) { throw err; }
@@ -383,6 +442,11 @@ var scrape = function(callback, url, justTitle) {
       addTimes($, obj);
       addCourse($, obj);
       addAsideNotes($, obj);
+      combineNotes(obj);
+
+      obj.parsedUrl = URL.parse(url, true);
+      delete obj.parsedUrl.query;
+      delete obj.parsedUrl.search;
     }
 
     callback(null, [obj]);
@@ -390,284 +454,26 @@ var scrape = function(callback, url, justTitle) {
 };
 
 if (program.url) {
-  var url = program.url,
-      parsedUrl = URL.parse(url, true);
-
-  delete parsedUrl.query;
-  delete parsedUrl.search;
-
-  var exportRecipe = function(item) {
-    var obj = {};
-    obj['AFFILIATE_ID'] = -1;
-
-    // Add Categories
-    var categories = obj['CATEGORIES'] = [];
-    var addCategory = function(id, name, userAdded) {
-      categories.push({
-        CATEGORY_ID: id,
-        ITEM_TYPE_ID: 102,
-        NAME: name,
-        USER_ADDED: userAdded
-      });
-    };
-    _.each(item.categories, function(category) {
-      //addCategory(206, 'Smoothies', false);
-      addCategory(category.id, category.name, false);
-    });
-
-    // Add course
-    if (item.course) {
-      obj['COURSE_ID'] = parseInt(item.course.id, 10);
-      obj['COURSE_NAME'] = item.course.name;
-    } else {
-      obj['COURSE_ID'] = 2;
-      obj['COURSE_NAME'] = 'Main';
-    }
-
-    obj['CUISINE_ID'] = -1;
-    obj['DIFFICULTY'] = 0;
-
-    // Add directions
-    var directions = obj['DIRECTIONS_LIST'] = [];
-    var text;
-    _.each(item.procedures, function(procedure) {
-      text = _.trim(procedure.text);
-      if (text) {
-        text = util.trimMultipleWhiteSpace(text);
-        directions.push({
-          VARIATION_ID: -1,
-          LABEL_TEXT: procedure.header || '',
-          IS_HIGHLIGHTED: false,
-          DIRECTION_TEXT: text
-        });
-      }
-    });
-
-    // EQUIPMENT
-
-    // Add main picture
-    if (item.image && item.image.data) {
-      obj['EXPORT_TYPE'] = 'BINARY';
-      obj['IMAGE'] = item.image.data;
-    }
-
-    // Add Ingredients
-    var list = obj['INGREDIENTS_TREE'] = [];
-    (function walker(array, list, isTop) {
-      if (_.isArray(array)) {
-        _.each(array, function(item) {
-          walker(item, list, isTop);
-        });
-      }
-      else if (array.isDivider) {
-        if (/*!isTop &&*/ array.description === 'Or') { //flatten if not on top
-          var tmpDesc = _.map(array.ingredients, function(ingredient) {
-            return ingredient.description;
-          }).join(' or ');
-
-          walker({
-            quantity: array.ingredients[0].quantity,
-            measurement: array.ingredients[0].measurement,
-            description: tmpDesc,
-            direction: array.ingredients[0].direction,
-            alt: array.ingredients[0].alt
-          }, list, isTop);
-        }
-        else {
-          var tmp = {};
-          tmp['DIVIDER_INGREDIENT'] = {
-            DESCRIPTION: array.description,
-            DIRECTION: '',
-            INCLUDED_RECIPE_ID: -1,
-            IS_DIVIDER: true,
-            IS_MAIN: false,
-            MEASUREMENT: '',
-            QUANTITY: '' + array.ingredients.length
-          };
-
-          var children = [];
-          tmp['INGREDIENTS'] = children;
-          list.push(tmp);
-          walker(array.ingredients, children, false);
-        }
-      }
-      else {
-
-        var tmp = '';
-        if (array.direction) {
-          tmp += array.direction;
-        }
-        if (array.alt) {
-          tmp = tmp + ' (' + array.alt + ')';
-        }
-        tmp = util.substituteDegree(util.substituteFraction(tmp));
-
-        list.push({
-          DESCRIPTION: array.description,
-          DIRECTION: tmp,
-          INCLUDED_RECIPE_ID: -1,
-          IS_DIVIDER: false,
-          IS_MAIN: false,
-          MEASUREMENT: array.measurement || '',
-          QUANTITY: array.quantity || ''
-        });
-      }
-    })(item.ingredients, list, true);
-
-    obj['KEYWORDS'] = '';
-    obj['MEASUREMENT_SYSTEM'] = 0;  // US Standard
-    obj['NAME'] = item.title;
-    obj['NOTE'] = '';
-
-    // Add Notes and Aside Notes (with pictures)
-    var notes = obj['NOTES_LIST'] = [];
-    var i = 0, tmp, title;
-    _.each(item.notes, function(note) {
-      tmp = {};
-      notes.push({
-        'NOTE_TEXT': note,
-        'SORT_ORDER': i++,
-        'TYPE_ID': 10
-      });
-    });
-    _.each(item.asideNotes, function(asideNote) {
-      title = [
-          '<h4>' + asideNote.h4 + '</h4>',
-          '<h3>' + asideNote.h3 + '</h3>' ];
-
-      var intros = _.map(asideNote.intros, function(intro) {
-        return '<p>' + intro + '</p>';
-      }).join(util.linefeed);
-
-      if (intros && intros.length) {
-        notes.push({
-          'NOTE_TEXT': title.concat(intros).join(util.linefeed),
-          'SORT_ORDER': i++,
-          'TYPE_ID': 10
-        });
-        title = []; // reset the <h4> and <h3>
-      }
-
-      _.each(asideNote.notes, function(note) {
-        tmp = {
-          'NOTE_TEXT': title.concat(['<p>' + note.text + '</p>']).join(util.linefeed),
-          'SORT_ORDER': i++,
-          'TYPE_ID': 10
-        };
-        title = []; // reset the <h4> and <h3>
-
-        if (note.image && note.image.data) {
-          tmp['IMAGE'] = note.image.data;
-        }
-        notes.push(tmp);
-      });
-    });
-
-    obj['NUTRITION'] = '';
-    // PREP_TIMES
-    obj['PUBLICATION_PAGE'] = URL.format(parsedUrl);
-    obj['SERVINGS'] = 1;
-    obj['SOURCE'] = 'Cooks Illustrated';
-    // Add Summary
-    obj['SUMMARY'] = _.map(item.summaries, function(summary) {
-      return '<p>' + summary + '</p>';
-    })
-    .join(util.linefeed);
-
-    obj['TYPE'] = 102;
-    obj['URL'] = URL.format(parsedUrl);
-    obj['YIELD'] = item.servings;
-
-    var plist_file = util.expandHomeDir('~/Desktop/recipe.mgourmet4');
-    util.writePlist(function(err, obj) {
-      if (err) { console.error(err); }
-    }, [obj], plist_file);
-  };
+  var url = program.url;
 
   scrape(function(err, items) {
     if (err) { log.error(err); }
 
     if (program.save) {
-      var data = require(parser.get('dataFile'));
-      _.each(items, function(item) {
-        _.each(item.saveIngredients, function(ingredient) {
-          data.push(ingredient);
-        });
-
-        fs.writeFileSync(parser.get('dataFile'), 'module.exports = '
-                         + JSON.stringify(data, null, 2) + ';');
-      });
+      util.saveIngredients(items, parser.get('dataFile'));
     }
 
-    var downloadImage = function(src, callback) {
-      if (src.indexOf('//') === 0) {
-        src = src.replace('//', 'http://');
-      }
-      var oURL = URL.parse(src);
-      var request = http.request({
-        port: 80,
-        host: oURL.hostname,
-        method: 'GET',
-        path: oURL.pathname
-      });
-
-      request.end();
-      request.on('response', function (response) {
-        var type = response.headers['content-type'],
-            prefix = 'data:' + type + ';base64,',
-            body = '';
-
-        response.setEncoding('binary');
-        response.on('end', function () {
-          var base64 = new Buffer(body, 'binary').toString('base64');
-          callback(null, base64);
-        });
-        response.on('data', function (chunk) {
-          if (response.statusCode === 200) {
-            body += chunk;
-          }
-        });
-      });
-    };
-
-    // collate all images
-    var images = [];
-    _.each(items, function(item) {
-      if (item.image) {
-        if (item.image.src) {
-          images.push(item.image);
-        }
-        if (item.asideNotes.length) {
-          _.each(item.asideNotes, function(asideNote) {
-            _.each(asideNote.notes, function(note) {
-              images.push(note.image);
-            });
-          });
-        }
-      }
-    });
-
-    // download all images
-    async.forEach(images, function(image, done) {
-      if (image.src) {
-        downloadImage(image.src, function(err, base64) {
-          if (!err) {
-            log.ok('Downloaded: ' + image.src);
-          }
-          image.data = base64;
-          done();
-        });
-      } else {
-        done();
-      }
-    }, function(err) {
+    var images = util.collateAllImages(items);
+    util.downloadAllImages(images, function(err) {
+      if (err) { log.error(err); }
       _.each(items, function(item) {
         if (!program.title) {
-          exportRecipe(item);
+          util.savePlistToFile(exporter.exportRecipe(item, 'Cooks Illustrated'));
         }
         log.ok('Recipe Title:' + item.title);
       });
     });
+
   }, url, program.title);
 }
 else {

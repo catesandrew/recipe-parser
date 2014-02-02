@@ -13,7 +13,7 @@ var constants = require('./lib/mac-gourmet-constants').constants,
     MacGourmetExport = require('./lib/mac-gourmet-export'),
     CategoryClassifier = require('./lib/category-classifier'),
     parser = new Parser(),
-    exporter = new MacGourmetExport();
+    exporter = new MacGourmetExport(),
     classifier = new CategoryClassifier();
 
 var main = require('./main'),
@@ -333,6 +333,7 @@ var addTimes = function($, obj) {
   listHelper($, '.hrecipe .recipe-about td span.totalTime', function() {
     text = _.trim(util.text(this));
     log.oklns('Total Time: ' + text + ', Minutes: ' + calcMinutes(parseTime(text)));
+    minutes = calcMinutes(parseTime(text));
     times.push(splitUp(minutes, 30));  // total time
     return false; // stop iterating
   });
@@ -394,13 +395,6 @@ var scrape = function(callback, url, justTitle) {
 if (program.url) {
   var url = program.url;
 
-  var saveToFile = function(obj) {
-    var plistFile = util.expandHomeDir('~/Desktop/recipe.mgourmet4');
-    util.writePlist(function(err, obj) {
-      if (err) { console.error(err); }
-    }, [obj], plistFile);
-  };
-
   scrape(function(err, items) {
     if (err) { log.error(err); }
 
@@ -413,7 +407,7 @@ if (program.url) {
       if (err) { log.error(err); }
       _.each(items, function(item) {
         if (!program.title) {
-          saveToFile(exporter.exportRecipe(item));
+          util.savePlistToFile(exporter.exportRecipe(item, 'Serious Eats'));
         }
         log.ok('Recipe Title:' + item.title);
       });
