@@ -1,66 +1,282 @@
 /* jshint indent: false */
-var nodeUtil = require('util'),
-    async = require('async'),
-    nodeio = require('node.io'),
+var async = require('async'),
+    fs = require('fs'),
+    request = require('request'),
+    cheerio = require('cheerio'),
     program = require('commander'),
+    changeCase = require('change-case'),
     http = require('http'),
     URL = require('url');
 
+var constants = require('./lib/mac-gourmet-constants').constants,
+    Parser = require('./lib/food-network-parser'),
+    MacGourmetExport = require('./lib/mac-gourmet-export'),
+    CategoryClassifier = require('./lib/category-classifier'),
+    parser = new Parser(),
+    exporter = new MacGourmetExport(),
+    classifier = new CategoryClassifier();
+
 var main = require('./main'),
     util = main.util,
+    log = main.log,
     _ = util._;
 
 program
   .version('0.1')
   .description('Scrub a recipe from foodnetwork.com')
-  .option('-u, --url <string>', 'url of recipe to scrub')
-  .option('-s, --season <string>', 'season number')
-  .option('-e, --episode <string>', 'episode number')
-  .option('-d, --debug', 'output extra debug information')
+  .option('-u, --url <string>', 'url of recipe to scrub from.')
+  .option('-s, --save', 'save scrubbed ingredients (used for regression)?')
+  .option('-t, --title', 'just parse the title.')
+  .option('-d, --debug', 'output extra debug information?')
   .parse(process.argv);
 
-var verbose = function() {
-  if (program.debug) {
-    console.log.apply(null, arguments);
-  }
-};
+main.option.debug = program.debug;
 
-var listHelper = function($, selector, chooseFirst, helper) {
+var listHelper = function($, selector, context, callback) {
+  if (context) {
+    if (_.isFunction(context)) {
+      callback = context;
+      context = undefined;
+    }
+  }
+
   try {
-    var elements = $(selector);
+    var elements = $(selector, context);
+    log.debug(elements.length);
     if (elements.length) {
-      verbose('  count: ' + elements.length);
-      if (chooseFirst) {
-        helper(_.first(elements));
-      } else {
-        elements.each(function(ele) {
-          helper(ele);
-        });
-      }
-    } else if (elements.children && elements.children.length) {
-      verbose('  count: ' + elements.children.length);
-      if (chooseFirst) {
-        helper(elements.children.first());
-      } else {
-        elements.children.each(function(ele) {
-          helper(ele);
-        });
-      }
-    } else {
-      verbose('  count: 1');
-      helper(elements);
+      elements.each(function(index, element) {
+        return callback.call(this, index, element);
+      });
     }
   } catch(e) {
-    verbose(e);
+    log.errorlns(e);
   }
 };
 
-var addProcedure = function($, obj) {
-  verbose('## Adding Procedures');
+var addTitle = function($, obj) {
+  log.writelns('Adding Title');
+  var text;
+
+  listHelper($, '.section.title > .title > h1[itemprop="name"]', function(index, title) {
+    //console.log(this);  // refers to the $ wrapped title element
+    //console.log(title); //refers to the plain title element
+    obj.title = _.trim(util.text(this));
+    log.oklns(obj.title);
+  });
+};
+
+var addServings = function($, obj) {
+  log.writelns('Adding Servings');
+  listHelper($, 'dd[itemprop="recipeYield"]', function() {
+    obj.servings = util.substituteFraction(_.trim(util.text(this)));
+    log.oklns(obj.servings);
+    return false; // stop iterating
+  });
+};
+
+var addImage = function($, obj) {
+  obj.image || (obj.image = {});
+  log.writelns('Adding Image');
+
+  listHelper($, '#photo img', function() {
+    obj.image = {
+      src: this.attr('src'),
+      alt: this.attr('alt')
+    };
+    return false; // stop iterating
+  });
+};
+
+var addIngredients = function($, obj) {
+  obj.ingredients || (obj.ingredients = []);
+  obj.saveIngredients || (obj.saveIngredients = []);
+  obj.categories || (obj.categories = []);
+  log.writelns('Adding Ingredients');
+  var ingredients = $('.ingredients > ul li'),
+      top = obj.ingredients,
+      list = obj.ingredients,
+      descriptions = [],
+      saveInbObj,
+      retval,
+      output,
+      text;
+
+  listHelper($, '.ingredients > ul li', function(index, ingredient) {
+    if (this.attr('itemprop') === 'ingredients') {
+      text = _.trim(util.fulltext(ingredient));
+      retval = parser.parseIngredient(text);
+      saveInbObj = {};
+      saveInbObj[text] = retval;
+      obj.saveIngredients.push(saveInbObj);
+
+      (function walker(vals) {
+        if (_.isArray(vals)) {
+          _.each(vals, function(val) {
+            walker(val);
+          });
+        } else if (vals.isDivider) {
+          log.oklns(vals.description);
+          walker(vals.ingredients);
+        } else {
+          if (vals.description) {
+            descriptions.push(vals.description);
+          }
+          output = _.compact([vals.quantity, vals.measurement, vals.description]).join(' ');
+          if (vals.direction) {
+            output += ', ' + vals.direction;
+          }
+          if (vals.alt) {
+            output += ' (' + vals.alt + ')';
+          }
+          log.ok(util.substituteDegree(util.substituteFraction(output)));
+        }
+      })(retval);
+
+      list.push(retval);
+    } else {
+      var group = _.trim(util.text(this));
+      if (group) {
+        var match = group.match(removeEndingColonRe);
+        if (match) {
+          group = changeCase.titleCase(match[1]);
+        } else {
+          group = changeCase.titleCase(group);
+        }
+      }
+      log.ok('Group: ' + group);
+
+      var parent = {
+        description: group,
+        isDivider: true,
+        ingredients: []
+      };
+      top.push(parent);
+      list = parent.ingredients;
+    }
+  });
+  //console.log(JSON.stringify(obj.ingredients, null, 2));
+
+  log.writelns('Guessing Categories');
+  var categories = classifier.guessCategories(descriptions);
+  _.each(categories, function(cat) {
+    obj.categories.push({
+      id: constants.CATEGORIES[cat.id],
+      name: cat.id
+    });
+    //log.ok('"' + cat.id + '", with probability of ' + cat.avg);
+  });
+};
+
+var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
+var removeEndingColonRe = /([^:]*):$/;
+var addProcedures = function($, obj) {
+  log.writelns('Adding Procedures');
   obj.procedures || (obj.procedures = []);
-  listHelper($, '.body-text .fn_instructions p', false, function(procedure) {
-    if (!procedure) { return; }
-    obj.procedures.push(util.substituteDegree(util.substituteFraction(util.trim(procedure.striptags))));
+  var header,
+      match,
+      text;
+
+  listHelper($, '.instructions ol li[itemprop="recipeInstructions"] div', function(index, procedure) {
+    header = undefined;
+
+    listHelper($, 'b', this, function() {
+      header = _.trim(util.text(this));
+    });
+
+    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(procedure))));
+    match = text.match(removeLeadingDigitPeriodRe);
+    if (match) {
+      text = match[1];
+    }
+    if (header) {
+      text = _.trim(text.replace(header, ''));
+      match = header.match(removeEndingColonRe);
+      if (match) {
+        header = changeCase.titleCase(match[1]);
+      }
+    }
+
+    obj.procedures.push({
+      header: header,
+      text: text
+    });
+
+    if (header) {
+      log.oklns(index + 1 + ' # ' + header + ' # ' + text);
+    } else {
+      log.oklns(index + 1 + ' - ' + text);
+    }
+  });
+};
+
+var addNotes = function($, obj) {
+  log.writelns('Adding Notes');
+  obj.notes || (obj.notes = []);
+  var text;
+
+  listHelper($, '.serves > p', function(index, note) {
+    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(note))));
+
+    obj.notes.push({
+      text: text
+    });
+    log.oklns(index + 1 + '- ' + text);
+  });
+};
+
+var addTimes = function($, obj) {
+  log.writelns('Adding Times');
+  var text;
+
+  listHelper($, '.other-attributes meta[itemprop="totalTime"]', function(index, meta) {
+    text = _.trim(this.attr('content'));
+    //PT0H0M  - 0 hours, 0 mins
+    //PT1H20M - 1 hour, 20 mins
+    obj.totalTime = text; // TODO - parse
+    log.oklns(text);
+  });
+};
+
+var addCourse = function($, obj) {
+  obj.categories || (obj.categories = []);
+  log.writelns('Adding Course');
+  var name, val, cat;
+
+  listHelper($, '.other-attributes meta[itemprop="recipeCategory"]', function(index, meta) {
+    name = _.trim(this.attr('content'));
+    if (name) {
+      log.oklns(name);
+
+      if (name === 'Side Dishes') {
+        cat = 'Side Dishes';
+      } else if (name === 'Main Courses') {
+        cat = 'Main Dish';
+        val = 'Main';
+      } else if (name === 'Desserts or Baked Goods') {
+        cat = 'Desserts';
+        val = 'Dessert';
+      } else if (name === 'Appetizers') {
+        val = cat = 'Appetizer';
+      }
+
+      if (val) {
+        obj.course = {
+          id: constants.COURSES[val],
+          name: val
+        };
+      }
+
+      if (cat) {
+        obj.categories.push({
+          id: constants.CATEGORIES[cat],
+          name: cat
+        });
+      }
+    }
+
+    if (obj.course) {
+      log.oklns(obj.course.id + ' - ' + obj.course.name);
+    }
   });
 };
 
@@ -73,185 +289,43 @@ var addTags = function($, obj) {
   });
 };
 
-var addImage = function($, obj) {
-  verbose('## Adding Image');
+var scrape = function(callback, url, justTitle) {
+  request(url, function (err, response, body) {
+    if (err) { throw err; }
+    var $ = cheerio.load(body, {
+      verbose: true,
+      ignoreWhitespace: true
+    });
 
-  listHelper($, '#recipe-lead img', true, function(img) {
-    if (!img) { return; }
-    obj.image = {
-      src: img.attribs.src,
-      alt: img.attribs.alt
-    };
-  });
-};
+    var obj = {};
+    addTitle($, obj);
 
-var addIngredients = function($, obj) {
-  verbose('## Adding Ingredients');
-  obj.ingredients || (obj.ingredients = []);
-  var ingredients = $('.kv-ingred-list1 li'),
-      text,
-      matches,
-      breakdown,
-      description;
+    if (!justTitle) {
+      addServings($, obj);
+      addImage($, obj);
+      addIngredients($, obj);
+      //addProcedures($, obj);
+      //addNotes($, obj);
+      //addTimes($, obj);
+      //addCourse($, obj);
+      //addTags($, obj);
 
-  ingredients.each(function(ingredient) {
-    breakdown = {};
-    text = ingredient.striptags;
-    //console.log(text);
-    if (text) {
-      matches = text.match(/^([-\d\/ ]+(?:\s+to\s+)?(?:[\d\/ ]+)?)?\s*(\w+)\s+(.*)/i);
-      //console.log('match: ' + matches);
-
-      if (matches && matches.length) {
-        breakdown.quantity = matches[1];
-        breakdown.measurement = matches[2];
-
-        if (matches[3].indexOf(',') > 0) {
-          text = matches[3];
-          matches = text.match(/(.*), ([^,]*$)/i);
-
-          breakdown.product = util.substituteFraction(util.trim(matches[1]));
-          breakdown.direction = util.substituteFraction(util.trim(matches[2]));
-        } else {
-          breakdown.product = util.substituteFraction(util.trim(matches[3]));
-        }
-
-        obj.ingredients.push(breakdown);
-      }
+      obj.parsedUrl = URL.parse(url, true);
+      delete obj.parsedUrl.query;
+      delete obj.parsedUrl.search;
     }
+
+    callback(null, [obj]);
   });
-};
-
-var scrape = function(callback, url) {
-  var methods = {
-    input: false,
-    run: function() {
-      var self = this;
-      this.getHtml(url, function(err, $) {
-        if (err) { this.exit(err); }
-        var obj = {};
-
-        try {
-          obj.title = $('.fn_name').striptags;
-
-          addTags($, obj);
-          addImage($, obj);
-          addIngredients($, obj);
-          addProcedure($, obj);
-
-          verbose('## Adding Servings');
-          var servings = $('.rm-block .border dd span');
-          if (servings) {
-            obj.servings = util.substituteFraction(util.trim(servings.striptags));
-          }
-
-          verbose('## Adding Times');
-          var totalTime = $('.rm-block [itemprop="totalTime"]');
-          if (totalTime) {
-            obj.totalTime = totalTime.attribs['content'];
-          }
-
-          var prepTime = $('.rm-block [itemprop="prepTime"]');
-          if (prepTime) {
-            obj.prepTime = prepTime.attribs['content'];
-          }
-
-          var cookTime = $('.rm-block [itemprop="cookTime"]');
-          if (cookTime) {
-            obj.cookTime = cookTime.attribs['content'];
-          }
-
-          //var source = $('p [itemprop="url"] span');
-          //if (source) {
-            //obj.source = source.striptags;
-          //}
-        } catch(e) {
-          verbose(e);
-        }
-
-        this.emit(obj);
-      });
-    }
-  };
-
-  var job = new nodeio.Job({
-    auto_retry: true,
-    timeout: 20,
-    retries: 3,
-    silent: true
-  }, methods);
-
-  nodeio.start(job, {}, function(err, data) {
-    if (err) { callback(err); }
-    callback(null, data);
-  }, true);
 };
 
 if (program.url) {
-  var url = program.url,
-      season = program.season,
-      episode = program.episode,
-      seasonEpisode,
-      obj;
+  var url = program.url;
 
-
-  obj = util.calcPadding(season, 2);
-  seasonEpisode = 'S' + (obj.padding + season).slice(obj.len);
-  obj = util.calcPadding(episode, 2);
-  seasonEpisode += 'E' + (obj.padding + episode).slice(obj.len);
-
+  //obj['PUBLICATION_PAGE'] = "<ul><li><a href=''></a></li><li><a href=''>" + seasonEpisode + '</a></li></ul>';
+  //obj['SOURCE'] = 'Good Eats';
+  /*
   var exportRecipe = function(item) {
-    var obj = {};
-    obj['AFFILIATE_ID'] = -1;
-    obj['COURSE_ID'] = 2;
-    obj['COURSE_NAME'] = 'Main';
-    obj['CUISINE_ID'] = -1;
-    obj['DIFFICULTY'] = 0;
-    obj['KEYWORDS'] = item.tags.join(', ');
-    obj['MEASUREMENT_SYSTEM'] = 0;
-    obj['NAME'] = seasonEpisode + ' - ' + util.trim(item.title);
-    obj['NOTE'] = '';
-    obj['NOTES_LIST'] = [];
-    obj['NUTRITION'] = '';
-    //obj['PUBLICATION_PAGE'] = url;
-    obj['PUBLICATION_PAGE'] = "<ul><li><a href=''></a></li><li><a href=''>" + seasonEpisode + '</a></li></ul>';
-    obj['SERVINGS'] = 1;
-    obj['SOURCE'] = 'Good Eats';
-    obj['TYPE'] = 102;
-    obj['URL'] = url;
-    obj['YIELD'] = util.trim(item.servings);
-
-    if (item.image && item.image.data) {
-      obj['EXPORT_TYPE'] = 'BINARY';
-      obj['IMAGE'] = item.image.data;
-    }
-
-    var categories = obj['CATEGORIES'] = [];
-    var addCategory = function(id, name, userAdded) {
-      categories.push({
-        CATEGORY_ID: id,
-        ITEM_TYPE_ID: 102,
-        NAME: name,
-        USER_ADDED: userAdded
-      });
-    };
-    //addCategory(10, 'Holiday', false);
-    //addCategory(14, 'Thanksgiving', false);
-    //addCategory(21, 'Side Dishes', false);
-
-    var directions = obj['DIRECTIONS_LIST'] = [];
-    _.each(item.procedures, function(procedure) {
-      procedure = util.trim(procedure);
-      if (procedure) {
-        procedure = procedure.replace(/\s{2,}/g, ' '); // replace extra spaces with one
-        directions.push({
-          VARIATION_ID: -1,
-          LABEL_TEXT: '',
-          IS_HIGHLIGHTED: false,
-          DIRECTION_TEXT: procedure
-        });
-      }
-    });
 
     var preps = obj['PREP_TIMES'] = [];
     var addTime = function(id, time) {
@@ -289,72 +363,33 @@ if (program.url) {
     if (item.inactiveTime) {
       addTime(28, item.inactiveTime); // inactive
     }
-
-    var ingredients = obj['INGREDIENTS_TREE'] = [];
-    _.each(item.ingredients, function(ingredient) {
-      ingredients.push({
-        DESCRIPTION: util.trim(ingredient.product),
-        DIRECTION: util.trim(ingredient.direction) || '',
-        INCLUDED_RECIPE_ID: -1,
-        IS_DIVIDER: false,
-        IS_MAIN: false,
-        MEASUREMENT: util.trim(ingredient.measurement),
-        QUANTITY: util.trim(ingredient.quantity)
-      });
-    });
-
-    var plist_file = util.expandHomeDir('~/Desktop/recipe.mgourmet4');
-    util.writePlist(function(err, obj) {
-      if (err) { console.error(err); }
-    }, [obj], plist_file);
   };
+  */
 
   scrape(function(err, items) {
-    if (err) { console.log(err); }
+    if (err) { log.error(err); }
 
-    async.forEach(items, function(item, done) {
-      if (item.image && item.image.src) {
-        var oURL = URL.parse(item.image.src),
-            request = http.request({
-              port: 80,
-              host: oURL.hostname,
-              method: 'GET',
-              path: oURL.pathname
-            });
+    if (program.save) {
+      util.saveIngredients(items, parser.get('dataFile'));
+    }
 
-        request.end();
-        request.on('response', function (response) {
-          var type = response.headers["content-type"],
-              prefix = 'data:' + type + ';base64,',
-              body = '';
-
-          response.setEncoding('binary');
-          response.on('end', function () {
-            var base64 = new Buffer(body, 'binary').toString('base64'),
-            data = prefix + base64;
-            //item.image.data = data;
-            item.image.data = base64;
-            done();
-          });
-          response.on('data', function (chunk) {
-            if (response.statusCode === 200) {
-              body += chunk;
-            }
-          });
-        });
-      } else {
-        done();
-      }
-    }, function(err) {
+    var images = util.collateAllImages(items);
+    util.downloadAllImages(images, function(err) {
+      if (err) { log.error(err); }
+      /*
       _.each(items, function(item) {
-        exportRecipe(item);
-        console.log('Done: ' + item.title);
+        if (!program.title) {
+          util.savePlistToFile(exporter.exportRecipe(item, 'Good Eats'));
+        }
+        log.ok('Recipe Title:' + item.title);
       });
+      */
     });
-  }, url);
+
+  }, url, program.title);
 }
 else {
-  console.log(program.description());
-  console.log("Version: " + program.version());
-  console.log(program.helpInformation());
+  log.writelns(program.description());
+  log.writelns('Version: ' + program.version());
+  log.writelns(program.helpInformation());
 }

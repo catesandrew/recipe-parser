@@ -196,7 +196,6 @@ var addIngredients = function($, obj) {
   });
 };
 
-// http://www.seriouseats.com/recipes/2014/01/spicy-cumin-wings-recipe.html
 var removeEndingColonRe = /([^:]*):$/;
 var addProcedures = function($, obj) {
   log.writelns('Adding Procedures');
