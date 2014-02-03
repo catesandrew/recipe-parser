@@ -385,6 +385,8 @@ var scrape = function(callback, url, justTitle) {
       obj.parsedUrl = URL.parse(url, true);
       delete obj.parsedUrl.query;
       delete obj.parsedUrl.search;
+
+      obj.publicationPage = URL.format(obj.parsedUrl);
     }
 
     callback(null, [obj]);

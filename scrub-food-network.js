@@ -167,7 +167,7 @@ var addIngredients = function($, obj) {
   });
 };
 
-var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
+// http://www.foodnetwork.com/recipes/alton-brown/pumpkin-pie-recipe.html
 var removeEndingColonRe = /([^:]*):$/;
 var addProcedures = function($, obj) {
   log.writelns('Adding Procedures');
@@ -176,35 +176,33 @@ var addProcedures = function($, obj) {
       match,
       text;
 
-  listHelper($, '.instructions ol li[itemprop="recipeInstructions"] div', function(index, procedure) {
-    header = undefined;
-
-    listHelper($, 'b', this, function() {
+  listHelper($, '.directions[itemprop="recipeInstructions"] > *', function(index, procedure) {
+    if (this.is('span.subtitle')) {
       header = _.trim(util.text(this));
-    });
-
-    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(procedure))));
-    match = text.match(removeLeadingDigitPeriodRe);
-    if (match) {
-      text = match[1];
-    }
-    if (header) {
-      text = _.trim(text.replace(header, ''));
-      match = header.match(removeEndingColonRe);
-      if (match) {
-        header = changeCase.titleCase(match[1]);
+    } else if (this.is('p')) {
+      text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(procedure))));
+      if (header) {
+        match = header.match(removeEndingColonRe);
+        if (match) {
+          header = changeCase.titleCase(match[1]);
+        }
       }
-    }
 
-    obj.procedures.push({
-      header: header,
-      text: text
-    });
+      obj.procedures.push({
+        header: header,
+        text: text
+      });
 
-    if (header) {
-      log.oklns(index + 1 + ' # ' + header + ' # ' + text);
+      if (header) {
+        log.oklns(index + 1 + ' # ' + header + ' # ' + text);
+      } else {
+        log.oklns(index + 1 + ' - ' + text);
+      }
+
+      header = undefined;
+
     } else {
-      log.oklns(index + 1 + ' - ' + text);
+      return true; // keep iterating
     }
   });
 };
@@ -228,6 +226,14 @@ var addTimes = function($, obj) {
   log.writelns('Adding Times');
   var text;
 
+  //addTime(9, item.prepTime); // prep
+  //addTime(5, item.cookTime); // cook
+  //addTime(30, item.totalTime); // total
+  //addTime(28, item.inactiveTime); // inactive
+  //matches = time.match(/(\d+)H(\d+)M/i); // PT1H0M
+  //if (matches) {
+    //hours = parseInt(matches[1], 10);
+    //minutes = parseInt(matches[2], 10);
   listHelper($, '.other-attributes meta[itemprop="totalTime"]', function(index, meta) {
     text = _.trim(this.attr('content'));
     //PT0H0M  - 0 hours, 0 mins
@@ -281,7 +287,7 @@ var addCourse = function($, obj) {
 };
 
 var addTags = function($, obj) {
-  verbose('## Adding Tags');
+  //verbose('## Adding Tags');
   obj.tags || (obj.tags = []);
   listHelper($, '.article-info li.tags span', false, function(tag) {
     if (!tag) { return; }
@@ -333,10 +339,6 @@ if (program.url) {
           minutes,
           matches;
 
-      matches = time.match(/(\d+)H(\d+)M/i); // PT1H0M
-      if (matches) {
-        hours = parseInt(matches[1], 10);
-        minutes = parseInt(matches[2], 10);
 
         preps.push({
           TIME_TYPE_ID: id,
@@ -348,21 +350,6 @@ if (program.url) {
       }
     };
 
-    if (item.prepTime) {
-      addTime(9, item.prepTime); // prep
-    }
-
-    if (item.cookTime) {
-      addTime(5, item.cookTime); // cook
-    }
-
-    if (item.totalTime) {
-      addTime(30, item.totalTime); // total
-    }
-
-    if (item.inactiveTime) {
-      addTime(28, item.inactiveTime); // inactive
-    }
   };
   */
 

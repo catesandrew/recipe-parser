@@ -447,6 +447,15 @@ var scrape = function(callback, url, justTitle) {
       obj.parsedUrl = URL.parse(url, true);
       delete obj.parsedUrl.query;
       delete obj.parsedUrl.search;
+
+      obj.publicationPage = [
+        "<ul><li><a href='",
+        URL.format(obj.parsedUrl),
+        "'>",
+        obj.datePublished,
+        '</a></li></ul>'
+      ].join('');
+
     }
 
     callback(null, [obj]);

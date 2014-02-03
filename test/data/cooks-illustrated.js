@@ -1334,5 +1334,19 @@ module.exports = [
         "direction": "thinly sliced"
       }
     }
+  },
+  {
+    "1   medium tomato cut into a medium dice (peeling and seeding optional)": {
+      "quantity": "1",
+      "measurement": "medium",
+      "description": "tomato cut into a medium dice",
+      "direction": "peeling and seeding optional",
+      "finale": {
+        "quantity": "1",
+        "measurement": "medium",
+        "description": "tomato",
+        "direction": "cut into a medium dice, peeling and seeding optional",
+      }
+    }
   }
 ];

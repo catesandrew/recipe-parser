@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for RECIPE in {106..110}
+for RECIPE in {112..120}
 do
     URL=http://mako.dev/cooksillustrated/recipes/recipe-${RECIPE}.html
     RESULT=`curl -o /dev/null --silent --head --write-out '%{http_code}\n' ${URL}`
