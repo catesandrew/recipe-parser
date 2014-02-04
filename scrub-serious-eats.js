@@ -146,6 +146,8 @@ var addIngredients = function($, obj) {
   listHelper($, '.hrecipe .content-unit .ingredients ul li span', function(index, ingredient) {
     if (!this.children('strong').length) {
       text = _.trim(util.fulltext(ingredient));
+      text = util.decodeFractions(text);
+
       retval = parser.parseIngredient(text);
       saveInbObj = {};
       saveInbObj[text] = retval;

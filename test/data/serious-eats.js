@@ -1,5 +1,15 @@
 module.exports = [
   {
+    "Cooking spray": {
+      "description": "Cooking spray"
+    }
+  },
+  {
+    "Non-stick cooking spray": {
+      "description": "Non-stick cooking spray"
+    }
+  },
+  {
     "2 tablespoons ground cumin": {
       "quantity": "2",
       "measurement": "tablespoons",
@@ -135,7 +145,8 @@ module.exports = [
     "1 cup frozen orange juice concentrate": {
       "quantity": "1",
       "measurement": "cup",
-      "description": "frozen orange juice concentrate"
+      "description": "orange juice concentrate",
+      "direction": "frozen"
     }
   },
   {
@@ -471,11 +482,6 @@ module.exports = [
     }
   },
   {
-    "Cooking spray": {
-      "description": "Cooking spray"
-    }
-  },
-  {
     "1/2 teaspoon kosher salt": {
       "quantity": "1/2",
       "measurement": "teaspoon",
@@ -527,6 +533,136 @@ module.exports = [
       "measurement": "tablespoon",
       "description": "lemon juice",
       "direction": "fresh"
+    }
+  },
+  {
+    "2 cups all-purpose flour (about 10 ounces)": {
+      "quantity": "2",
+      "measurement": "cups",
+      "description": "all-purpose flour",
+      "alt": "about 10 ounces"
+    }
+  },
+  {
+    "1/2 teaspoon baking soda": {
+      "quantity": "1/2",
+      "measurement": "teaspoon",
+      "description": "baking soda"
+    }
+  },
+  {
+    "1 teaspoon baking powder": {
+      "quantity": "1",
+      "measurement": "teaspoon",
+      "description": "baking powder"
+    }
+  },
+  {
+    "1 1/2 teaspoons kosher salt": {
+      "quantity": "1 1/2",
+      "measurement": "teaspoons",
+      "description": "kosher salt"
+    }
+  },
+  {
+    "2 tablespoons sugar": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "sugar"
+    }
+  },
+  {
+    "3 whole eggs": {
+      "quantity": "3",
+      "measurement": "whole",
+      "description": "eggs"
+    }
+  },
+  {
+    "2 cups buttermilk": {
+      "quantity": "2",
+      "measurement": "cups",
+      "description": "buttermilk"
+    }
+  },
+  {
+    "2 tablespoons melted butter": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "melted butter"
+    }
+  },
+  {
+    "6 ounces bacon, cooked until crisp, crumbled, plus 1 tablespoon reserved bacon fat": {
+      "quantity": "6",
+      "measurement": "ounces",
+      "description": "bacon",
+      "direction": "cooked until crisp, crumbled, plus 1 tablespoon reserved bacon fat"
+    }
+  },
+  {
+    "6 ounces freshly grated cheddar cheese": {
+      "quantity": "6",
+      "measurement": "ounces",
+      "description": "cheddar cheese",
+      "direction": "freshly grated"
+    }
+  },
+  {
+    "6 scallions, whites and light greens only, thinly sliced, plus more for garnish": {
+      "quantity": "6",
+      "description": "scallions",
+      "direction": "whites and light greens only, thinly sliced, plus more for garnish"
+    }
+  },
+  {
+    "Maple syrup": {
+      "description": "Maple syrup"
+    }
+  },
+  {
+    "1 cup coconut water": {
+      "quantity": "1",
+      "measurement": "cup",
+      "description": "coconut water"
+    }
+  },
+  {
+    "1/2 cup Silk coconut milk (see note)": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "Silk coconut milk",
+      "direction": "see note"
+    }
+  },
+  {
+    "1 tablespoon Laxmi tamarind concentrate": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "Laxmi tamarind concentrate"
+    }
+  },
+  {
+    "1 banana, peeled": {
+      "quantity": "1",
+      "description": "banana",
+      "direction": "peeled"
+    }
+  },
+  {
+    "1 cup plain kefir, such as Lifeway": {
+      "quantity": "1",
+      "measurement": "cup",
+      "description": "plain kefir",
+      "direction": "such as Lifeway"
+    }
+  },
+  {
+    "10 ounces frozen mango chunks": {
+      "quantity": "10",
+      "measurement": "ounces",
+      "description": "mango chunks",
+      "direction": "frozen"
     }
   }
 ];
