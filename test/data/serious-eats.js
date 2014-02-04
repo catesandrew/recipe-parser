@@ -195,7 +195,7 @@ module.exports = [
         "measurement": "medium",
         "description": "garlic cloves",
         "direction": "minced",
-        "alt": "about 2 tablespoons",
+        "alt": "about 2 tablespoons"
       }
     }
   },
@@ -224,15 +224,119 @@ module.exports = [
     "Kosher salt": {
       "description": "Kosher salt",
       "finale": {
-        "description": "kosher salt",
+        "description": "kosher salt"
       }
     }
   },
   {
-    "Corn tortillas, cilantro, diced onions, lime wedges, and queso fresco for serving (optional)": {
-      "description": "Corn tortillas",
-      "direction": "cilantro, diced onions, lime wedges, and queso fresco for serving",
-      "alt": "optional"
+    "1 pound small white beans, rinsed and picked over": {
+      "quantity": "1",
+      "measurement": "pound",
+      "description": "small white beans",
+      "direction": "rinsed and picked over"
     }
-  }
+  },
+  {
+    "2 quarts homemade or store-bought low sodium chicken broth": {
+      "quantity": "2",
+      "measurement": "quarts",
+      "description": "low sodium chicken broth"
+    }
+  },
+  //{
+    //"2 bay leaves": {
+      //"quantity": "2",
+      //"description": "bay leaves"
+    //}
+  //},
+  //{
+    //"3/4 pound Hatch (Anaheim) chiles (see note above)": {
+      //"quantity": "3/4",
+      //"measurement": "pound",
+      //"description": "Hatch chiles (see note above)",
+      //"direction": "Anaheim"
+    //}
+  //},
+  //{
+    //"2 tablespoons vegetable oil": {
+      //"quantity": "2",
+      //"measurement": "tablespoons",
+      //"description": "vegetable oil"
+    //}
+  //},
+  //{
+    //"4 chicken legs": {
+      //"quantity": "4",
+      //"description": "chicken legs"
+    //}
+  //},
+  //{
+    //"Freshly ground black pepper": {
+      //"description": "black pepper",
+      //"direction": "Freshly ground"
+    //}
+  //},
+  //{
+    //"1 large onion, thinly sliced (about 1 1/2 cups)": {
+      //"quantity": "1",
+      //"measurement": "large",
+      //"description": "onion",
+      //"direction": "thinly sliced",
+      //"alt": "about 1 1/2 cups"
+    //}
+  //},
+  //{
+    //"4 medium cloves garlic, thinly sliced": {
+      //"quantity": "4",
+      //"measurement": "medium",
+      //"description": "garlic cloves",
+      //"direction": "thinly sliced"
+    //}
+  //},
+  //{
+    //"1 tablespoon ground cumin": {
+      //"quantity": "1",
+      //"measurement": "tablespoon",
+      //"description": "cumin",
+      //"direction": "ground"
+    //}
+  //},
+  //{
+    //"1 teaspoon ground coriander seed": {
+      //"quantity": "1",
+      //"measurement": "teaspoon",
+      //"description": "coriander seed",
+      //"direction": "ground"
+    //}
+  //},
+  //{
+    //"1/2 cup roughly chopped fresh cilantro leaves, plus more for garnish": {
+      //"quantity": "1/2",
+      //"measurement": "cup",
+      //"description": "roughly chopped fresh cilantro leaves",
+      //"direction": "plus more for garnish"
+    //}
+  //},
+  //{
+    //"1 tablespoon juice from 1 lime, plus 1 extra lime divided into 8 wedges": {
+      //"quantity": "1",
+      //"measurement": "tablespoon",
+      //"description": "juice",
+      //"direction": "freshly squeezed from 1 lime"
+    //}
+  //},
+  //{
+    //"Sour cream or Mexican crema for serving": {
+      //"description": "Or",
+      //"isDivider": true,
+      //"ingredients": [
+        //{
+          //"description": "Sour cream"
+        //},
+        //{
+          //"description": "Mexican crema for serving"
+        //}
+      //]
+    //}
+  //}
 ];
