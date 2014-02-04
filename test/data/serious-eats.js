@@ -332,26 +332,103 @@ module.exports = [
         "quantity": "1",
         "measurement": "tablespoon",
         "description": "juice",
-        "direction": "freshly squeezed from 1 lime, plus 1 extra lime divided into 8 wedges",
+        "direction": "freshly squeezed from 1 lime, plus 1 extra lime divided into 8 wedges"
       }
     }
   },
   {
-    "Sour cream or Mexican crema for serving": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "description": "Sour cream"
-        },
-        {
-          "description": "Mexican crema for serving",
-          "finale": {
-            "description": "Mexican crema",
-            "direction": "for serving"
+    "Sour cream or Mexican crema for serving": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "description": "Sour cream"
+          },
+          {
+            "description": "Mexican crema for serving",
+            "finale": {
+              "description": "Mexican crema",
+              "direction": "for serving"
+            }
           }
+        ]
+      }
+    ]
+  },
+  {
+    "Kosher salt for brine": {
+      "description": "Kosher salt for brine",
+      "finale": {
+        "description": "Kosher salt",
+        "direction": "for brine"
+      }
+    }
+  },
+  {
+    "2 teaspoons granulated sugar": {
+      "quantity": "2",
+      "measurement": "teaspoons",
+      "description": "granulated sugar"
+    }
+  },
+  {
+    "1 1/2 pounds (24 ounces) boneless, skinless chicken breast or legs (see note)": {
+      "quantity": "1 1/2",
+      "measurement": "pounds",
+      "description": "boneless",
+      "direction": "skinless chicken breast or legs",
+      "alt": "24 ounces",
+      "finale": {
+        "quantity": "1 1/2",
+        "measurement": "pounds",
+        "description": "boneless, skinless chicken breast or legs",
+        "direction": "",
+        "alt": "24 ounces",
+      }
+    }
+  },
+  {
+    "2 tablespoons olive oil": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "olive oil"
+    }
+  },
+  {
+    "3/4 cup cornmeal": {
+      "quantity": "3/4",
+      "measurement": "cup",
+      "description": "cornmeal"
+    }
+  },
+  {
+    "Kosher salt and freshly ground black pepper": [
+      {
+        "description": "Kosher salt",
+        "finale": {
+          "description": "kosher salt",
         }
-      ]
-    }]
+      },
+      {
+        "description": "black pepper",
+        "direction": "freshly ground"
+      }
+    ]
+  },
+  {
+    "1/4 teaspoon cayenne": {
+      "quantity": "1/4",
+      "measurement": "teaspoon",
+      "description": "cayenne"
+    }
+  },
+  {
+    "3 cups Corn Flakes cereal, crushed": {
+      "quantity": "3",
+      "measurement": "cups",
+      "description": "Corn Flakes cereal",
+      "direction": "crushed"
+    }
   }
 ];
