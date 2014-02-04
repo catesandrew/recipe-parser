@@ -384,7 +384,7 @@ module.exports = [
         "measurement": "pounds",
         "description": "boneless, skinless chicken breast or legs",
         "direction": "",
-        "alt": "24 ounces",
+        "alt": "24 ounces"
       }
     }
   },
@@ -407,7 +407,7 @@ module.exports = [
       {
         "description": "Kosher salt",
         "finale": {
-          "description": "kosher salt",
+          "description": "kosher salt"
         }
       },
       {
@@ -429,6 +429,104 @@ module.exports = [
       "measurement": "cups",
       "description": "Corn Flakes cereal",
       "direction": "crushed"
+    }
+  },
+  {
+    "4.5 ounces all-purpose flour (about 1 cup)": {
+      "quantity": "4.5",
+      "measurement": "ounces",
+      "description": "all-purpose flour",
+      "alt": "about 1 cup"
+    }
+  },
+  {
+    "1 1/2 cups panko (Japanese breadcrumbs)": {
+      "quantity": "1 1/2",
+      "measurement": "cups",
+      "description": "panko",
+      "direction": "Japanese breadcrumbs"
+    }
+  },
+  {
+    "3 tablespoons water": {
+      "quantity": "3",
+      "measurement": "tablespoons",
+      "description": "water"
+    }
+  },
+  {
+    "1 large egg, lightly beaten": {
+      "quantity": "1",
+      "measurement": "large",
+      "description": "egg",
+      "direction": "lightly beaten"
+    }
+  },
+  {
+    "1 1/4 pounds cod fillets (1/2 inch thick)": {
+      "quantity": "1 1/4",
+      "measurement": "pounds",
+      "description": "cod fillets",
+      "alt": "1/2 inch thick"
+    }
+  },
+  {
+    "Cooking spray": {
+      "description": "Cooking spray"
+    }
+  },
+  {
+    "1/2 teaspoon kosher salt": {
+      "quantity": "1/2",
+      "measurement": "teaspoon",
+      "description": "kosher salt"
+    }
+  },
+  {
+    "1/3 cup light mayonnaise": {
+      "quantity": "1/3",
+      "measurement": "cup",
+      "description": "light mayonnaise"
+    }
+  },
+  {
+    "2 tablespoons chopped kosher dill pickles": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "kosher dill pickles",
+      "direction": "chopped"
+    }
+  },
+  {
+    "1 tablespoon finely chopped red onion": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "red onion",
+      "direction": "finely chopped"
+    }
+  },
+  {
+    "1 tablespoon chopped fresh parsley": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "parsley",
+      "direction": "chopped fresh"
+    }
+  },
+  {
+    "1 tablespoon capers, rinsed, drained, and chopped": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "capers",
+      "direction": "rinsed, drained, and chopped"
+    }
+  },
+  {
+    "1 tablespoon fresh lemon juice": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "lemon juice",
+      "direction": "fresh"
     }
   }
 ];

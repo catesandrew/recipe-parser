@@ -6,6 +6,7 @@ var async = require('async'),
     program = require('commander'),
     changeCase = require('change-case'),
     http = require('http'),
+    entities = require('./lib/entities'),
     URL = require('url');
 
 var constants = require('./lib/mac-gourmet-constants').constants,
@@ -123,8 +124,8 @@ var addSummary = function($, obj) {
       }
     }
 
-    text = util.substituteDegree(util.substituteFraction(_.trim(util.fulltext(summary))));
-    log.ok(index + 1 + '- ' + text);
+    text = util.substituteDegree(util.substituteFraction(_.trim(entities.decode(this.html()))));
+    log.ok(text);
     obj.summaries.push(text);
   });
 };
