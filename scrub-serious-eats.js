@@ -72,6 +72,14 @@ var addTitle = function($, obj) {
   });
 };
 
+var addDatePublished = function($, obj) {
+  log.writelns('Adding Date Published');
+  listHelper($, 'footer.metadata > time', function(index, meta) {
+    obj.datePublished = _.trim(_.first(util.text(this).split(util.linefeed)));
+    log.oklns(obj.datePublished);
+  });
+};
+
 var addServings = function($, obj) {
   log.writelns('Adding Servings');
   listHelper($, '.hrecipe .recipe-about td span.yield', function(index, h4) {
@@ -371,6 +379,7 @@ var scrape = function(callback, url, justTitle) {
     addTitle($, obj);
 
     if (!justTitle) {
+      addDatePublished($, obj);
       addServings($, obj);
       addImage($, obj);
       addSummary($, obj);
@@ -386,7 +395,13 @@ var scrape = function(callback, url, justTitle) {
       delete obj.parsedUrl.query;
       delete obj.parsedUrl.search;
 
-      obj.publicationPage = URL.format(obj.parsedUrl);
+      obj.publicationPage = [
+        "<ul><li><a href='",
+        URL.format(obj.parsedUrl),
+        "'>",
+        obj.datePublished,
+        '</a></li></ul>'
+      ].join('');
     }
 
     callback(null, [obj]);
