@@ -256,66 +256,72 @@ module.exports = [
       "description": "Hatch (Anaheim) chiles"
     }
   },
-  //{
-    //"2 tablespoons vegetable oil": {
-      //"quantity": "2",
-      //"measurement": "tablespoons",
-      //"description": "vegetable oil"
-    //}
-  //},
-  //{
-    //"4 chicken legs": {
-      //"quantity": "4",
-      //"description": "chicken legs"
-    //}
-  //},
-  //{
-    //"Freshly ground black pepper": {
-      //"description": "black pepper",
-      //"direction": "Freshly ground"
-    //}
-  //},
-  //{
-    //"1 large onion, thinly sliced (about 1 1/2 cups)": {
-      //"quantity": "1",
-      //"measurement": "large",
-      //"description": "onion",
-      //"direction": "thinly sliced",
-      //"alt": "about 1 1/2 cups"
-    //}
-  //},
-  //{
-    //"4 medium cloves garlic, thinly sliced": {
-      //"quantity": "4",
-      //"measurement": "medium",
-      //"description": "garlic cloves",
-      //"direction": "thinly sliced"
-    //}
-  //},
-  //{
-    //"1 tablespoon ground cumin": {
-      //"quantity": "1",
-      //"measurement": "tablespoon",
-      //"description": "cumin",
-      //"direction": "ground"
-    //}
-  //},
-  //{
-    //"1 teaspoon ground coriander seed": {
-      //"quantity": "1",
-      //"measurement": "teaspoon",
-      //"description": "coriander seed",
-      //"direction": "ground"
-    //}
-  //},
-  //{
-    //"1/2 cup roughly chopped fresh cilantro leaves, plus more for garnish": {
-      //"quantity": "1/2",
-      //"measurement": "cup",
-      //"description": "roughly chopped fresh cilantro leaves",
-      //"direction": "plus more for garnish"
-    //}
-  //},
+  {
+    "2 tablespoons vegetable oil": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "vegetable oil"
+    }
+  },
+  {
+    "4 chicken legs": {
+      "quantity": "4",
+      "description": "chicken legs"
+    }
+  },
+  {
+    "Freshly ground black pepper": {
+      "description": "black pepper",
+      "direction": "Freshly ground"
+    }
+  },
+  {
+    "1 large onion, thinly sliced (about 1 1/2 cups)": {
+      "quantity": "1",
+      "measurement": "large",
+      "description": "onion",
+      "direction": "thinly sliced",
+      "alt": "about 1 1/2 cups"
+    }
+  },
+  {
+    "4 medium cloves garlic, thinly sliced": {
+      "quantity": "4",
+      "measurement": "medium",
+      "description": "cloves garlic",
+      "direction": "thinly sliced",
+      "finale": {
+        "quantity": "4",
+        "measurement": "medium",
+        "description": "garlic cloves",
+        "direction": "thinly sliced"
+      }
+    }
+  },
+  {
+    "1 tablespoon ground cumin": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "cumin",
+      "direction": "ground"
+    }
+  },
+  {
+    "1 teaspoon ground coriander seed": {
+      "quantity": "1",
+      "measurement": "teaspoon",
+      "description": "coriander seed",
+      "direction": "ground"
+    }
+  },
+  {
+    "1/2 cup roughly chopped fresh cilantro leaves, plus more for garnish": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "cilantro leaves",
+      "direction": "roughly chopped fresh, plus more for garnish"
+    }
+  },
   //{
     //"1 tablespoon juice from 1 lime, plus 1 extra lime divided into 8 wedges": {
       //"quantity": "1",
