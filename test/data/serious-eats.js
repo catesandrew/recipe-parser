@@ -243,20 +243,19 @@ module.exports = [
       "description": "low sodium chicken broth"
     }
   },
-  //{
-    //"2 bay leaves": {
-      //"quantity": "2",
-      //"description": "bay leaves"
-    //}
-  //},
-  //{
-    //"3/4 pound Hatch (Anaheim) chiles (see note above)": {
-      //"quantity": "3/4",
-      //"measurement": "pound",
-      //"description": "Hatch chiles (see note above)",
-      //"direction": "Anaheim"
-    //}
-  //},
+  {
+    "2 bay leaves": {
+      "quantity": "2",
+      "description": "bay leaves"
+    }
+  },
+  {
+    "3/4 pound Hatch (Anaheim) chiles (see note above)": {
+      "quantity": "3/4",
+      "measurement": "pound",
+      "description": "Hatch (Anaheim) chiles"
+    }
+  },
   //{
     //"2 tablespoons vegetable oil": {
       //"quantity": "2",
