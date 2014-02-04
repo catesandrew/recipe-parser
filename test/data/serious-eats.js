@@ -322,26 +322,36 @@ module.exports = [
       "direction": "roughly chopped fresh, plus more for garnish"
     }
   },
-  //{
-    //"1 tablespoon juice from 1 lime, plus 1 extra lime divided into 8 wedges": {
-      //"quantity": "1",
-      //"measurement": "tablespoon",
-      //"description": "juice",
-      //"direction": "freshly squeezed from 1 lime"
-    //}
-  //},
-  //{
-    //"Sour cream or Mexican crema for serving": {
-      //"description": "Or",
-      //"isDivider": true,
-      //"ingredients": [
-        //{
-          //"description": "Sour cream"
-        //},
-        //{
-          //"description": "Mexican crema for serving"
-        //}
-      //]
-    //}
-  //}
+  {
+    "1 tablespoon juice from 1 lime, plus 1 extra lime divided into 8 wedges": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "juice from 1 lime",
+      "direction": "plus 1 extra lime divided into 8 wedges",
+      "finale": {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "juice",
+        "direction": "freshly squeezed from 1 lime, plus 1 extra lime divided into 8 wedges",
+      }
+    }
+  },
+  {
+    "Sour cream or Mexican crema for serving": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "description": "Sour cream"
+        },
+        {
+          "description": "Mexican crema for serving",
+          "finale": {
+            "description": "Mexican crema",
+            "direction": "for serving"
+          }
+        }
+      ]
+    }]
+  }
 ];
