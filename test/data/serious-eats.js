@@ -718,7 +718,7 @@ module.exports = [
         "quantity": "40",
         "description": "garlic cloves",
         "direction": "peeled",
-        "alt": "about 3 heads",
+        "alt": "about 3 heads"
       }
     }
   },
@@ -730,22 +730,24 @@ module.exports = [
     }
   },
   {
-    "2 tablespoons Cognac or brandy": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "2",
-          "measurement": "tablespoons",
-          "description": "Cognac"
-        },
-        {
-          "quantity": "2",
-          "measurement": "tablespoons",
-          "description": "brandy"
-        }
-      ]
-    }]
+    "2 tablespoons Cognac or brandy": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "2",
+            "measurement": "tablespoons",
+            "description": "Cognac"
+          },
+          {
+            "quantity": "2",
+            "measurement": "tablespoons",
+            "description": "brandy"
+          }
+        ]
+      }
+    ]
   },
   {
     "1/2 cup homemade or store-bought low sodium chicken stock": {
@@ -760,6 +762,114 @@ module.exports = [
       "measurement": "tablespoons",
       "description": "lemon juice",
       "direction": "fresh-squeezed, plus 1 lemon, cut into wedges, divided"
+    }
+  },
+  {
+    "1 (4-pound) whole chicken": {
+      "quantity": "1",
+      "altMeasurement": "4-pound",
+      "measurement": "whole",
+      "description": "chicken",
+      "finale": {
+        "quantity": "1 (4-pound)",
+        "measurement": "whole",
+        "description": "chicken"
+      }
+    }
+  },
+  {
+    "3 celery stalks, coarsely chopped (about 6 ounces)": {
+      "quantity": "3",
+      "description": "celery stalks",
+      "direction": "coarsely chopped",
+      "alt": "about 6 ounces"
+    }
+  },
+  {
+    "2 carrots, cut into 1-inch pieces (about 5 ounces)": {
+      "quantity": "2",
+      "description": "carrots",
+      "direction": "cut into 1-inch pieces",
+      "alt": "about 5 ounces"
+    }
+  },
+  {
+    "1 onion, peeled and cut into wedges (about 10 ounces)": {
+      "quantity": "1",
+      "description": "onion",
+      "direction": "peeled and cut into wedges",
+      "alt": "about 10 ounces"
+    }
+  },
+  {
+    "1/2 bunch fresh flat-leaf parsley (about 2 ounces)": {
+      "quantity": "1/2",
+      "measurement": "bunch",
+      "description": "flat-leaf parsley",
+      "direction": "fresh",
+      "alt": "about 2 ounces"
+    }
+  },
+  {
+    "3 tablespoons butter, divided": {
+      "quantity": "3",
+      "measurement": "tablespoons",
+      "description": "butter",
+      "direction": "divided"
+    }
+  },
+  {
+    "1 cup chopped onion": {
+      "quantity": "1",
+      "measurement": "cup",
+      "description": "onion",
+      "direction": "chopped"
+    }
+  },
+  {
+    "1/4 cup sliced celery": {
+      "quantity": "1/4",
+      "measurement": "cup",
+      "description": "celery",
+      "direction": "sliced"
+    }
+  },
+  {
+    "1 carrot, halved lengthwise and sliced": {
+      "quantity": "1",
+      "description": "carrot",
+      "direction": "halved lengthwise and sliced"
+    }
+  },
+  {
+    "4.5 ounces all-purpose flour (about 1 cup)": {
+      "quantity": "4.5",
+      "measurement": "ounces",
+      "description": "all-purpose flour",
+      "alt": "about 1 cup"
+    }
+  },
+  {
+    "6 tablespoons nonfat buttermilk": {
+      "quantity": "6",
+      "measurement": "tablespoons",
+      "description": "nonfat buttermilk"
+    }
+  },
+  {
+    "1 tablespoon chopped fresh thyme": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "thyme",
+      "direction": "chopped fresh"
+    }
+  },
+  {
+    "3 tablespoons chopped fresh flat-leaf parsley": {
+      "quantity": "3",
+      "measurement": "tablespoons",
+      "description": "flat-leaf parsley",
+      "direction": "chopped fresh"
     }
   }
 ];
