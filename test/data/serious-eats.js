@@ -880,42 +880,46 @@ module.exports = [
     }
   },
   {
-    "2 pounds chicken drumsticks or thighs": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "2",
-          "measurement": "pounds",
-          "description": "chicken drumsticks"
-        },
-        {
-          "quantity": "2",
-          "measurement": "pounds",
-          "description": "thighs"
-        }
-      ]
-    }]
+    "2 pounds chicken drumsticks or thighs": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "2",
+            "measurement": "pounds",
+            "description": "chicken drumsticks"
+          },
+          {
+            "quantity": "2",
+            "measurement": "pounds",
+            "description": "thighs"
+          }
+        ]
+      }
+    ]
   },
   {
-    "6 ounces smoked Mexican or Spanish chorizo, cut into 1/4-inch slices": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "6",
-          "measurement": "ounces",
-          "description": "smoked Mexican",
-          "direction": "cut into 1/4-inch slices"
-        },
-        {
-          "quantity": "6",
-          "measurement": "ounces",
-          "description": "Spanish chorizo",
-          "direction": "cut into 1/4-inch slices"
-        }
-      ]
-    }]
+    "6 ounces smoked Mexican or Spanish chorizo, cut into 1/4-inch slices": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "6",
+            "measurement": "ounces",
+            "description": "smoked Mexican",
+            "direction": "cut into 1/4-inch slices"
+          },
+          {
+            "quantity": "6",
+            "measurement": "ounces",
+            "description": "Spanish chorizo",
+            "direction": "cut into 1/4-inch slices"
+          }
+        ]
+      }
+    ]
   },
   {
     "8 scallions, finely sliced, greens and whites reserved separately": {
@@ -944,7 +948,7 @@ module.exports = [
         "measurement": "medium",
         "description": "garlic cloves",
         "direction": "minced",
-        "alt": "about 4 teaspoons",
+        "alt": "about 4 teaspoons"
       }
     }
   },
@@ -969,26 +973,104 @@ module.exports = [
     }
   },
   {
-    "Sour cream or Mexican-style crema, for serving": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "description": "Sour cream",
-          "direction": "for serving"
-        },
-        {
-          "description": "Mexican-style crema",
-          "direction": "for serving"
-        }
-      ]
-    }]
+    "Sour cream or Mexican-style crema, for serving": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "description": "Sour cream",
+            "direction": "for serving"
+          },
+          {
+            "description": "Mexican-style crema",
+            "direction": "for serving"
+          }
+        ]
+      }
+    ]
   },
   {
     "1 lime, cut into 8 wedges": {
       "quantity": "1",
       "description": "lime",
       "direction": "cut into 8 wedges"
+    }
+  },
+  {
+    "1 pound large shrimp, peeled and deveined": {
+      "quantity": "1",
+      "measurement": "pound",
+      "description": "large shrimp",
+      "direction": "peeled and deveined"
+    }
+  },
+  {
+    "1 shallot, thinly sliced (about 1/2 cup)": {
+      "quantity": "1",
+      "description": "shallot",
+      "direction": "thinly sliced",
+      "alt": "about 1/2 cup"
+    }
+  },
+  {
+    "1 cup pre-rinsed or washed quinoa": {
+      "quantity": "1",
+      "measurement": "cup",
+      "description": "pre-rinsed or washed quinoa"
+    }
+  },
+  {
+    "2 cups homemade vegetable stock or store-bought low-sodium vegetable broth": {
+      "quantity": "2",
+      "measurement": "cups",
+      "description": "low-sodium vegetable broth"
+    }
+  },
+  {
+    "1 cucumber, roughly diced (about 1 1/2 cups)": {
+      "quantity": "1",
+      "description": "cucumber",
+      "direction": "roughly diced",
+      "alt": "about 1 1/2 cups"
+    }
+  },
+  {
+    "1 (15-oz) can chickpeas, drained and rinsed": {
+      "quantity": "1",
+      "altMeasurement": "15-oz",
+      "measurement": "can",
+      "description": "chickpeas",
+      "direction": "drained and rinsed",
+      "finale": {
+        "quantity": "1 (15-oz)",
+        "measurement": "can",
+        "description": "chickpeas",
+        "direction": "drained and rinsed",
+      }
+
+    }
+  },
+  {
+    "1 tablespoon fresh juice from 1 lemon": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "juice from 1 lemon",
+      "direction": "fresh",
+      "finale": {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "juice",
+        "direction": "freshly squeezed from 1 lemon, fresh",
+      }
+    }
+  },
+  {
+    "1/2 cup chopped fresh cilantro leaves": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "cilantro leaves",
+      "direction": "chopped fresh"
     }
   }
 ];
