@@ -682,21 +682,84 @@ module.exports = [
     }
   },
   {
-    "1 ounce Cointreau or triple sec": [{
+    "1 ounce Cointreau or triple sec": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "1",
+            "measurement": "ounce",
+            "description": "Cointreau"
+          },
+          {
+            "quantity": "1",
+            "measurement": "ounce",
+            "description": "triple sec"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "2 pounds skinless chicken thighs": {
+      "quantity": "2",
+      "measurement": "pounds",
+      "description": "skinless chicken thighs"
+    }
+  },
+  {
+    "40 cloves (about 3 heads) garlic, peeled": {
+      "quantity": "40",
+      "description": "cloves garlic",
+      "direction": "peeled",
+      "alt": "about 3 heads",
+      "finale": {
+        "quantity": "40",
+        "description": "garlic cloves",
+        "direction": "peeled",
+        "alt": "about 3 heads",
+      }
+    }
+  },
+  {
+    "1 1/2 cups dry white wine": {
+      "quantity": "1 1/2",
+      "measurement": "cups",
+      "description": "dry white wine"
+    }
+  },
+  {
+    "2 tablespoons Cognac or brandy": [{
       "description": "Or",
       "isDivider": true,
       "ingredients": [
         {
-          "quantity": "1",
-          "measurement": "ounce",
-          "description": "Cointreau"
+          "quantity": "2",
+          "measurement": "tablespoons",
+          "description": "Cognac"
         },
         {
-          "quantity": "1",
-          "measurement": "ounce",
-          "description": "triple sec"
+          "quantity": "2",
+          "measurement": "tablespoons",
+          "description": "brandy"
         }
       ]
     }]
+  },
+  {
+    "1/2 cup homemade or store-bought low sodium chicken stock": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "low sodium chicken stock"
+    }
+  },
+  {
+    "2 tablespoons fresh-squeezed lemon juice, plus 1 lemon, cut into wedges, divided": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "lemon juice",
+      "direction": "fresh-squeezed, plus 1 lemon, cut into wedges, divided"
+    }
   }
 ];
