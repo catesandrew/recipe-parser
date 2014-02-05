@@ -871,5 +871,124 @@ module.exports = [
       "description": "flat-leaf parsley",
       "direction": "chopped fresh"
     }
+  },
+  {
+    "1 pound dried black beans": {
+      "quantity": "1",
+      "measurement": "pound",
+      "description": "dried black beans"
+    }
+  },
+  {
+    "2 pounds chicken drumsticks or thighs": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "2",
+          "measurement": "pounds",
+          "description": "chicken drumsticks"
+        },
+        {
+          "quantity": "2",
+          "measurement": "pounds",
+          "description": "thighs"
+        }
+      ]
+    }]
+  },
+  {
+    "6 ounces smoked Mexican or Spanish chorizo, cut into 1/4-inch slices": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "6",
+          "measurement": "ounces",
+          "description": "smoked Mexican",
+          "direction": "cut into 1/4-inch slices"
+        },
+        {
+          "quantity": "6",
+          "measurement": "ounces",
+          "description": "Spanish chorizo",
+          "direction": "cut into 1/4-inch slices"
+        }
+      ]
+    }]
+  },
+  {
+    "8 scallions, finely sliced, greens and whites reserved separately": {
+      "quantity": "8",
+      "description": "scallions",
+      "direction": "finely sliced, greens and whites reserved separately"
+    }
+  },
+  {
+    "2 Serrano peppers, 1 finely chopped (about 2 tablespoons), the other thinly sliced for garnish": {
+      "quantity": "2",
+      "description": "Serrano peppers",
+      "direction": "1 finely chopped the other thinly sliced for garnish",
+      "alt": "about 2 tablespoons"
+    }
+  },
+  {
+    "4 medium cloves garlic, minced (about 4 teaspoons)": {
+      "quantity": "4",
+      "measurement": "medium",
+      "description": "cloves garlic",
+      "direction": "minced",
+      "alt": "about 4 teaspoons",
+      "finale": {
+        "quantity": "4",
+        "measurement": "medium",
+        "description": "garlic cloves",
+        "direction": "minced",
+        "alt": "about 4 teaspoons",
+      }
+    }
+  },
+  {
+    "2 whole chipotle peppers in adobo sauce, finely minced, plus 1 tablespoon sauce from can": {
+      "quantity": "2",
+      "measurement": "whole",
+      "description": "chipotle peppers in adobo sauce",
+      "direction": "finely minced, plus 1 tablespoon sauce from can"
+    }
+  },
+  {
+    "Sliced avocado, for serving": {
+      "description": "avocado",
+      "direction": "Sliced, for serving"
+    }
+  },
+  {
+    "Fresh cilantro leaves, for serving": {
+      "description": "cilantro leaves",
+      "direction": "Fresh, for serving"
+    }
+  },
+  {
+    "Sour cream or Mexican-style crema, for serving": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "description": "Sour cream",
+          "direction": "for serving"
+        },
+        {
+          "description": "Mexican-style crema",
+          "direction": "for serving"
+        }
+      ]
+    }]
+  },
+  {
+    "1 lime, cut into 8 wedges": {
+      "quantity": "1",
+      "description": "lime",
+      "direction": "cut into 8 wedges"
+    }
   }
 ];
