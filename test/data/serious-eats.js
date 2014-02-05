@@ -664,5 +664,39 @@ module.exports = [
       "description": "mango chunks",
       "direction": "frozen"
     }
+  },
+  {
+    "1/2 ounce tart cherry juice concentrate (see note above)": {
+      "quantity": "1/2",
+      "measurement": "ounce",
+      "description": "tart cherry juice concentrate",
+      "direction": "see note above"
+    }
+  },
+  {
+    "1/2 ounce freshly squeezed lime juice, from 1 lime": {
+      "quantity": "1/2",
+      "measurement": "ounce",
+      "description": "lime juice",
+      "direction": "freshly squeezed, from 1 lime"
+    }
+  },
+  {
+    "1 ounce Cointreau or triple sec": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "1",
+          "measurement": "ounce",
+          "description": "Cointreau"
+        },
+        {
+          "quantity": "1",
+          "measurement": "ounce",
+          "description": "triple sec"
+        }
+      ]
+    }]
   }
 ];
