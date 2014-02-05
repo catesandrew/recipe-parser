@@ -1046,9 +1046,8 @@ module.exports = [
         "quantity": "1 (15-oz)",
         "measurement": "can",
         "description": "chickpeas",
-        "direction": "drained and rinsed",
+        "direction": "drained and rinsed"
       }
-
     }
   },
   {
@@ -1061,7 +1060,7 @@ module.exports = [
         "quantity": "1",
         "measurement": "tablespoon",
         "description": "juice",
-        "direction": "freshly squeezed from 1 lemon, fresh",
+        "direction": "freshly squeezed from 1 lemon, fresh"
       }
     }
   },
@@ -1072,5 +1071,111 @@ module.exports = [
       "description": "cilantro leaves",
       "direction": "chopped fresh"
     }
-  }
+  },
+  {
+    "All-Butter Crust for a 9-inch single-crust pie partially prebaked and cooled": {
+      "description": "All-Butter Crust for a 9-inch single-crust pie partially prebaked and cooled"
+    }
+  },
+  {
+    "4 ounces bittersweet chocolate (we use 70% cocoa), chopped into 1/4-inch pieces": {
+      "quantity": "4",
+      "measurement": "ounces",
+      "description": "bittersweet chocolate",
+      "direction": "chopped into 1/4-inch pieces, we use 70% cocoa"
+    }
+  },
+  {
+    "1 large egg yolk": {
+      "quantity": "1",
+      "measurement": "large",
+      "description": "egg yolk"
+    }
+  },
+  {
+    "1 1⁄3 cups granulated sugar": {
+      "quantity": "1 1/3",
+      "measurement": "cups",
+      "description": "granulated sugar"
+    }
+  },
+  //{
+    //"1/2 cup fresh Meyer lemon juice (from 3 to 4 lemons)": {
+      //"quantity": "1/2",
+      //"measurement": "cup",
+      //"description": "Meyer lemon juice",
+      //"direction": "fresh, from 3 to 4 lemons"
+    //}
+  //},
+  //{
+    //"1/4 cup fresh orange juice": {
+      //"quantity": "1/4",
+      //"measurement": "cup",
+      //"description": "orange juice",
+      //"direction": "fresh"
+    //}
+  //},
+  //{
+    //"Finely grated zest of 1 Meyer lemon": {
+      //"description": "zest of 1 Meyer lemon",
+      //"direction": "Finely grated"
+    //}
+  //},
+  //{
+    //"Finely grated zest of 1/4 orange": {
+      //"description": "zest of 1/4 orange",
+      //"direction": "Finely grated"
+    //}
+  //},
+  //{
+    //"1 1/4 cups unbleached all-purpose flour": {
+      //"quantity": "1 1/4",
+      //"measurement": "cups",
+      //"description": "unbleached all-purpose flour"
+    //}
+  //},
+  //{
+    //"1/2 teaspoon kosher salt": {
+      //"quantity": "1/2",
+      //"measurement": "teaspoon",
+      //"description": "kosher salt"
+    //}
+  //},
+  //{
+    //"1 1/2 teaspoons granulated sugar": {
+      //"quantity": "1 1/2",
+      //"measurement": "teaspoons",
+      //"description": "granulated sugar"
+    //}
+  //},
+  //{
+    //"1/4 pound (1 stick) cold unsalted butter, cut into 1/2-inch pieces": {
+      //"quantity": "1/4",
+      //"measurement": "pound",
+      //"description": "cold unsalted butter",
+      //"direction": "cut into 1/2-inch pieces",
+      //"alt": "1 stick"
+    //}
+  //},
+  //{
+    //"1/2 cup cold water": {
+      //"quantity": "1/2",
+      //"measurement": "cup",
+      //"description": "cold water"
+    //}
+  //},
+  //{
+    //"2 tablespoons cider vinegar": {
+      //"quantity": "2",
+      //"measurement": "tablespoons",
+      //"description": "cider vinegar"
+    //}
+  //},
+  //{
+    //"1/2 cup ice": {
+      //"quantity": "1/2",
+      //"measurement": "cup",
+      //"description": "ice"
+    //}
+  //}
 ];
