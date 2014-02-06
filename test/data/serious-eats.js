@@ -1124,7 +1124,13 @@ module.exports = [
       "quantity": "1/4",
       "measurement": "cup",
       "description": "orange juice",
-      "direction": "fresh"
+      "direction": "fresh",
+      "finale": {
+        "quantity": "1/4",
+        "measurement": "cup",
+        "description": "orange juice",
+        "direction": "freshly squeezed",
+      }
     }
   },
   {
@@ -1169,26 +1175,28 @@ module.exports = [
     }
   },
   {
-    "1 ounce (30 g) cheddar or Dubliner cheese, grated": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "1",
-          "measurement": "ounce",
-          "description": "cheddar",
-          "direction": "grated",
-          "alt": "30 g"
-        },
-        {
-          "quantity": "1",
-          "measurement": "ounce",
-          "description": "Dubliner cheese",
-          "direction": "grated",
-          "alt": "30 g"
-        }
-      ]
-    }]
+    "1 ounce (30 g) cheddar or Dubliner cheese, grated": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "1",
+            "measurement": "ounce",
+            "description": "cheddar",
+            "direction": "grated",
+            "alt": "30 g"
+          },
+          {
+            "quantity": "1",
+            "measurement": "ounce",
+            "description": "Dubliner cheese",
+            "direction": "grated",
+            "alt": "30 g"
+          }
+        ]
+      }
+    ]
   },
   {
     "1 to 2 ounces (30 to 55 g) Danish blue, Roquefort, Valdeon blue, or Gorgonzola cheese": {
@@ -1197,6 +1205,20 @@ module.exports = [
       "description": "Danish blue",
       "direction": "Roquefort, Valdeon blue, or Gorgonzola cheese",
       "alt": "30 to 55 g"
+    }
+  },
+  {
+    "1 1/2 tablespoons fresh-squeezed lemon juice": {
+      "quantity": "1 1/2",
+      "measurement": "tablespoons",
+      "description": "lemon juice",
+      "direction": "fresh-squeezed",
+      "finale": {
+        "quantity": "1 1/2",
+        "measurement": "tablespoons",
+        "description": "lemon juice",
+        "direction": "freshly squeezed",
+      }
     }
   }
 ];
