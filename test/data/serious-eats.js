@@ -678,7 +678,13 @@ module.exports = [
       "quantity": "1/2",
       "measurement": "ounce",
       "description": "lime juice",
-      "direction": "freshly squeezed, from 1 lime"
+      "direction": "freshly squeezed, from 1 lime",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "ounce",
+        "description": "lime juice",
+        "direction": "freshly squeezed from 1 lime",
+      }
     }
   },
   {
@@ -1099,22 +1105,28 @@ module.exports = [
       "description": "granulated sugar"
     }
   },
-  //{
-    //"1/2 cup fresh Meyer lemon juice (from 3 to 4 lemons)": {
-      //"quantity": "1/2",
-      //"measurement": "cup",
-      //"description": "Meyer lemon juice",
-      //"direction": "fresh, from 3 to 4 lemons"
-    //}
-  //},
-  //{
-    //"1/4 cup fresh orange juice": {
-      //"quantity": "1/4",
-      //"measurement": "cup",
-      //"description": "orange juice",
-      //"direction": "fresh"
-    //}
-  //},
+  {
+    "1/2 cup fresh Meyer lemon juice (from 3 to 4 lemons)": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "Meyer lemon juice",
+      "direction": "fresh, from 3 to 4 lemons",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "Meyer lemon juice",
+        "direction": "freshly squeezed from 3 to 4 lemons"
+      }
+    }
+  },
+  {
+    "1/4 cup fresh orange juice": {
+      "quantity": "1/4",
+      "measurement": "cup",
+      "description": "orange juice",
+      "direction": "fresh"
+    }
+  },
   //{
     //"Finely grated zest of 1 Meyer lemon": {
       //"description": "zest of 1 Meyer lemon",
@@ -1127,55 +1139,21 @@ module.exports = [
       //"direction": "Finely grated"
     //}
   //},
-  //{
-    //"1 1/4 cups unbleached all-purpose flour": {
-      //"quantity": "1 1/4",
-      //"measurement": "cups",
-      //"description": "unbleached all-purpose flour"
-    //}
-  //},
-  //{
-    //"1/2 teaspoon kosher salt": {
-      //"quantity": "1/2",
-      //"measurement": "teaspoon",
-      //"description": "kosher salt"
-    //}
-  //},
-  //{
-    //"1 1/2 teaspoons granulated sugar": {
-      //"quantity": "1 1/2",
-      //"measurement": "teaspoons",
-      //"description": "granulated sugar"
-    //}
-  //},
-  //{
-    //"1/4 pound (1 stick) cold unsalted butter, cut into 1/2-inch pieces": {
-      //"quantity": "1/4",
-      //"measurement": "pound",
-      //"description": "cold unsalted butter",
-      //"direction": "cut into 1/2-inch pieces",
-      //"alt": "1 stick"
-    //}
-  //},
-  //{
-    //"1/2 cup cold water": {
-      //"quantity": "1/2",
-      //"measurement": "cup",
-      //"description": "cold water"
-    //}
-  //},
-  //{
-    //"2 tablespoons cider vinegar": {
-      //"quantity": "2",
-      //"measurement": "tablespoons",
-      //"description": "cider vinegar"
-    //}
-  //},
-  //{
-    //"1/2 cup ice": {
-      //"quantity": "1/2",
-      //"measurement": "cup",
-      //"description": "ice"
-    //}
-  //}
+  {
+    "1/4 pound (1 stick) cold unsalted butter, cut into 1/2-inch pieces": {
+      "quantity": "1/4",
+      "measurement": "pound",
+      "description": "unsalted butter",
+      "direction": "cold, cut into 1/2-inch pieces",
+      "alt": "1 stick"
+    }
+  },
+  {
+    "1/2 cup cold water": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "water",
+      "direction": "cold"
+    }
+  }
 ];
