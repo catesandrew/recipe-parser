@@ -683,7 +683,7 @@ module.exports = [
         "quantity": "1/2",
         "measurement": "ounce",
         "description": "lime juice",
-        "direction": "freshly squeezed from 1 lime",
+        "direction": "freshly squeezed from 1 lime"
       }
     }
   },
@@ -1127,18 +1127,6 @@ module.exports = [
       "direction": "fresh"
     }
   },
-  //{
-    //"Finely grated zest of 1 Meyer lemon": {
-      //"description": "zest of 1 Meyer lemon",
-      //"direction": "Finely grated"
-    //}
-  //},
-  //{
-    //"Finely grated zest of 1/4 orange": {
-      //"description": "zest of 1/4 orange",
-      //"direction": "Finely grated"
-    //}
-  //},
   {
     "1/4 pound (1 stick) cold unsalted butter, cut into 1/2-inch pieces": {
       "quantity": "1/4",
@@ -1154,6 +1142,61 @@ module.exports = [
       "measurement": "cup",
       "description": "water",
       "direction": "cold"
+    }
+  },
+  {
+    "3 1/2 cups (840 ml) water": {
+      "quantity": "3 1/2",
+      "measurement": "cups",
+      "description": "water",
+      "alt": "840 ml"
+    }
+  },
+  {
+    "1 cup (140 g) polenta": {
+      "quantity": "1",
+      "measurement": "cup",
+      "description": "polenta",
+      "alt": "140 g"
+    }
+  },
+  {
+    "1 1/4 cups (300 ml) whole milk": {
+      "quantity": "1 1/4",
+      "measurement": "cups",
+      "description": "whole milk",
+      "alt": "300 ml"
+    }
+  },
+  {
+    "1 ounce (30 g) cheddar or Dubliner cheese, grated": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "1",
+          "measurement": "ounce",
+          "description": "cheddar",
+          "direction": "grated",
+          "alt": "30 g"
+        },
+        {
+          "quantity": "1",
+          "measurement": "ounce",
+          "description": "Dubliner cheese",
+          "direction": "grated",
+          "alt": "30 g"
+        }
+      ]
+    }]
+  },
+  {
+    "1 to 2 ounces (30 to 55 g) Danish blue, Roquefort, Valdeon blue, or Gorgonzola cheese": {
+      "quantity": "1 to 2",
+      "measurement": "ounces",
+      "description": "Danish blue",
+      "direction": "Roquefort, Valdeon blue, or Gorgonzola cheese",
+      "alt": "30 to 55 g"
     }
   }
 ];
