@@ -1129,7 +1129,7 @@ module.exports = [
         "quantity": "1/4",
         "measurement": "cup",
         "description": "orange juice",
-        "direction": "freshly squeezed",
+        "direction": "freshly squeezed"
       }
     }
   },
@@ -1217,8 +1217,46 @@ module.exports = [
         "quantity": "1 1/2",
         "measurement": "tablespoons",
         "description": "lemon juice",
-        "direction": "freshly squeezed",
+        "direction": "freshly squeezed"
       }
+    }
+  },
+  {
+    "2 medium cooked and peeled beets, finely diced (about 1 cup)": {
+      "quantity": "2",
+      "measurement": "medium",
+      "description": "cooked and peeled beets",
+      "direction": "finely diced",
+      "alt": "about 1 cup",
+      "finale": {
+        "quantity": "2",
+        "measurement": "medium",
+        "description": "beets",
+        "direction": "cooked and peeled, finely diced",
+        "alt": "about 1 cup",
+      }
+    }
+  },
+  {
+    "4 teaspoons juice from 1 lemon, plus 1 lemon cut into wedges for serving": {
+      "quantity": "4",
+      "measurement": "teaspoons",
+      "description": "juice from 1 lemon",
+      "direction": "plus 1 lemon cut into wedges for serving",
+      "finale": {
+        "quantity": "4",
+        "measurement": "teaspoons",
+        "description": "juice",
+        "direction": "freshly squeezed from 1 lemon, plus 1 lemon cut into wedges for serving",
+      }
+    }
+  },
+  {
+    "2 whole lemon sole, scaled and gilled": {
+      "quantity": "2",
+      "measurement": "whole",
+      "description": "lemon sole",
+      "direction": "scaled and gilled"
     }
   }
 ];
