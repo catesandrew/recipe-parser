@@ -1415,29 +1415,31 @@ module.exports = [
       "altMeasurement": "2-inch",
       "finale": {
         "quantity": "1 (2-inch)",
-        "description": "cinnamon stick",
+        "description": "cinnamon stick"
       }
     }
   },
   {
-    "2 cups basmati rice (or other long-grain rice), rinsed until water runs clear": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "2",
-          "measurement": "cups",
-          "description": "basmati rice",
-          "direction": "rinsed until water runs clear"
-        },
-        {
-          "quantity": "2",
-          "measurement": "cups",
-          "description": "other long-grain rice",
-          "direction": "rinsed until water runs clear"
-        }
-      ]
-    }]
+    "2 cups basmati rice (or other long-grain rice), rinsed until water runs clear": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "2",
+            "measurement": "cups",
+            "description": "basmati rice",
+            "direction": "rinsed until water runs clear"
+          },
+          {
+            "quantity": "2",
+            "measurement": "cups",
+            "description": "other long-grain rice",
+            "direction": "rinsed until water runs clear"
+          }
+        ]
+      }
+    ]
   },
   {
     "2 2/3 cups low-sodium homemade or store bought chicken broth": {
@@ -1456,8 +1458,55 @@ module.exports = [
         "quantity": "1/2",
         "measurement": "cup",
         "description": "cilantro leaves and fine stems",
-        "direction": "freshly chopped",
+        "direction": "freshly chopped"
       }
     }
+  },
+  {
+    "1 1/2 quarts low-sodium homemade or store bought vegetable or chicken broth (see note above)": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "1 1/2",
+          "measurement": "quarts",
+          "description": "low-sodium vegetable broth",
+          "direction": "see note above"
+        },
+        {
+          "quantity": "1 1/2",
+          "measurement": "quarts",
+          "description": "low-sodium chicken broth",
+          "direction": "see note above"
+        }
+      ]
+    }]
+  },
+  /*
+  {
+    "1 tablespoon zest and 2 tablespoons juice from 1 lemon": [
+      {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "zest",
+        "finale": {
+          "quantity": "1",
+          "measurement": "tablespoon",
+          "description": "lemon zest",
+        }
+      },
+      {
+        "quantity": "2",
+        "measurement": "tablespoons",
+        "description": "juice from 1 lemon",
+        "finale": {
+          "quantity": "2",
+          "measurement": "tablespoons",
+          "description": "lemon juice",
+          "direction": "freshly squeezed from 1 lemon",
+        }
+      }
+    ]
   }
+  */
 ];
