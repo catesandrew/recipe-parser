@@ -521,7 +521,7 @@ module.exports = [
         "quantity": "1",
         "measurement": "tablespoon",
         "description": "parsley",
-        "direction": "freshly chopped",
+        "direction": "freshly chopped"
       }
     }
   },
@@ -878,7 +878,7 @@ module.exports = [
         "quantity": "1",
         "measurement": "tablespoon",
         "description": "thyme",
-        "direction": "freshly chopped",
+        "direction": "freshly chopped"
       }
     }
   },
@@ -892,7 +892,7 @@ module.exports = [
         "quantity": "3",
         "measurement": "tablespoons",
         "description": "flat-leaf parsley",
-        "direction": "freshly chopped",
+        "direction": "freshly chopped"
       }
     }
   },
@@ -1098,7 +1098,7 @@ module.exports = [
         "quantity": "1/2",
         "measurement": "cup",
         "description": "cilantro leaves",
-        "direction": "freshly chopped",
+        "direction": "freshly chopped"
       }
     }
   },
@@ -1294,7 +1294,7 @@ module.exports = [
         "measurement": "pounds",
         "description": "Yukon Gold potatoes",
         "direction": "quartered",
-        "alt": "about 4 medium",
+        "alt": "about 4 medium"
       }
     }
   },
@@ -1316,7 +1316,24 @@ module.exports = [
         "quantity": "1",
         "measurement": "tablespoon",
         "description": "parsley leaves",
-        "direction": "freshly chopped",
+        "direction": "freshly chopped"
+      }
+    }
+  },
+  {
+    "1 day-old French baguette, cut into 1/4-inch slices": {
+      "quantity": "1",
+      "description": "French baguette",
+      "direction": "day-old, cut into 1/4-inch slices"
+    }
+  },
+  {
+    "Grated nutmeg": {
+      "description": "nutmeg",
+      "direction": "Grated",
+      "finale": {
+        "description": "nutmeg",
+        "direction": "freshly grated",
       }
     }
   },
