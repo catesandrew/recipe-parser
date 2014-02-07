@@ -4,16 +4,23 @@ var assert = require('assert'),
     natural = require('natural'),
     pluralize = require('pluralize'),
     chai = require('chai'),
-    ingredients = require('./data/cooks-illustrated'),
-    main = require('../main');
-
-var Parser = require('../lib/cooks-illustrated-parser'),
-    parser = new Parser();
-
-var expect = chai.expect;
-var util = main.util,
+    main = require('../main'),
+    expect = chai.expect,
+    util = main.util,
     _ = util._;
 
+var Parsers = [
+    require('../lib/cooks-illustrated-parser'),
+    require('../lib/serious-eats-parser'),
+  ],
+  parsers = [
+    new Parsers[0](),
+    new Parsers[1](),
+  ],
+  ingredientSets = [
+    require('./data/cooks-illustrated'),
+    require('./data/serious-eats')
+  ];
 
 // test helper functions
 function getKeyFromTestData(value, key) {
@@ -115,51 +122,65 @@ describe('pluralize', function () {
   });
 });
 
-describe('cooks illustrated instructions parser', function() {
+describe('recipe instructions parser', function() {
   it('should parse quantity', function() {
     var expectedQuantity,
+        ingredients,
         quantity,
+        parser,
         value,
         key;
 
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      value = _.first(_.values(ingredient));
-      expectedQuantity = getKeyFromTestData(value, 'quantity');
-      quantity = parser.getQuantity(key);
+    _.each(_.zip(ingredientSets, parsers), function(tuple) {
+      ingredients = tuple[0];
+      parser = tuple[1];
 
-      _.each(expectedQuantity, function(expected) {
-        if (_.isArray(expected)) {
-          _.each(expected, function(expectedChild) {
-            expect(quantity).to.equal(expectedChild);
-          });
-        } else {
-          expect(quantity).to.equal(expected);
-        }
+      _.each(ingredients, function(ingredient) {
+        key = _.first(_.keys(ingredient));
+        value = _.first(_.values(ingredient));
+        expectedQuantity = getKeyFromTestData(value, 'quantity');
+        quantity = parser.getQuantity(key);
+
+        _.each(expectedQuantity, function(expected) {
+          if (_.isArray(expected)) {
+            _.each(expected, function(expectedChild) {
+              expect(quantity).to.equal(expectedChild);
+            });
+          } else {
+            expect(quantity).to.equal(expected);
+          }
+        });
       });
     });
   });
 
   it('should parse measurement', function() {
     var expectedMeasurement,
+        ingredients,
         measurement,
-        key,
-        value;
+        parser,
+        value,
+        key;
 
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      value = _.first(_.values(ingredient));
-      expectedMeasurement = getKeyFromTestData(value, 'measurement');
-      measurement = (parser.getMeasurement(key) || {}).matched;
+    _.each(_.zip(ingredientSets, parsers), function(tuple) {
+      ingredients = tuple[0];
+      parser = tuple[1];
 
-      _.each(expectedMeasurement, function(expected) {
-        if (_.isArray(expected)) {
-          _.each(expected, function(expectedChild) {
-            expect(measurement).to.equal(expectedChild);
-          });
-        } else {
-          expect(measurement).to.equal(expected);
-        }
+      _.each(ingredients, function(ingredient) {
+        key = _.first(_.keys(ingredient));
+        value = _.first(_.values(ingredient));
+        expectedMeasurement = getKeyFromTestData(value, 'measurement');
+        measurement = (parser.getMeasurement(key) || {}).matched;
+
+        _.each(expectedMeasurement, function(expected) {
+          if (_.isArray(expected)) {
+            _.each(expected, function(expectedChild) {
+              expect(measurement).to.equal(expectedChild);
+            });
+          } else {
+            expect(measurement).to.equal(expected);
+          }
+        });
       });
     });
   });
@@ -167,53 +188,67 @@ describe('cooks illustrated instructions parser', function() {
   it('should parse description', function() {
     var expectedDescriptions,
         descriptions,
+        ingredients,
+        parser,
         value,
         key;
 
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      value = _.first(_.values(ingredient));
-      expectedDescriptions = getKeyFromTestData(value, 'description');
-      descriptions = (parser.getDescriptions(key) || {}).descriptions;
+    _.each(_.zip(ingredientSets, parsers), function(tuple) {
+      ingredients = tuple[0];
+      parser = tuple[1];
 
-      for (var i = 0, l = expectedDescriptions.length; i < l; i++) {
-        if (_.isArray(expectedDescriptions[i])) {
-          for (var j = 0, ll = expectedDescriptions[i].length; j < ll; j++) {
-            expect(descriptions[j]).to.equal(expectedDescriptions[i][j]);
+      _.each(ingredients, function(ingredient) {
+        key = _.first(_.keys(ingredient));
+        value = _.first(_.values(ingredient));
+        expectedDescriptions = getKeyFromTestData(value, 'description');
+        descriptions = (parser.getDescriptions(key) || {}).descriptions;
+
+        for (var i = 0, l = expectedDescriptions.length; i < l; i++) {
+          if (_.isArray(expectedDescriptions[i])) {
+            for (var j = 0, ll = expectedDescriptions[i].length; j < ll; j++) {
+              expect(descriptions[j]).to.equal(expectedDescriptions[i][j]);
+            }
+          } else {
+            expect(descriptions[i]).to.equal(expectedDescriptions[i]);
           }
-        } else {
-          expect(descriptions[i]).to.equal(expectedDescriptions[i]);
         }
-      }
+      });
     });
   });
 
   it('should parse directions and alts', function() {
     var expectedDirections,
         expectedAlts,
+        ingredients,
         directions,
+        parser,
         value,
         key;
 
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      value = _.first(_.values(ingredient));
-      expectedDirections = getKeyFromTestData(value, 'direction');
-      expectedAlts = getKeyFromTestData(value, 'alt');
-      directions = parser.getDirectionsAndAlts(key);
+    _.each(_.zip(ingredientSets, parsers), function(tuple) {
+      ingredients = tuple[0];
+      parser = tuple[1];
 
-      for (var i = 0, l = expectedDirections.length; i < l; i++) {
-        if (_.isArray(expectedDirections[i])) {
-          for (var j = 0, ll = expectedDirections[i].length; j < ll; j++) {
-            expect(directions[j].direction).to.equal(expectedDirections[i][j]);
-            expect(directions[j].alt).to.equal(expectedAlts[i][j]);
+      _.each(ingredients, function(ingredient) {
+        key = _.first(_.keys(ingredient));
+        value = _.first(_.values(ingredient));
+        expectedDirections = getKeyFromTestData(value, 'direction');
+        expectedAlts = getKeyFromTestData(value, 'alt');
+        directions = parser.getDirectionsAndAlts(key);
+
+        for (var i = 0, l = expectedDirections.length; i < l; i++) {
+          if (_.isArray(expectedDirections[i])) {
+            for (var j = 0, ll = expectedDirections[i].length; j < ll; j++) {
+              expect(directions[j].direction).to.equal(expectedDirections[i][j]);
+              expect(directions[j].alt).to.equal(expectedAlts[i][j]);
+            }
+          } else {
+            expect(directions[i].direction).to.equal(expectedDirections[i]);
+            expect(directions[i].alt).to.equal(expectedAlts[i]);
           }
-        } else {
-          expect(directions[i].direction).to.equal(expectedDirections[i]);
-          expect(directions[i].alt).to.equal(expectedAlts[i]);
         }
-      }
 
+      });
     });
   });
 
@@ -221,101 +256,115 @@ describe('cooks illustrated instructions parser', function() {
     var descriptionObjs,
         descriptions,
         measurement,
+        ingredients,
         directions,
         allPieces,
         quantity,
+        parser,
         values,
         key;
 
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      values = _.first(_.values(ingredient));
+    _.each(_.zip(ingredientSets, parsers), function(tuple) {
+      ingredients = tuple[0];
+      parser = tuple[1];
 
-      allPieces = parser.getAllPieces(key);
-      quantity = allPieces.quantity;
-      measurement = allPieces.measurement;
-      descriptionObjs = allPieces.descriptions;
-      descriptions = descriptionObjs.descriptions;
-      directions = allPieces.directions;
+      _.each(ingredients, function(ingredient) {
+        key = _.first(_.keys(ingredient));
+        values = _.first(_.values(ingredient));
 
-      function arrayWalker(array) {
-        var obj = array[0],
-            desc = array[1],
-            dir = array[2];
-        if (obj.finale) {
-          expect(quantity).to.equal(obj.finale.quantity);
-          expect(measurement).to.equal(obj.finale.measurement);
-          expect(desc).to.equal(obj.finale.description);
-          expect(dir.direction).to.equal(obj.finale.direction);
-          expect(dir.alt).to.equal(obj.finale.alt);
-        } else {
-          expect(quantity).to.equal(obj.quantity);
-          expect(measurement).to.equal(obj.measurement);
-          expect(desc).to.equal(obj.description);
-          expect(dir.direction).to.equal(obj.direction);
-          expect(dir.alt).to.equal(obj.alt);
-        }
-      }
+        allPieces = parser.getAllPieces(key);
+        quantity = allPieces.quantity;
+        measurement = allPieces.measurement;
+        descriptionObjs = allPieces.descriptions;
+        descriptions = descriptionObjs.descriptions;
+        directions = allPieces.directions;
 
-      function zipWalker(arrays) {
-        _.each(arrays, function(array) {
-          arrayWalker(array);
-        });
-      }
-
-      (function walker(vals) {
-        if (_.isArray(vals)) {
-          if (vals.length > 1) {
-            // where an ingredient gets broken down into two or more sub
-            // ingredients, typically happens for `and` types. For example `salt
-            // and pepper` gets broken down into `salt` and `black pepper`
-            zipWalker(_.zip(vals, descriptions, directions));
+        function arrayWalker(array) {
+          var obj = array[0],
+              desc = array[1],
+              dir = array[2];
+          if (obj.finale) {
+            expect(quantity).to.equal(obj.finale.quantity);
+            expect(measurement).to.equal(obj.finale.measurement);
+            expect(desc).to.equal(obj.finale.description);
+            expect(dir.direction).to.equal(obj.finale.direction);
+            expect(dir.alt).to.equal(obj.finale.alt);
           } else {
-            // when an ingredient gets broken down into two or more sub
-            // ingredients, typically happens for `or` types. The typage is
-            // important as it denotes a grouping to the callee.
-            _.each(vals, function(val) {
-              walker(val);
-            });
+            expect(quantity).to.equal(obj.quantity);
+            expect(measurement).to.equal(obj.measurement);
+            expect(desc).to.equal(obj.description);
+            expect(dir.direction).to.equal(obj.direction);
+            expect(dir.alt).to.equal(obj.alt);
           }
-        } else if (vals.isDivider) {
-          zipWalker(_.zip(vals.ingredients, descriptions, directions));
-        } else {
-          zipWalker(_.zip([vals], descriptions, directions));
         }
-      })(values);
 
+        function zipWalker(arrays) {
+          _.each(arrays, function(array) {
+            arrayWalker(array);
+          });
+        }
+
+        (function walker(vals) {
+          if (_.isArray(vals)) {
+            if (vals.length > 1) {
+              // where an ingredient gets broken down into two or more sub
+              // ingredients, typically happens for `and` types. For example `salt
+              // and pepper` gets broken down into `salt` and `black pepper`
+              zipWalker(_.zip(vals, descriptions, directions));
+            } else {
+              // when an ingredient gets broken down into two or more sub
+              // ingredients, typically happens for `or` types. The typage is
+              // important as it denotes a grouping to the callee.
+              _.each(vals, function(val) {
+                walker(val);
+              });
+            }
+          } else if (vals.isDivider) {
+            zipWalker(_.zip(vals.ingredients, descriptions, directions));
+          } else {
+            zipWalker(_.zip([vals], descriptions, directions));
+          }
+        })(values);
+
+      });
     });
   });
 
   it('should collate and produce a pretty result', function() {
     var expectedVals,
         expectedVal,
+        ingredients,
         actuals,
+        parser,
         actual,
         key;
 
-    _.each(ingredients, function(ingredient) {
-      key = _.first(_.keys(ingredient));
-      expectedVals = _.first(_.values(ingredient));
+    _.each(_.zip(ingredientSets, parsers), function(tuple) {
+      ingredients = tuple[0];
+      parser = tuple[1];
 
-      actuals = parser.parseIngredient(key);
-      if (!_.isArray(actuals)) { actuals = [actuals]; }
-      if (!_.isArray(expectedVals)) { expectedVals = [expectedVals]; }
+      _.each(ingredients, function(ingredient) {
+        key = _.first(_.keys(ingredient));
+        expectedVals = _.first(_.values(ingredient));
 
-      _.zip(actuals, expectedVals, function(tuple) {
-        actual = tuple[0];
-        expectedVal = tuple[1];
+        actuals = parser.parseIngredient(key);
+        if (!_.isArray(actuals)) { actuals = [actuals]; }
+        if (!_.isArray(expectedVals)) { expectedVals = [expectedVals]; }
 
-        if (expectedVal.finale) {
-          expect(actual).to.deep.equal(expectedVal.finale);
-        } else {
-          expect(actual).to.deep.equal(expectedVal);
-        }
+        _.zip(actuals, expectedVals, function(tuple) {
+          actual = tuple[0];
+          expectedVal = tuple[1];
+
+          if (expectedVal.finale) {
+            expect(actual).to.deep.equal(expectedVal.finale);
+          } else {
+            expect(actual).to.deep.equal(expectedVal);
+          }
+
+        });
 
       });
-
     });
+
   });
 });
-
