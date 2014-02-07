@@ -832,7 +832,7 @@ module.exports = [
         "quantity": "3",
         "measurement": "tablespoons",
         "description": "unsalted butter",
-        "direction": "divided",
+        "direction": "divided"
       }
     }
   },
@@ -1354,5 +1354,17 @@ module.exports = [
         "description": "unsalted butter"
       }
     }
-  }
+  },
+  {
+    "4 tablespoons flour": {
+      "quantity": "4",
+      "measurement": "tablespoons",
+      "description": "flour",
+      "finale": {
+        "quantity": "4",
+        "measurement": "tablespoons",
+        "description": "all-purpose flour",
+      }
+    }
+  },
 ];
