@@ -1090,7 +1090,7 @@ module.exports = [
         "quantity": "1",
         "measurement": "tablespoon",
         "description": "juice",
-        "direction": "freshly squeezed from 1 lemon, fresh"
+        "direction": "freshly squeezed from 1 lemon"
       }
     }
   },
@@ -1363,8 +1363,40 @@ module.exports = [
       "finale": {
         "quantity": "4",
         "measurement": "tablespoons",
-        "description": "all-purpose flour",
+        "description": "all-purpose flour"
       }
     }
   },
+  {
+    "1/2 cup (4 ounces) fresh sweet potato juice from about 1 medium sweet potato": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "sweet potato juice from about 1 medium sweet potato",
+      "direction": "fresh",
+      "alt": "4 ounces",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "sweet potato juice",
+        "direction": "freshly squeezed from about 1 medium sweet potato",
+        "alt": "4 ounces"
+      }
+    }
+  },
+  {
+    "1/2 cup (4 ounces) fresh apple juice from about 1 medium apple": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "apple juice from about 1 medium apple",
+      "direction": "fresh",
+      "alt": "4 ounces",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "apple juice",
+        "direction": "freshly squeezed from about 1 medium apple",
+        "alt": "4 ounces",
+      }
+    }
+  }
 ];
