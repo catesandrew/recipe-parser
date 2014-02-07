@@ -1395,7 +1395,68 @@ module.exports = [
         "measurement": "cup",
         "description": "apple juice",
         "direction": "freshly squeezed from about 1 medium apple",
-        "alt": "4 ounces",
+        "alt": "4 ounces"
+      }
+    }
+  },
+  {
+    "1 whole chicken, cut into 8 pieces (2 thighs, 2 drumsticks, 4 breast pieces), or 2 pounds mixed chicken pieces": {
+      "quantity": "1",
+      "measurement": "whole",
+      "description": "chicken",
+      "direction": "cut into 8 pieces or 2 pounds mixed chicken pieces",
+      "alt": "2 thighs, 2 drumsticks, 4 breast pieces"
+    }
+  },
+  {
+    "1 (2-inch) cinnamon stick": {
+      "quantity": "1",
+      "description": "cinnamon stick",
+      "altMeasurement": "2-inch",
+      "finale": {
+        "quantity": "1 (2-inch)",
+        "description": "cinnamon stick",
+      }
+    }
+  },
+  {
+    "2 cups basmati rice (or other long-grain rice), rinsed until water runs clear": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "2",
+          "measurement": "cups",
+          "description": "basmati rice",
+          "direction": "rinsed until water runs clear"
+        },
+        {
+          "quantity": "2",
+          "measurement": "cups",
+          "description": "other long-grain rice",
+          "direction": "rinsed until water runs clear"
+        }
+      ]
+    }]
+  },
+  {
+    "2 2/3 cups low-sodium homemade or store bought chicken broth": {
+      "quantity": "2 2/3",
+      "measurement": "cups",
+      "description": "low-sodium chicken broth"
+    }
+  },
+  {
+    "1/2 cup chopped fresh cilantro leaves and fine stems": {
+      "quantity": "1/2",
+      "measurement": "cup",
+      "description": "cilantro leaves and fine stems",
+      "direction": "chopped fresh",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "cilantro leaves and fine stems",
+        "direction": "freshly chopped",
       }
     }
   }
