@@ -827,7 +827,13 @@ module.exports = [
       "quantity": "3",
       "measurement": "tablespoons",
       "description": "butter",
-      "direction": "divided"
+      "direction": "divided",
+      "finale": {
+        "quantity": "3",
+        "measurement": "tablespoons",
+        "description": "unsalted butter",
+        "direction": "divided",
+      }
     }
   },
   {
@@ -1333,8 +1339,20 @@ module.exports = [
       "direction": "Grated",
       "finale": {
         "description": "nutmeg",
-        "direction": "freshly grated",
+        "direction": "freshly grated"
       }
     }
   },
+  {
+    "2 tablespoons butter": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "butter",
+      "finale": {
+        "quantity": "2",
+        "measurement": "tablespoons",
+        "description": "unsalted butter"
+      }
+    }
+  }
 ];
