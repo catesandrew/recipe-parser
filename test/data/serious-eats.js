@@ -516,7 +516,13 @@ module.exports = [
       "quantity": "1",
       "measurement": "tablespoon",
       "description": "parsley",
-      "direction": "chopped fresh"
+      "direction": "chopped fresh",
+      "finale": {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "parsley",
+        "direction": "freshly chopped",
+      }
     }
   },
   {
@@ -867,7 +873,13 @@ module.exports = [
       "quantity": "1",
       "measurement": "tablespoon",
       "description": "thyme",
-      "direction": "chopped fresh"
+      "direction": "chopped fresh",
+      "finale": {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "thyme",
+        "direction": "freshly chopped",
+      }
     }
   },
   {
@@ -875,7 +887,13 @@ module.exports = [
       "quantity": "3",
       "measurement": "tablespoons",
       "description": "flat-leaf parsley",
-      "direction": "chopped fresh"
+      "direction": "chopped fresh",
+      "finale": {
+        "quantity": "3",
+        "measurement": "tablespoons",
+        "description": "flat-leaf parsley",
+        "direction": "freshly chopped",
+      }
     }
   },
   {
@@ -1075,7 +1093,13 @@ module.exports = [
       "quantity": "1/2",
       "measurement": "cup",
       "description": "cilantro leaves",
-      "direction": "chopped fresh"
+      "direction": "chopped fresh",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "cup",
+        "description": "cilantro leaves",
+        "direction": "freshly chopped",
+      }
     }
   },
   {
@@ -1233,7 +1257,7 @@ module.exports = [
         "measurement": "medium",
         "description": "beets",
         "direction": "cooked and peeled, finely diced",
-        "alt": "about 1 cup",
+        "alt": "about 1 cup"
       }
     }
   },
@@ -1247,7 +1271,7 @@ module.exports = [
         "quantity": "4",
         "measurement": "teaspoons",
         "description": "juice",
-        "direction": "freshly squeezed from 1 lemon, plus 1 lemon cut into wedges for serving",
+        "direction": "freshly squeezed from 1 lemon, plus 1 lemon cut into wedges for serving"
       }
     }
   },
@@ -1258,5 +1282,42 @@ module.exports = [
       "description": "lemon sole",
       "direction": "scaled and gilled"
     }
-  }
+  },
+  {
+    "2 pounds Yukon Gold potatoes (about 4 medium) quartered": {
+      "quantity": "2",
+      "measurement": "pounds",
+      "description": "Yukon Gold potatoes quartered",
+      "alt": "about 4 medium",
+      "finale": {
+        "quantity": "2",
+        "measurement": "pounds",
+        "description": "Yukon Gold potatoes",
+        "direction": "quartered",
+        "alt": "about 4 medium",
+      }
+    }
+  },
+  {
+    "1 tablespoon drained capers": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "capers",
+      "direction": "drained"
+    }
+  },
+  {
+    "1 tablespoon chopped fresh parsley leaves": {
+      "quantity": "1",
+      "measurement": "tablespoon",
+      "description": "parsley leaves",
+      "direction": "chopped fresh",
+      "finale": {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "parsley leaves",
+        "direction": "freshly chopped",
+      }
+    }
+  },
 ];
