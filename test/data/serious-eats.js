@@ -1595,7 +1595,20 @@ module.exports = [
         "quantity": "1 (15 ounce)",
         "measurement": "jar",
         "description": "cheese spread",
-        "direction": "such as Cheez Whiz",
+        "direction": "such as Cheez Whiz"
+      }
+    }
+  },
+  {
+    "10 ounce bag tortilla chips": {
+      "quantity": "10",
+      "measurement": "ounce bag",
+      "description": "tortilla chips",
+      "finale": {
+        "quantity": "1 (10 ounce)",
+        "altMeasurement": "10 ounce",
+        "measurement": "bag",
+        "description": "tortilla chips"
       }
     }
   }
