@@ -1463,24 +1463,26 @@ module.exports = [
     }
   },
   {
-    "1 1/2 quarts low-sodium homemade or store bought vegetable or chicken broth (see note above)": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "1 1/2",
-          "measurement": "quarts",
-          "description": "low-sodium vegetable broth",
-          "direction": "see note above"
-        },
-        {
-          "quantity": "1 1/2",
-          "measurement": "quarts",
-          "description": "low-sodium chicken broth",
-          "direction": "see note above"
-        }
-      ]
-    }]
+    "1 1/2 quarts low-sodium homemade or store bought vegetable or chicken broth (see note above)": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "1 1/2",
+            "measurement": "quarts",
+            "description": "low-sodium vegetable broth",
+            "direction": "see note above"
+          },
+          {
+            "quantity": "1 1/2",
+            "measurement": "quarts",
+            "description": "low-sodium chicken broth",
+            "direction": "see note above"
+          }
+        ]
+      }
+    ]
   },
   {
     "1 tablespoon zest and 2 tablespoons juice from 1 lemon": [
@@ -1492,7 +1494,7 @@ module.exports = [
           "quantity": "1",
           "measurement": "tablespoon",
           "description": "lemon zest",
-          "direction": "freshly zested from 1 lemon",
+          "direction": "freshly zested from 1 lemon"
         }
       },
       {
@@ -1503,9 +1505,81 @@ module.exports = [
           "quantity": "2",
           "measurement": "tablespoons",
           "description": "lemon juice",
-          "direction": "freshly squeezed from 1 lemon",
+          "direction": "freshly squeezed from 1 lemon"
         }
       }
     ]
+  },
+  {
+    "2 pounds goat or lamb chops, cut into individual chops": [{
+      "description": "Or",
+      "isDivider": true,
+      "ingredients": [
+        {
+          "quantity": "2",
+          "measurement": "pounds",
+          "description": "goat",
+          "direction": "cut into individual chops"
+        },
+        {
+          "quantity": "2",
+          "measurement": "pounds",
+          "description": "lamb chops",
+          "direction": "cut into individual chops"
+        }
+      ]
+    }]
+  },
+  {
+    "1 medium onion finely sliced (about 1 1/4 cups)": {
+      "quantity": "1",
+      "measurement": "medium",
+      "description": "onion finely sliced",
+      "alt": "about 1 1/4 cups",
+      "finale": {
+        "quantity": "1",
+        "measurement": "medium",
+        "description": "onion",
+        "direction": "finely sliced",
+        "alt": "about 1 1/4 cups",
+      }
+    }
+  },
+  {
+    "4 cloves garlic finely chopped (about 4 teaspoons)": {
+      "quantity": "4",
+      "description": "cloves garlic finely chopped",
+      "alt": "about 4 teaspoons",
+      "finale": {
+        "quantity": "4",
+        "description": "garlic cloves",
+        "direction": "finely chopped",
+        "alt": "about 4 teaspoons",
+      }
+    }
+  },
+  {
+    "1 inch piece ginger finely chopped": {
+      "quantity": "1",
+      "measurement": "inch piece",
+      "description": "ginger finely chopped",
+      "finale": {
+        "quantity": "1",
+        "measurement": "1-inch piece",
+        "description": "ginger",
+        "direction": "finely chopped"
+      }
+    }
+  },
+  {
+    "3 green Serrano peppers slit lengthwise": {
+      "quantity": "3",
+      "description": "green Serrano peppers slit lengthwise",
+      "finale": {
+        "quantity": "3",
+        "description": "green Serrano peppers",
+        "direction": "slit lengthwise"
+      }
+    }
   }
 ];
