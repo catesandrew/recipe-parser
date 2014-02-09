@@ -1511,24 +1511,26 @@ module.exports = [
     ]
   },
   {
-    "2 pounds goat or lamb chops, cut into individual chops": [{
-      "description": "Or",
-      "isDivider": true,
-      "ingredients": [
-        {
-          "quantity": "2",
-          "measurement": "pounds",
-          "description": "goat",
-          "direction": "cut into individual chops"
-        },
-        {
-          "quantity": "2",
-          "measurement": "pounds",
-          "description": "lamb chops",
-          "direction": "cut into individual chops"
-        }
-      ]
-    }]
+    "2 pounds goat or lamb chops, cut into individual chops": [
+      {
+        "description": "Or",
+        "isDivider": true,
+        "ingredients": [
+          {
+            "quantity": "2",
+            "measurement": "pounds",
+            "description": "goat",
+            "direction": "cut into individual chops"
+          },
+          {
+            "quantity": "2",
+            "measurement": "pounds",
+            "description": "lamb chops",
+            "direction": "cut into individual chops"
+          }
+        ]
+      }
+    ]
   },
   {
     "1 medium onion finely sliced (about 1 1/4 cups)": {
@@ -1541,7 +1543,7 @@ module.exports = [
         "measurement": "medium",
         "description": "onion",
         "direction": "finely sliced",
-        "alt": "about 1 1/4 cups",
+        "alt": "about 1 1/4 cups"
       }
     }
   },
@@ -1554,7 +1556,7 @@ module.exports = [
         "quantity": "4",
         "description": "garlic cloves",
         "direction": "finely chopped",
-        "alt": "about 4 teaspoons",
+        "alt": "about 4 teaspoons"
       }
     }
   },
@@ -1579,6 +1581,21 @@ module.exports = [
         "quantity": "3",
         "description": "green Serrano peppers",
         "direction": "slit lengthwise"
+      }
+    }
+  },
+  {
+    "1 (15 ounce) jar cheese spread (such as Cheez Whiz)": {
+      "quantity": "1",
+      "altMeasurement": "15 ounce",
+      "measurement": "jar",
+      "description": "cheese spread",
+      "direction": "such as Cheez Whiz",
+      "finale": {
+        "quantity": "1 (15 ounce)",
+        "measurement": "jar",
+        "description": "cheese spread",
+        "direction": "such as Cheez Whiz",
       }
     }
   }
