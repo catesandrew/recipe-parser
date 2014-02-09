@@ -253,10 +253,12 @@ describe('recipe instructions parser', function() {
   });
 
   it('should collate all data, [quantity, measurement, description, direction, and alts]', function() {
-    var descriptionObjs,
+    var descriptionObj,
         descriptions,
+        measurements,
         measurement,
         ingredients,
+        quantities,
         directions,
         allPieces,
         quantity,
@@ -273,16 +275,19 @@ describe('recipe instructions parser', function() {
         values = _.first(_.values(ingredient));
 
         allPieces = parser.getAllPieces(key);
-        quantity = allPieces.quantity;
-        measurement = allPieces.measurement;
-        descriptionObjs = allPieces.descriptions;
-        descriptions = descriptionObjs.descriptions;
+        quantities = allPieces.quantities;
+        measurements = allPieces.measurements;
+        descriptionObj = allPieces.descriptionObj;
+        descriptions = descriptionObj.descriptions;
         directions = allPieces.directions;
 
         function arrayWalker(array) {
           var obj = array[0],
               desc = array[1],
-              dir = array[2];
+              dir = array[2],
+              quantity = array[3],
+              measurement = array[4];
+
           if (obj.finale) {
             expect(quantity).to.equal(obj.finale.quantity);
             expect(measurement).to.equal(obj.finale.measurement);
@@ -310,7 +315,7 @@ describe('recipe instructions parser', function() {
               // where an ingredient gets broken down into two or more sub
               // ingredients, typically happens for `and` types. For example `salt
               // and pepper` gets broken down into `salt` and `black pepper`
-              zipWalker(_.zip(vals, descriptions, directions));
+              zipWalker(_.zip(vals, descriptions, directions, quantities, measurements));
             } else {
               // when an ingredient gets broken down into two or more sub
               // ingredients, typically happens for `or` types. The typage is
@@ -320,9 +325,9 @@ describe('recipe instructions parser', function() {
               });
             }
           } else if (vals.isDivider) {
-            zipWalker(_.zip(vals.ingredients, descriptions, directions));
+            zipWalker(_.zip(vals.ingredients, descriptions, directions, quantities, measurements));
           } else {
-            zipWalker(_.zip([vals], descriptions, directions));
+            zipWalker(_.zip([ vals ], descriptions, directions, quantities, measurements));
           }
         })(values);
 
