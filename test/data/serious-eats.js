@@ -1482,4 +1482,30 @@ module.exports = [
       ]
     }]
   },
+  {
+    "1 tablespoon zest and 2 tablespoons juice from 1 lemon": [
+      {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "lemon zest from 1 lemon",
+        "finale": {
+          "quantity": "1",
+          "measurement": "tablespoon",
+          "description": "lemon zest",
+          "direction": "freshly zested from 1 lemon",
+        }
+      },
+      {
+        "quantity": "1",
+        "measurement": "tablespoon",
+        "description": "2 tablespoons lemon juice from 1 lemon",
+        "finale": {
+          "quantity": "2",
+          "measurement": "tablespoons",
+          "description": "lemon juice",
+          "direction": "freshly squeezed from 1 lemon",
+        }
+      }
+    ]
+  }
 ];
