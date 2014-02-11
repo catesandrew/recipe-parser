@@ -18,7 +18,8 @@
     "underscore.string": "~2.3.3",
     "colors": "~0.6.2",
     "cheerio": "~0.13.1",
-    "change-case": "~1.0.4"
+    "change-case": "~1.0.4",
+    "prompt": "~0.2.12"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

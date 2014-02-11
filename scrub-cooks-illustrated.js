@@ -4,9 +4,15 @@ var async = require('async'),
     request = require('request'),
     cheerio = require('cheerio'),
     program = require('commander'),
+    prompt = require('prompt'),
     changeCase = require('change-case'),
     http = require('http'),
     URL = require('url');
+
+//
+// Start the prompt
+//
+prompt.start();
 
 var constants = require('./lib/mac-gourmet-constants').constants,
     Parser = require('./lib/cooks-illustrated-parser'),
@@ -27,6 +33,7 @@ program
   .option('-u, --url <string>', 'url of recipe to scrub from.')
   .option('-s, --save', 'save scrubbed ingredients (used for regression)?')
   .option('-t, --title', 'just parse the title.')
+  .option('-i, --ingredients', 'just parse the ingredients interactively.')
   .option('-d, --debug', 'output extra debug information?')
   .parse(process.argv);
 
@@ -193,6 +200,82 @@ var addIngredients = function($, obj) {
       name: cat.id
     });
     //log.ok('"' + cat.id + '", with probability of ' + cat.avg);
+  });
+};
+
+var interactiveIngredientCheck = function(obj) {
+  var schema = {
+    properties: {
+      'yesno': {
+        message: 'Save this ingredient?',
+        validator: /y[es]*|n[o]?/,
+        warning: 'Must respond yes or no',
+        default: 'no'
+      }
+    }
+  };
+
+  log.subhead(util.repeat(80, '-'));
+  log.writetableln([40,40], ['qty', 'measurement']);
+  log.writetableln([40,40], ['description', 'direction']);
+
+  async.forEachSeries(obj.saveIngredients, function(ing, next) {
+    var key,
+        val,
+        qty,
+        dir;
+
+    _.each(_.zip(_.keys(ing), _.values(ing)), function(tuple) {
+      key = tuple[0];
+      val = tuple[1];
+
+      log.header(key);
+
+      (function walker(vals) {
+        if (_.isArray(vals)) {
+          _.each(vals, function(val) { walker(val); });
+        } else if (vals.isDivider) {
+          log.writelns(vals.description);
+          walker(vals.ingredients);
+        } else {
+          qty = vals.quantity;
+          if (vals.altMeasurement) {
+            qty = qty + ' (' + vals.altMeasurement + ')';
+          }
+          dir = vals.direction;
+          if (vals.alt) {
+            dir = dir + ' (' + vals.alt + ')';
+          }
+          qty = util.substituteDegree(util.substituteFraction(qty));
+          dir = util.substituteDegree(util.substituteFraction(dir));
+
+          log.writetableln([14, 66], ['quantity', qty || '[empty]']);
+          log.writetableln([14, 66], ['measurement', vals.measurement || '[empty]']);
+          log.writetableln([14, 66], ['description', vals.description || '[empty]']);
+          log.writetableln([14, 66], ['direction', dir]);
+        }
+      })(val);
+
+      prompt.get(schema, function (err, result) {
+        var save = /^(y|ye|yes)$/i.test(result.yesno);
+        if (save) {
+          var tmp = {};
+          if (val.isDivider) {
+            tmp[key] = [ val ];
+          } else {
+            tmp[key] = val;
+          }
+
+          util.saveJustIngredients([tmp], parser.get('dataFile'), function(err) {
+            if (err) { throw err; }
+            next();
+          });
+        } else {
+          next();
+        }
+      });
+    });
+
   });
 };
 
@@ -420,7 +503,7 @@ var combineNotes = function(obj) {
   obj.notes = dest;
 };
 
-var scrape = function(callback, url, justTitle) {
+var scrape = function(callback, url, justTitle, checkIngredients) {
   request(url, function (err, response, body) {
     if (err) { throw err; }
     var $ = cheerio.load(body, {
@@ -458,6 +541,10 @@ var scrape = function(callback, url, justTitle) {
 
     }
 
+    if (checkIngredients) {
+      interactiveIngredientCheck(obj);
+    }
+
     callback(null, [obj]);
   });
 };
@@ -472,18 +559,22 @@ if (program.url) {
       util.saveIngredients(items, parser.get('dataFile'));
     }
 
-    var images = util.collateAllImages(items);
-    util.downloadAllImages(images, function(err) {
-      if (err) { log.error(err); }
+    if (program.title) {
       _.each(items, function(item) {
-        if (!program.title) {
-          util.savePlistToFile(exporter.exportRecipe(item, 'Cooks Illustrated'));
-        }
         log.ok('Recipe Title:' + item.title);
       });
-    });
+    } else {
+      var images = util.collateAllImages(items);
+      util.downloadAllImages(images, function(err) {
+        if (err) { log.error(err); }
+        _.each(items, function(item) {
+          util.savePlistToFile(exporter.exportRecipe(item, 'Cooks Illustrated'));
+          log.ok('Recipe Title:' + item.title);
+        });
+      });
+    }
 
-  }, url, program.title);
+  }, url, program.title, program.ingredients);
 }
 else {
   log.writelns(program.description());
