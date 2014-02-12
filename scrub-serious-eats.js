@@ -249,13 +249,21 @@ var interactiveIngredientCheck = function(obj) {
           log.writelns(vals.description);
           walker(vals.ingredients);
         } else {
-          qty = vals.quantity || '';
+          qty = vals.quantity;
           if (vals.altMeasurement) {
-            qty = qty + ' (' + vals.altMeasurement + ')';
+            if (qty) {
+              qty = qty + ' (' + vals.altMeasurement + ')';
+            } else {
+              qty = '(' + vals.altMeasurement + ')';
+            }
           }
-          dir = vals.direction || '';
+          dir = vals.direction;
           if (vals.alt) {
-            dir = dir + ' (' + vals.alt + ')';
+            if (dir) {
+              dir = dir + ' (' + vals.alt + ')';
+            } else {
+              dir = '(' + vals.alt + ')';
+            }
           }
           qty = util.substituteDegree(util.substituteFraction(qty));
           dir = util.substituteDegree(util.substituteFraction(dir));
