@@ -1648,7 +1648,22 @@ module.exports = [
         "quantity": "1/2",
         "measurement": "ounce",
         "description": "lime juice",
-        "direction": "freshly squeezed from 1 lime",
+        "direction": "freshly squeezed from 1 lime"
+      }
+    }
+  },
+  {
+    "1 (1- by 3-inch) strip of orange zest, white pith removed": {
+      "quantity": "1",
+      "altMeasurement": "(1- by 3-inch)",
+      "measurement": "strip",
+      "description": "of orange zest",
+      "direction": "white pith removed",
+      "finale": {
+        "quantity": "1 (1- by 3-inch)",
+        "measurement": "strip",
+        "description": "orange zest",
+        "direction": "white pith removed",
       }
     }
   }
