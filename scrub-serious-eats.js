@@ -318,6 +318,11 @@ var addProcedures = function($, obj) {
         if (!_.isEmpty(tmp)) {
           if (header) {
             tmp = _.trim(tmp.replace(header, ''));
+
+            match = tmp.match(/^:\s*(.*)$/);
+            if (match) {
+              tmp = match[1];
+            }
           }
           text += tmp;
         }
