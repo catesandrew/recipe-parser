@@ -1634,7 +1634,21 @@ module.exports = [
         "quantity": "1",
         "measurement": "handful",
         "description": "cilantro leaves",
-        "direction": "fresh, chopped",
+        "direction": "fresh, chopped"
+      }
+    }
+  },
+  {
+    "1/2 ounce freshly squeezed juice from 1 lime": {
+      "quantity": "1/2",
+      "measurement": "ounce",
+      "description": "juice from 1 lime",
+      "direction": "freshly squeezed",
+      "finale": {
+        "quantity": "1/2",
+        "measurement": "ounce",
+        "description": "lime juice",
+        "direction": "freshly squeezed from 1 lime",
       }
     }
   }
