@@ -249,11 +249,11 @@ var interactiveIngredientCheck = function(obj) {
           log.writelns(vals.description);
           walker(vals.ingredients);
         } else {
-          qty = vals.quantity;
+          qty = vals.quantity || '';
           if (vals.altMeasurement) {
             qty = qty + ' (' + vals.altMeasurement + ')';
           }
-          dir = vals.direction;
+          dir = vals.direction || '';
           if (vals.alt) {
             dir = dir + ' (' + vals.alt + ')';
           }
