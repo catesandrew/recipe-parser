@@ -1621,7 +1621,20 @@ module.exports = [
         "quantity": "6",
         "measurement": "tablespoon",
         "description": "lime juice",
-        "direction": "freshly squeezed from 4 to 6 limes",
+        "direction": "freshly squeezed from 4 to 6 limes"
+      }
+    }
+  },
+  {
+    "Handful fresh cilantro leaves, chopped": {
+      "measurement": "Handful",
+      "description": "cilantro leaves",
+      "direction": "fresh, chopped",
+      "finale": {
+        "quantity": "1",
+        "measurement": "handful",
+        "description": "cilantro leaves",
+        "direction": "fresh, chopped",
       }
     }
   }
