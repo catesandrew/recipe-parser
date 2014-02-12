@@ -342,7 +342,7 @@ module.exports = [
       "finale": {
         "quantity": "1",
         "measurement": "tablespoon",
-        "description": "juice",
+        "description": "lime juice",
         "direction": "freshly squeezed from 1 lime, plus 1 extra lime divided into 8 wedges"
       }
     }
@@ -1089,7 +1089,7 @@ module.exports = [
       "finale": {
         "quantity": "1",
         "measurement": "tablespoon",
-        "description": "juice",
+        "description": "lemon juice",
         "direction": "freshly squeezed from 1 lemon"
       }
     }
@@ -1276,7 +1276,7 @@ module.exports = [
       "finale": {
         "quantity": "4",
         "measurement": "teaspoons",
-        "description": "juice",
+        "description": "lemon juice",
         "direction": "freshly squeezed from 1 lemon, plus 1 lemon cut into wedges for serving"
       }
     }
@@ -1609,6 +1609,19 @@ module.exports = [
         "altMeasurement": "10 ounce",
         "measurement": "bag",
         "description": "tortilla chips"
+      }
+    }
+  },
+  {
+    "6 tablespoon juice from 4 to 6 limes": {
+      "quantity": "6",
+      "measurement": "tablespoon",
+      "description": "juice from 4 to 6 limes",
+      "finale": {
+        "quantity": "6",
+        "measurement": "tablespoon",
+        "description": "lime juice",
+        "direction": "freshly squeezed from 4 to 6 limes",
       }
     }
   }
