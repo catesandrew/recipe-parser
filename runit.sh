@@ -7,7 +7,7 @@ do
     if [ $RESULT -eq 200 ]
     then
         echo "Number: ${RECIPE}, press return to parse the next recipe."
-        node scrub-cooks-illustrated.js --url ${URL}
+        node scrub-cooks-illustrated.js --ingredients --url ${URL}
         NAME=`node scrub-cooks-illustrated.js --title --url ${URL}`
         NAME=`echo "${NAME}" | grep -n 'Recipe Title' | awk -F'[:]' '{print $3}'`
         QUERY="$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${NAME}")"

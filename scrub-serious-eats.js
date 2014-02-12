@@ -490,10 +490,6 @@ var scrape = function(callback, url, justTitle, checkIngredients) {
       ].join('');
     }
 
-    if (checkIngredients) {
-      interactiveIngredientCheck(obj);
-    }
-
     callback(null, [obj]);
   });
 };
@@ -516,14 +512,19 @@ if (program.url) {
       var images = util.collateAllImages(items);
       util.downloadAllImages(images, function(err) {
         if (err) { log.error(err); }
+
         _.each(items, function(item) {
           util.savePlistToFile(exporter.exportRecipe(item, 'Serious Eats'));
           log.ok('Recipe Title:' + item.title);
+
+          if (program.ingredients) {
+            interactiveIngredientCheck(item);
+          }
         });
       });
     }
 
-  }, url, program.title, program.ingredients);
+  }, url, program.title);
 }
 else {
   log.writelns(program.description());

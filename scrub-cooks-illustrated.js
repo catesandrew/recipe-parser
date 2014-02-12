@@ -203,7 +203,7 @@ var addIngredients = function($, obj) {
   });
 };
 
-var interactiveIngredientCheck = function(obj) {
+var interactiveIngredientCheck = function(obj, callback) {
   var schema = {
     properties: {
       'yesno': {
@@ -276,7 +276,7 @@ var interactiveIngredientCheck = function(obj) {
       });
     });
 
-  });
+  }, callback);
 };
 
 var removeLeadingDigitPeriodRe = /(?:^\d+\.\s+)(.*)$/;
@@ -541,10 +541,6 @@ var scrape = function(callback, url, justTitle, checkIngredients) {
 
     }
 
-    if (checkIngredients) {
-      interactiveIngredientCheck(obj);
-    }
-
     callback(null, [obj]);
   });
 };
@@ -560,21 +556,33 @@ if (program.url) {
     }
 
     if (program.title) {
-      _.each(items, function(item) {
+      async.forEachSeries(items, function(item, next) {
         log.ok('Recipe Title:' + item.title);
+        next();
+      }, function(err) {
+        process.exit(1);
       });
     } else {
       var images = util.collateAllImages(items);
       util.downloadAllImages(images, function(err) {
         if (err) { log.error(err); }
-        _.each(items, function(item) {
+
+        async.forEachSeries(items, function(item, next) {
           util.savePlistToFile(exporter.exportRecipe(item, 'Cooks Illustrated'));
           log.ok('Recipe Title:' + item.title);
+
+          if (program.ingredients) {
+            interactiveIngredientCheck(item, next);
+          } else {
+            next();
+          }
+        }, function(err) {
+          process.exit(1);
         });
       });
     }
 
-  }, url, program.title, program.ingredients);
+  }, url, program.title);
 }
 else {
   log.writelns(program.description());
