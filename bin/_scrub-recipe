@@ -1,0 +1,194 @@
+#!/usr/bin/env node
+var async = require('async'),
+    fs = require('fs'),
+    request = require('request'),
+    cheerio = require('cheerio'),
+    program = require('commander'),
+    prompt = require('prompt'),
+    changeCase = require('change-case'),
+    http = require('http'),
+    URL = require('url');
+
+//
+// Start the prompt
+//
+prompt.start();
+
+var scrape = require('../lib/scrub-cooks-illustrated').scrape,
+    CooksIllustratedParser = require('../lib/cooks-illustrated-parser'),
+    MacGourmetExport = require('../lib/mac-gourmet-export'),
+    parser = new CooksIllustratedParser(),
+    exporter = new MacGourmetExport(),
+    RecipeParser = require('../'),
+    util = require('../lib/util'),
+    log = require('../lib/log'),
+    _ = util._;
+
+// Ideally this should return the correct parser
+var recipeParser = new RecipeParser({
+  debug: program.debug
+});
+
+// options
+program
+  .version(RecipeParser.version)
+  .description('Scrub a recipe.')
+  .option('-u, --url <url>', 'url of recipe to scrub from.')
+  .option('-P, --parser <name>', 'specify the parser to use', 'se')
+  .option('-E, --exporter <name>', 'specify the exporter to use', 'mgd')
+  .option('-s, --save', 'save scrubbed ingredients? (used for regression)')
+  .option('-t, --title', 'just parse the title.')
+  .option('-i, --ingredients', 'just parse the ingredients interactively.')
+  .option('-d, --debug', 'output extra debug information?')
+  .option('--debug-brk', "enable node's debugger breaking on the first line")
+  .option('--parsers', 'display available parsers')
+  .option('--exporters', 'display available exporters')
+  .parse(process.argv);
+
+//main.option.debug = program.debug;
+program.name = 'scrub-recipe';
+
+// --parsers
+
+program.on('parsers', function(){
+  console.log();
+  console.log('    se - seriouseats.com');
+  console.log('    fn - foodnetwork.com');
+  console.log('    ci - cooksillustrated.com');
+  console.log('    atk - americastestkitchen.com');
+  console.log('    cc - cookscountry.com');
+  console.log();
+  process.exit();
+});
+
+// --exporters
+
+program.on('exporters', function(){
+  console.log();
+  console.log('    mgd - MacGourmet Deluxe');
+  console.log();
+  process.exit();
+});
+
+// parse args
+program.parse(process.argv);
+
+var interactiveIngredientCheck = function(obj, callback) {
+  var schema = {
+    properties: {
+      'yesno': {
+        message: 'Save this ingredient?',
+        validator: /y[es]*|n[o]?/,
+        warning: 'Must respond yes or no',
+        default: 'no'
+      }
+    }
+  };
+
+  log.subhead(util.repeat(80, '-'));
+  log.writetableln([40,40], ['qty', 'measurement']);
+  log.writetableln([40,40], ['description', 'direction']);
+
+  async.forEachSeries(obj.saveIngredients, function(ing, next) {
+    var key,
+        val,
+        qty,
+        dir;
+
+    _.each(_.zip(_.keys(ing), _.values(ing)), function(tuple) {
+      key = tuple[0];
+      val = tuple[1];
+
+      log.header(key);
+
+      (function walker(vals) {
+        if (_.isArray(vals)) {
+          _.each(vals, function(val) { walker(val); });
+        } else if (vals.isDivider) {
+          log.writelns(vals.description);
+          walker(vals.ingredients);
+        } else {
+          qty = vals.quantity;
+          if (vals.altMeasurement) {
+            qty = qty + ' (' + vals.altMeasurement + ')';
+          }
+          dir = vals.direction;
+          if (vals.alt) {
+            dir = dir + ' (' + vals.alt + ')';
+          }
+          qty = util.substituteDegree(util.substituteFraction(qty));
+          dir = util.substituteDegree(util.substituteFraction(dir));
+
+          log.writetableln([14, 66], ['quantity', qty || '[empty]']);
+          log.writetableln([14, 66], ['measurement', vals.measurement || '[empty]']);
+          log.writetableln([14, 66], ['description', vals.description || '[empty]']);
+          log.writetableln([14, 66], ['direction', dir]);
+        }
+      })(val);
+
+      prompt.get(schema, function (err, result) {
+        var save = /^(y|ye|yes)$/i.test(result.yesno);
+        if (save) {
+          var tmp = {};
+          if (val.isDivider) {
+            tmp[key] = [ val ];
+          } else {
+            tmp[key] = val;
+          }
+
+          util.saveJustIngredients([tmp], parser.get('dataFile'), function(err) {
+            if (err) { throw err; }
+            next();
+          });
+        } else {
+          next();
+        }
+      });
+    });
+
+  }, callback);
+};
+
+if (program.url) {
+  var url = program.url;
+
+  scrape(function(err, items) {
+    if (err) { log.error(err); }
+
+    if (program.save) {
+      util.saveIngredients(items, parser.get('dataFile'));
+    }
+
+    if (program.title) {
+      async.forEachSeries(items, function(item, next) {
+        log.ok('Recipe Title:' + item.title);
+        next();
+      }, function(err) {
+        process.exit(1);
+      });
+    } else {
+      var images = util.collateAllImages(items);
+      util.downloadAllImages(images, function(err) {
+        if (err) { log.error(err); }
+
+        async.forEachSeries(items, function(item, next) {
+          util.savePlistToFile(exporter.exportRecipe(item, 'Cooks Illustrated'));
+          log.ok('Recipe Title:' + item.title);
+
+          if (program.ingredients) {
+            interactiveIngredientCheck(item, next);
+          } else {
+            next();
+          }
+        }, function(err) {
+          process.exit(1);
+        });
+      });
+    }
+
+  }, url, program.title);
+} else {
+  log.writelns(program.description());
+  log.writelns('version: ' + program.version());
+  log.writelns(program.helpInformation());
+}

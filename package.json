@@ -1,6 +1,23 @@
 {
-  "name": "recipe-parsers",
+  "name": "recipe-parser",
   "version": "0.1.0",
+  "author": {
+    "name": "Andrew Cates",
+    "email": "catesandrew@gmail.com"
+  },
+  "description": "simple recipe parsers",
+  "bin": {
+    "scrub-cooks-illustrated": "./bin/scrub-cooks-illustrated",
+    "_scrub-cooks-illustrated": "./bin/_scrub-cooks-illustrated"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "main": "./index",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
   "dependencies": {
     "plist": "git://github.com/catesandrew/node-plist.git",
     "mocha": "~1.17.0",
@@ -14,7 +31,6 @@
     "chai": "~1.8.1",
     "pluralize": "0.0.6",
     "natural": "~0.1.25",
-    "grunt": "~0.4.2",
     "underscore.string": "~2.3.3",
     "colors": "~0.6.2",
     "cheerio": "~0.13.1",
@@ -28,6 +44,7 @@
     "grunt-concurrent": "~0.4.3",
     "grunt-mocha-test": "~0.9.0",
     "npm": "~1.3.26",
-    "install": "~0.1.7"
+    "install": "~0.1.7",
+    "load-grunt-tasks": "~0.3.0"
   }
 }
