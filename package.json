@@ -16,7 +16,7 @@
   "main": "./index",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/catesandrew/recipe-parser"
   },
   "dependencies": {
     "plist": "git://github.com/catesandrew/node-plist.git",
