@@ -15,19 +15,10 @@ var async = require('async'),
 prompt.start();
 
 var scrape = require('../lib/scrub-cooks-illustrated').scrape,
-    CooksIllustratedParser = require('../lib/cooks-illustrated-parser'),
-    MacGourmetExport = require('../lib/mac-gourmet-export'),
-    parser = new CooksIllustratedParser(),
-    exporter = new MacGourmetExport(),
     RecipeParser = require('../'),
     util = require('../lib/util'),
     log = require('../lib/log'),
     _ = util._;
-
-// Ideally this should return the correct parser
-var recipeParser = new RecipeParser({
-  debug: program.debug
-});
 
 // options
 program
@@ -39,13 +30,19 @@ program
   .option('-s, --save', 'save scrubbed ingredients? (used for regression)')
   .option('-t, --title', 'just parse the title.')
   .option('-i, --ingredients', 'just parse the ingredients interactively.')
-  .option('-d, --debug', 'output extra debug information?')
-  .option('--debug-brk', "enable node's debugger breaking on the first line")
+  .option('-v, --verbose', 'verbose messages')
+  .option('-d, --debug-log', 'output extra debug logging')
+  .option('--debug-brk', 'enable node\'s debugger breaking on the first line')
   .option('--parsers', 'display available parsers')
   .option('--exporters', 'display available exporters')
   .parse(process.argv);
 
-//main.option.debug = program.debug;
+// Ideally this should return the correct parser
+var recipeParser = new RecipeParser({
+  debug: program.debugLog,
+  verbose: program.verbose
+});
+
 program.name = 'scrub-recipe';
 
 // --parsers
@@ -61,14 +58,26 @@ program.on('parsers', function(){
   process.exit();
 });
 
+var parser = recipeParser.getParser(program.parser);
+
+var parserNames = {
+  'se': 'Serious Eats',
+  'fn': 'Food Network',
+  'ci': 'Cooks Illustrated',
+  'atk': 'America\'s Test Kitchen',
+  'cc': 'Cook\'s Country'
+};
+
 // --exporters
 
-program.on('exporters', function(){
+program.on('exporters', function() {
   console.log();
   console.log('    mgd - MacGourmet Deluxe');
   console.log();
   process.exit();
 });
+
+var exporter = recipeParser.getExporter(program.exporter);
 
 // parse args
 program.parse(process.argv);
@@ -172,7 +181,7 @@ if (program.url) {
         if (err) { log.error(err); }
 
         async.forEachSeries(items, function(item, next) {
-          util.savePlistToFile(exporter.exportRecipe(item, 'Cooks Illustrated'));
+          util.savePlistToFile(exporter.exportRecipe(item, parserNames[program.parser]));
           log.ok('Recipe Title:' + item.title);
 
           if (program.ingredients) {
@@ -186,9 +195,10 @@ if (program.url) {
       });
     }
 
-  }, url, program.title);
+  }, parser, url, program.title);
 } else {
   log.writelns(program.description());
   log.writelns('version: ' + program.version());
   log.writelns(program.helpInformation());
 }
+
