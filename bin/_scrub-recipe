@@ -23,7 +23,6 @@ program
   .option('-P, --parser <name>', 'specify the parser to use', 'se')
   .option('-E, --exporter <name>', 'specify the exporter to use', 'mgd')
   .option('-s, --save', 'save scrubbed ingredients? (used for regression)')
-  .option('-t, --title', 'just parse the title.')
   .option('-i, --ingredients', 'just parse the ingredients interactively.')
   .option('-v, --verbose', 'verbose messages')
   .option('-d, --debug-log', 'output extra debug logging')
@@ -164,34 +163,25 @@ var scrapeIt = function(url, callback) {
       util.saveIngredients(items, parser.get('dataFile'));
     }
 
-    if (program.title) {
+    var images = util.collateAllImages(items);
+    util.downloadAllImages(images, function(err) {
+      if (err) { log.error(err); }
+
       async.forEachSeries(items, function(item, next) {
+        util.savePlistToFile(exporter.exportRecipe(item, parserNames[program.parser]));
         log.ok('Recipe Title:' + item.title);
-        next();
+
+        if (program.ingredients) {
+          interactiveIngredientCheck(item, next);
+        } else {
+          next();
+        }
       }, function(err) {
         callback(err, items);
       });
-    } else {
-      var images = util.collateAllImages(items);
-      util.downloadAllImages(images, function(err) {
-        if (err) { log.error(err); }
+    });
 
-        async.forEachSeries(items, function(item, next) {
-          util.savePlistToFile(exporter.exportRecipe(item, parserNames[program.parser]));
-          log.ok('Recipe Title:' + item.title);
-
-          if (program.ingredients) {
-            interactiveIngredientCheck(item, next);
-          } else {
-            next();
-          }
-        }, function(err) {
-          callback(err, items);
-        });
-      });
-    }
-
-  }, parser, url, program.title);
+  }, parser, url);
 };
 
 if (program.loop) {
