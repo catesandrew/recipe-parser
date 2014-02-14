@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 var async = require('async'),
+    request = require('request'),
     program = require('commander'),
+    spawn = require('child_process').spawn,
     prompt = require('prompt');
 
 //
@@ -25,6 +27,7 @@ program
   .option('-i, --ingredients', 'just parse the ingredients interactively.')
   .option('-v, --verbose', 'verbose messages')
   .option('-d, --debug-log', 'output extra debug logging')
+  .option('--loop', 'loop through a list of urls (experimental)')
   .option('--debug-brk', 'enable node\'s debugger breaking on the first line')
   .option('--parsers', 'display available parsers')
   .option('--exporters', 'display available exporters')
@@ -153,9 +156,7 @@ var interactiveIngredientCheck = function(obj, callback) {
   }, callback);
 };
 
-if (program.url) {
-  var url = program.url;
-
+var scrapeIt = function(url, callback) {
   scraper.scrape(function(err, items) {
     if (err) { log.error(err); }
 
@@ -168,7 +169,7 @@ if (program.url) {
         log.ok('Recipe Title:' + item.title);
         next();
       }, function(err) {
-        process.exit(1);
+        callback(err, items);
       });
     } else {
       var images = util.collateAllImages(items);
@@ -185,15 +186,64 @@ if (program.url) {
             next();
           }
         }, function(err) {
-          process.exit(1);
+          callback(err, items);
         });
       });
     }
 
   }, parser, url, program.title);
+};
+
+if (program.loop) {
+  var schema = {
+    properties: {
+      'yesno': {
+        message: 'Continue?',
+        validator: /y[es]*|n[o]?/,
+        warning: 'Must respond yes or no',
+        default: 'yes'
+      }
+    }
+  };
+  // TODO: better way to bring in list of urls to batch scrub
+  var URL='http://mako.dev/cooksillustrated/recipes/recipe-',
+      url;
+
+  var numbers = [];
+  for (var i = 112; i < 121; i++) {
+    numbers.push(i);
+  }
+
+  async.forEachSeries(numbers, function(number, next) {
+    url = URL + number + '.html';
+    request(url, function (err, response, body) {
+      if (err || response.statusCode !== 200) {
+        next();
+      }
+
+      scrapeIt(url, function(err, items) {
+        _.each(items, function(item) {
+          spawn('python', ['-mwebbrowser', 'http://images.google.com/search?tbm=isch&q=' + escape(item.title)]);
+          spawn('python', ['-mwebbrowser', url]);
+        });
+
+        prompt.get(schema, function (err, result) {
+          var cont = /^(y|ye|yes)$/i.test(result.yesno);
+          if (cont) {
+            next();
+          } else {
+            process.exit();
+          }
+        });
+      });
+    });
+  });
+} else if (program.url) {
+  scrapeIt(program.url, function() {
+    process.exit();
+  });
 } else {
   log.writelns(program.description());
   log.writelns('version: ' + program.version());
   log.writelns(program.helpInformation());
 }
-
