@@ -7,8 +7,8 @@
   },
   "description": "simple recipe parsers",
   "bin": {
-    "scrub-cooks-illustrated": "./bin/scrub-cooks-illustrated",
-    "_scrub-cooks-illustrated": "./bin/_scrub-cooks-illustrated"
+    "scrub-recipe": "./bin/scrub-recipe",
+    "_scrub-recipe": "./bin/_scrub-recipe"
   },
   "scripts": {
     "test": "mocha"
