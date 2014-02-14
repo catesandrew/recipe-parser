@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 var async = require('async'),
-    fs = require('fs'),
-    request = require('request'),
-    cheerio = require('cheerio'),
     program = require('commander'),
-    prompt = require('prompt'),
-    changeCase = require('change-case'),
-    http = require('http'),
-    URL = require('url');
+    prompt = require('prompt');
 
 //
 // Start the prompt
@@ -118,11 +112,11 @@ var interactiveIngredientCheck = function(obj, callback) {
           log.writelns(vals.description);
           walker(vals.ingredients);
         } else {
-          qty = vals.quantity;
+          qty = vals.quantity || '';
           if (vals.altMeasurement) {
             qty = qty + ' (' + vals.altMeasurement + ')';
           }
-          dir = vals.direction;
+          dir = vals.direction || '';
           if (vals.alt) {
             dir = dir + ' (' + vals.alt + ')';
           }
