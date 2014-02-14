@@ -14,8 +14,7 @@ var async = require('async'),
 //
 prompt.start();
 
-var scrape = require('../lib/scrub-cooks-illustrated').scrape,
-    RecipeParser = require('../'),
+var RecipeParser = require('../'),
     util = require('../lib/util'),
     log = require('../lib/log'),
     _ = util._;
@@ -44,6 +43,8 @@ var recipeParser = new RecipeParser({
 });
 
 program.name = 'scrub-recipe';
+
+var scraper = recipeParser.getScraper(program.parser);
 
 // --parsers
 
@@ -161,7 +162,7 @@ var interactiveIngredientCheck = function(obj, callback) {
 if (program.url) {
   var url = program.url;
 
-  scrape(function(err, items) {
+  scraper.scrape(function(err, items) {
     if (err) { log.error(err); }
 
     if (program.save) {
