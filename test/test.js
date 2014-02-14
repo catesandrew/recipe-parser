@@ -4,9 +4,9 @@ var assert = require('assert'),
     natural = require('natural'),
     pluralize = require('pluralize'),
     chai = require('chai'),
-    main = require('../main'),
     expect = chai.expect,
-    util = main.util,
+    RecipeParser = require('../'),
+    util = require('../lib/util'),
     _ = util._;
 
 var Parsers = [
