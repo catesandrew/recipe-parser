@@ -1345,7 +1345,20 @@ module.exports = [
         "quantity": "1",
         "measurement": "medium",
         "description": "tomato",
-        "direction": "cut into a medium dice, peeling and seeding optional",
+        "direction": "cut into a medium dice, peeling and seeding optional"
+      }
+    }
+  },
+  {
+    "2   tablespoons fermented fish sauce such as nuoc mam": {
+      "quantity": "2",
+      "measurement": "tablespoons",
+      "description": "fermented fish sauce such as nuoc mam",
+      "finale": {
+        "quantity": "2",
+        "measurement": "tablespoons",
+        "description": "fermented fish sauce",
+        "direction": "such as nuoc mam"
       }
     }
   }
